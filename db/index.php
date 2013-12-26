@@ -104,7 +104,7 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 
 echo 'MPD DB INTERFACE<br>';
 echo 'INTERNAL USE ONLY<br>';
-echo 'hosted on raspyfi.local:81';
+echo 'hosted on volumio.local:81';
 }
 ?>
 
