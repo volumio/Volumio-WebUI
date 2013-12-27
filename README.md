@@ -1,5 +1,15 @@
-Volumio
+Volumio WebUI
 =======
+Forked From RaspyFi's WebUi
+
+Original work made by
+
+Andrea Coiutti & Simone De Gregori Andrea Coiutti (aka ACX) - PlayerUI frontend design - frontend HTML/JS/CSS coding Simone De Gregori (aka Orion) - PlayerUI PHP backend coding - frontend JS coding - OS optimization
+
+Optimized and revised
+
+Michelangelo Guarise - RaspyFi.com - Volumio.org
+
 
 VOLUMIO
 
