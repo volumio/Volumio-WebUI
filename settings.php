@@ -144,6 +144,28 @@ if (isset($_POST['syscmd'])){
 	case 'restore':
 		
 		break;
+	case 'i2son':
+	
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+snd_soc_bcm2708_i2s
+bcm2708_dmaengine
+snd_soc_pcm5102a
+snd_soc_rpi_pcm5102a';
+
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
+		break;
+	case 'i2soff':
+	
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd-bcm2835';
+
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'I2S Driver Deactivated. You must reboot for changes to take effect';
+		break;
 	}
 
 }

@@ -57,6 +57,25 @@ $_system_select[orionprofile]
 	</form>
 	<form class="form-horizontal" method="post">
 		<fieldset>
+			<legend>Activate I2S driver</legend>
+			<p>Activate i2s driver for HifiBerry and Rpi DAC.</p>
+			<div class="control-group">
+				<label class="control-label">Activate I2S Driver </label>
+				<div class="controls">
+					<input class="btn" type="submit" name="syscmd" value="i2son" id="i2son">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Deactivate I2S Driver</label>
+				<div class="controls">
+					<input class="btn" type="submit" name="syscmd" value="i2soff" id="i2soff">
+				</div>
+			</div>
+			
+		</fieldset>
+	</form>
+	<form class="form-horizontal" method="post">
+		<fieldset>
 			<legend>Compatibility fixes</legend>
 			<p>For people suffering problems with some receivers and DACs.</p>
 			<div class="control-group">

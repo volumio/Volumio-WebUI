@@ -293,12 +293,12 @@ session_start();
 	switch($_SESSION['w_queue']) {
 
 		case 'reboot':
-		$cmd = 'reboot';
+		$cmd = 'mpc stop && reboot';
 		sysCmd($cmd);
 		break;
 		
 		case 'poweroff':
-		$cmd = 'poweroff';
+		$cmd = 'mpc stop && poweroff';
 		sysCmd($cmd);
 		break;
 		

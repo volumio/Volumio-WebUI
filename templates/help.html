@@ -1,0 +1,151 @@
+<div class="container">
+	<h1>Help</h1>
+	<div class="row">
+		<div class="span3">
+			<h2>Table of contents</h2>
+			<ol>
+				<li><a href="#section1">Player UI</a></li>
+				<li><a href="#section2">Database Setup</a></li>
+				<li><a href="#section3">MPD setup</a></li>
+				<li><a href="#section4">Network Setup</a></li>
+				<li><a href="#section5">Airport</a></li>
+				<li><a href="#section6">Troubleshooting</a></li>
+			</ol>
+		</div>
+		<div class="span9">
+			<a name="section1"></a>
+			<h2>Player UI</h2>
+			<p>You have 3 main sections, Browse, Now Playing and Playlist</p>
+			<h3>BROWSE section</h3>
+            <ul>
+				<li>Here you have access to all your Local Music, stored on USB or NAS and WebRadios</li>
+				<li>You can type and search in real time</li>
+				<li>To play a track just double click on it (works only on PC)</li>
+			</ul>
+			<p>On the right side of each item you find the extended enqueue menu</p>
+			<ul>
+				<li>Add: adds a song to play queue</li>
+				<li>Add and play: adds a song to play queue and plays it immediatly</li>
+				<li>Add, replace and play:replaces current play queue with the item you select and plays it immediatly</li>
+				<li>Update this folder: refreshes the list of files in a specific folder. Useful if you copy new tracks or albums to a folder.</li>
+				<li>Please note that this is the only control available when using mobile browsers, since double click is not available with touch screens.</li>
+			</ul>
+			<p class="txtmid"><img src="images/docs/left.png" alt=""></p>
+			<h3>PLAYBACK section</h3>
+			<h4>Elapsed time indicator</h4>
+			<ul>
+				<li>Repeat all the files on playlist</li>
+				<li>Random play on the queue</li>
+				<li>Repeat the single song</li>
+				<li>Consume mode: delete songs once played</li>
+			</ul>
+			<p class="txtmid"><img src="images/docs/sx.png" alt=""></p>
+			<h4>Previous/next song, stop and play/pause</h4>
+			<ul>
+				<li>They do indicate current playing track and its bitrate/bitdepth</li>
+				<li>When RaspyFi is playing, the play button is showed</li>
+				<li>When RaspyFi is paused, the pause button is showed</li>
+			</ul>
+			<p class="txtmid"><img src="images/docs/center.png" alt=""></p>
+			<h4>Volume knob</h4>
+			<ul>
+				<li>You can scroll, insert a numeric value or just interact like a good old analog knob</li>
+				<li>Please note that you should activate the hardware or software mixer in the MPD Settings section</li>
+				<li>Mute, if you really need silence</li>
+			</ul>
+			<p class="txtmid"><img src="images/docs/dx.png" alt=""></p>
+			<h3>PLAYLIST section</h3>
+			This is your current play queue, currently RaspyFi supports only this playlist, you can remove tracks and search them here
+			
+			<hr>
+			
+			<a name="section2"></a>
+			<h2>Database Setup</h2>
+			<p>RaspyFi lists all your Music Library in an internal Database. Tracks and Folders have to be scanned to be added to the Database.</p>
+			<p>You can use a Local Storage (USB HD or Thumb Drive), which is automatically detected. Once you connect it to USB, remember to update the DB via the &quot;Update MPD Database&quot; button.</p>
+			<p>If you wish to use a Network Attached Storage, you can add as many Shares as you want. Please note that only Samba Shares are allowed with RaspyFi. </p>
+			<p>To add a network source, just fill the form, save your Network Mount and click "Update MPD Databe" . A green check will appear if everything is all right.<br>
+			If your network mount isn't properly recognized, try to put a random username on it or reboot the system. To view your files on the BROWSE tab, just refresh the page on your browser.</p>
+			
+			<hr>
+			
+			<a name="section3"></a><h2>MPD setup</h2>
+			<p>RaspyFi's core is MPD, a music player daemon that does an excellent job in delivering pure bit perfect pleasure. Here you have some handy features to customize its behaviour. 
+			If you're in the mood of manually editing, well you can just edit the /etc/mpd.conf file.</p> 
+			<h4>MPD setup</h4>
+			<ul>
+				<li>Port: default is 6600. Be aware, if edited this settings may result in unreachable player.</li>
+				<li>Gapless mp3 playback: immediatly starts the next song when the previous ends</li>
+				<li>Auto-update: when you add some new files to your music collection, the database is updated automatically</li>
+				<li>Volume control mixer:</li>
+			</ul>
+			<p>DISABLED: No remote volume control available, preserves audio quality but harms couch potatoes<br>
+			SOFTWARE: Works with every DAC available, but affectes audio quality<br>
+			HARDWARE: Works only with some DACS (and you probably have to edit the alsa section of mpd.conf) but it enables volume control without affecting sound quality.</p>
+			
+			<hr>
+			
+			<a name="section4"></a>
+			<h2>Network Setup</h2>
+			<p>Here you can configure your network settings, connecting via wi-fi and assign a static ip to your RaspyFi device. You can also find out which IP it is currently assigned to.			</p>
+			<ul>
+				<li>IP address: the ip you want to be permanently assigned to RaspyFi</li>
+				<li>Netmask: usually 255.255.255.0 should be good</li>
+				<li>Gateway: the IP of your router. Usually 192.168.1.1</li>
+				<li>DNS: You can set up alternative Domain Name Servers, could be useful.</li>
+			</ul>
+			<h4>Wi-Fi config</h4>
+			<ul>
+				<li>SSID: The name of wireless network you want to connect to</li>
+				<li>Security: WEP (you really sure?) or WPA</li>
+				<li>Passphrase: the passphrase of your Wi-Fi Network</li>
+			</ul>
+			<p>If everything is ok, you'll see an ip assigned to the Wi-Fi section.</p>
+			
+			<hr>
+			
+			<a name="section5"></a>
+			<h2>AIRPORT/AIRPLAY</h2>
+            <p>You can use RaspyFi also as an Airplay receiver. You can then play in high quality all the music you have in your pc, smartphone or tablet as you do with a remote wireless speaker.</p>
+			<p>ATTENTION: You must first stop RaspyFi from playing before activating it as an Airport receiver. Then you must stop your Airport playback before restarting your local play mode.</p>
+			<ul>
+				<li>iOs: when playing, in the lower right corner tick the Airplay trigger and select RaspyFi.</li>
+				<li>Itunes: when playing, upper left corner. Tick the Airplay trigger and select RaspyFi.</li>
+				<li>Android: you can use <a href="https://play.google.com/store/apps/details?id=eu.airaudio&hl=it">AirAudio</a></li>
+			</ul> 
+			<p class="txtmid"><img src="images/docs/a2.png" alt=""></p>
+			
+			<hr>
+			
+			<a name="section6"></a>
+			<h2>TROUBLESHOOTING</h2>
+            <h3>SSH CREDENTIALS</h3>
+			<p>username: pi <br>
+			password: raspberry <br>
+			ROOT ACCESS<br>
+			username: root<br>
+			password: root</p>
+			
+			<h3>RaspyFi Doesn't Boot</h3>
+			<p>Check PSU. It must be at least 1A and between 4,75 and 5,25 volts. Power cord must not be more than 1m long. If using USB powered hard drives, a powered USB hub is needed.
+			Try to download again the image and reflash the SD card.</p>
+			<h3>I cannot hear any sound </h3>
+			<p>RaspyFi outputs the sound automatically. If you have an USB DAC attached, it will output to USB DAC  (see <a href="http://www.raspyfi.com/raspberry-pi-usb-dac-and-raspyfi-supported-dacs/">compatibility list</a> ). 
+			If no USB DAC but HDMI is connected, it will output to HDMI. If nothing else than Analog Jack is plugged, well...</p>
+			<h3>I can't find out the IP of RaspyFi and I can't connect typing raspyfi.local on my browser</h3>
+			<ul>
+				<li>If you are on windows download and install<a href="http://www.raspyfi.com/wp-content/uploads/BonjourSetup.exe"> this</a></li>
+				<li>From Windows, go on Network and right-click on RaspyFi then "Open device web page"</li>
+				<li>On some Android Devices only typing the right IP will result in connecting to the WEBUI, use methods above to find the right IP</li>
+			</ul>
+			<h3>It's sounding crackling and distorted </h3>
+			<ul>
+				<li>Wait for the Database update to finish</li>
+				<li>If you are accessing network files, go to Database Settings, advanced settings and try gradually decreasing default rsize and wsize values </li>
+				<li>Check your PSU as described above and try disconnecting other devices from the PI.</li>
+			</ul>
+			<p>If all the above doesn't solve the situation, you can get help on the <a href="http://www.raspyfi.com/forum/">FORUM</a></p>
+			<p>&nbsp;</p>
+		</div>
+	</div>
+</div>

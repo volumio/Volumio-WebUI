@@ -57,7 +57,7 @@ fi
 
 # default
 if [ "$1" == "default" ]; then
-#echo -n ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo -n performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 ifconfig eth0 mtu 1500
 echo noop > /sys/block/mmcblk0/queue/scheduler
 echo 60 > /proc/sys/vm/swappiness

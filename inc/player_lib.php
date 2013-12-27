@@ -918,7 +918,7 @@ function wrk_mpdconf($outpath,$db) {
 	$output .= "\n";
 	$output .= "decoder {\n";
 	$output .= "\t\tplugin \"ffmpeg\"\n";
-	$output .= "\t\tenabled \"no\"\n";
+	$output .= "\t\tenabled \"yes\"\n";
 	$output .= "}\n";
 	$output .= "\n";
 	$output .= "input {\n";
