@@ -429,11 +429,15 @@ function refreshKnob(json){
 
 // time conversion
 function timeConvert(seconds) {
-    minutes = Math.floor(seconds / 60);
-    seconds -= minutes * 60;
-    mm = (minutes < 10) ? ('0' + minutes) : minutes;
-    ss = (seconds < 10) ? ('0' + seconds) : seconds;
-    display = mm + ':' + ss;
+    if(isNaN(seconds)) {
+    	display = '';
+    } else {
+    	minutes = Math.floor(seconds / 60);
+    	seconds -= minutes * 60;
+    	mm = (minutes < 10) ? ('0' + minutes) : minutes;
+    	ss = (seconds < 10) ? ('0' + seconds) : seconds;
+    	display = mm + ':' + ss;
+    }
     return display;
 }
 
