@@ -1101,6 +1101,11 @@ $file = '/proc/cpuinfo';
 					$arch = '04';
 					break;
 					
+					// Compulab Utilite
+					case 'Compulab CM-FX6':
+					$arch = '05';
+					break;
+					
 					default:
 					$arch = '--';
 					break;
@@ -1137,6 +1142,11 @@ playerSession('write',$db,'playerid',$playerid);
 		
 		case '04':
 		playerSession('write',$db,'hwplatform','BeagleBone Black');
+		playerSession('write',$db,'hwplatformid',$arch);
+		break;
+		
+		case '05':
+		playerSession('write',$db,'hwplatform','Compulab Utilite');
 		playerSession('write',$db,'hwplatformid',$arch);
 		break;
 		
