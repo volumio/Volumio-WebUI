@@ -378,7 +378,7 @@ session_start();
 		$fp = fopen($file, 'w');
 		fwrite($fp, $_SESSION['w_queueargs']);
 		fclose($fp);
-		//-- valutare inserimento reboot device o restart network
+		
 		break;
 		
 		case 'mpdcfg':

@@ -588,19 +588,19 @@ function hashCFG($action,$db) {
 playerSession('open',$db);
 	switch ($action) {
 		
-		case 'check_net':
-		$hash = md5_file('/etc/network/interfaces');
-		if ($hash != $_SESSION['netconfhash']) {
-			if ($_SESSION['netconf_advanced'] != 1) {
-			playerSession('write',$db,'netconf_advanced',1); 
-			}
-		return false;
-		} else {
-			if ($_SESSION['netconf_advanced'] != 0) {
-			playerSession('write',$db,'netconf_advanced',0);
-			}
-		}
-		break;
+//		case 'check_net':
+//		$hash = md5_file('/etc/network/interfaces');
+//		if ($hash != $_SESSION['netconfhash']) {
+//			if ($_SESSION['netconf_advanced'] != 1) {
+//			playerSession('write',$db,'netconf_advanced',1); 
+//			}
+//		return false;
+//		} else {
+//			if ($_SESSION['netconf_advanced'] != 0) {
+//			playerSession('write',$db,'netconf_advanced',0);
+//			}
+//		}
+//		break;
 		
 //		case 'check_mpd':
 //		$hash = md5_file('/etc/mpd.conf');
@@ -630,15 +630,15 @@ playerSession('open',$db);
 //		}
 //		break;
 		
-		case 'hash_net':
-		$hash = md5_file('/etc/network/interfaces');
-		playerSession('write',$db,'netconfhash',$hash); 
-		break;
+//		case 'hash_net':
+//		$hash = md5_file('/etc/network/interfaces');
+//		playerSession('write',$db,'netconfhash',$hash); 
+//		break;
 		
-		case 'hash_mpd':
-		$hash = md5_file('/etc/mpd.conf');
-		playerSession('write',$db,'mpdconfhash',$hash); 
-		break;
+//		case 'hash_mpd':
+//		$hash = md5_file('/etc/mpd.conf');
+//		playerSession('write',$db,'mpdconfhash',$hash); 
+//		break;
 		
 //		case 'hash_source':
 //		$hash = md5_file('/etc/auto.nas');
@@ -1164,18 +1164,18 @@ sysCmd('chmod a+rw /etc/mpd.conf');
 function wrk_sysEnvCheck($arch,$install) {
 	if ($arch == '01' OR $arch == '02' OR $arch == '03' OR $arch == '04' ) {
 	 // /etc/rc.local
-	 $a = '/etc/rc.local';
-	 $b = '/var/www/_OS_SETTINGS/etc/rc.local';
-	 if (md5_file($a) != md5_file($b)) {
-	 sysCmd('cp '.$b.' '.$a);
-	 }
+//	 $a = '/etc/rc.local';
+//	 $b = '/var/www/_OS_SETTINGS/etc/rc.local';
+//	 if (md5_file($a) != md5_file($b)) {
+//	 sysCmd('cp '.$b.' '.$a);
+//	 }
 	 
 	 // /etc/samba/smb.conf
-	 $a = '/etc/samba/smb.conf';
-	 $b = '/var/www/_OS_SETTINGS/etc/samba/smb.conf';
-	 if (md5_file($a) != md5_file($b)) {
-	 sysCmd('cp '.$b.' '.$a.' ');
-	 }
+//	 $a = '/etc/samba/smb.conf';
+//	 $b = '/var/www/_OS_SETTINGS/etc/samba/smb.conf';
+//	 if (md5_file($a) != md5_file($b)) {
+//	 sysCmd('cp '.$b.' '.$a.' ');
+//	 }
 	 // /etc/nginx.conf
 	 $a = '/etc/nginx/nginx.conf';
 	 $b = '/var/www/_OS_SETTINGS/etc/nginx/nginx.conf';
@@ -1244,20 +1244,20 @@ function wrk_sysEnvCheck($arch,$install) {
 	 $restartphp = 1;
 	 }
 		// (RaspberryPi arch)
-		if ($arch == '01') {
-			$a = '/boot/cmdline.txt';
-			$b = '/var/www/_OS_SETTINGS/boot/cmdline.txt';
-			if (md5_file($a) != md5_file($b)) {
-			sysCmd('cp '.$b.' '.$a.' ');
+//		if ($arch == '01') {
+//		$a = '/boot/cmdline.txt';
+//			$b = '/var/www/_OS_SETTINGS/boot/cmdline.txt';
+//			if (md5_file($a) != md5_file($b)) {
+//			sysCmd('cp '.$b.' '.$a.' ');
 			// /etc/fstab
-			$a = '/etc/fstab';
-			$b = '/var/www/_OS_SETTINGS/etc/fstab_raspberry';
-			if (md5_file($a) != md5_file($b)) {
-				sysCmd('cp '.$b.' '.$a.' ');
-				$reboot = 1;
-				}
-			}
-		}
+//			$a = '/etc/fstab';
+//			$b = '/var/www/_OS_SETTINGS/etc/fstab_raspberry';
+//			if (md5_file($a) != md5_file($b)) {
+//				sysCmd('cp '.$b.' '.$a.' ');
+//				$reboot = 1;
+//				}
+//			}
+//		}
 		if (isset($restartphp) && $restartphp == 1) {
 		sysCmd('service php5-fpm restart');
 		}
