@@ -1106,6 +1106,11 @@ $file = '/proc/cpuinfo';
 					$arch = '05';
 					break;
 					
+					// Wandboard
+					case 'Freescale i.MX6 Quad/DualLite (Device Tree)':
+					$arch = '06';
+					break;
+					
 					default:
 					$arch = '--';
 					break;
@@ -1150,6 +1155,11 @@ playerSession('write',$db,'playerid',$playerid);
 		playerSession('write',$db,'hwplatformid',$arch);
 		break;
 		
+		case '06':
+		playerSession('write',$db,'hwplatform','Wandboard');
+		playerSession('write',$db,'hwplatformid',$arch);
+		break;
+		
 		default:
 		playerSession('write',$db,'hwplatform','unknown');
 		playerSession('write',$db,'hwplatformid',$arch);
@@ -1172,7 +1182,7 @@ sysCmd('chmod a+rw /etc/mpd.conf');
 }
 
 function wrk_sysEnvCheck($arch,$install) {
-	if ($arch == '01' OR $arch == '02' OR $arch == '03' OR $arch == '04' ) {
+	if ($arch == '01' OR $arch == '02' OR $arch == '03' OR $arch == '04' OR $arch == '05' OR $arch == '06') {
 	 // /etc/rc.local
 //	 $a = '/etc/rc.local';
 //	 $b = '/var/www/_OS_SETTINGS/etc/rc.local';

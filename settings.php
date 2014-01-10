@@ -152,7 +152,8 @@ if (isset($_POST['syscmd'])){
 snd_soc_bcm2708_i2s
 bcm2708_dmaengine
 snd_soc_pcm5102a
-snd_soc_rpi_pcm5102a';
+snd_soc_hifiberry_dac
+snd_soc_rpi_dac';
 
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
@@ -170,6 +171,11 @@ snd_soc_rpi_pcm5102a';
 
 }
 
+// Show i2s selector only on RaspberryPI
+$arch = wrk_getHwPlatform();
+if ($arch != '01') {
+    $_i2s = "class=\"hide\"";
+    }
 if (isset($_POST['orionprofile']) && $_POST['orionprofile'] != $_SESSION['orionprofile']){
 	// load worker queue 
 	if ($_SESSION['w_lock'] != 1 && $_SESSION['w_queue'] == '') {

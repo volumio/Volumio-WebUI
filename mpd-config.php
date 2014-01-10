@@ -159,6 +159,7 @@ $dev3 = file_get_contents('/proc/asound/card2/id');
 $_mpd_select['device'] .= "<option value=\"0\" ".(($_mpd['device'] == '0') ? "selected" : "")." >$dev1</option>\n";	
 $_mpd_select['device'] .= "<option value=\"1\" ".(($_mpd['device'] == '1') ? "selected" : "")." >$dev2</option>\n";	
 $_mpd_select['device'] .= "<option value=\"2\" ".(($_mpd['device'] == '2') ? "selected" : "")." >$dev3</option>\n";
+$_mpd_select['device'] .= "<option value=\"3\" ".(($_mpd['device'] == '3') ? "selected" : "")." >$dev4</option>\n";
 
 // volume_normalization
 $_mpd_select['volume_normalization'] .= "<option value=\"yes\" ".(($_mpd['volume_normalization'] == 'yes') ? "selected" : "")." >yes</option>\n";	
