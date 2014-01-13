@@ -60,6 +60,14 @@
     <!--[if lt IE 9]>
       <script src="js/html5shiv.js"></script>
     <![endif]-->
+
+    <!-- allows removal of the mobile safari window dressing when 
+         added to the home screen of an iOS app. Also requires 
+         link.js which is included below -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+
 </head>
 
 <body class="<?php echo $sezione ?>">
