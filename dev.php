@@ -310,18 +310,7 @@ include('_header.php');
 					</select>
 				</div>
 			</div>
-			<div class="control-group">
-				<label class="control-label">VM Tsunamp DEV</label>
-				<div class="controls">
-					<div class="toggle">
-						<label class="toggle-radio" for="toggleOption2" >ON</label>
-						<input type="radio" name="dev" id="toggleOption1" value="1" <?php if ($_SESSION['dev'] == 1) echo "checked=\"checked\""; ?>>
-						<label class="toggle-radio" for="toggleOption1">OFF</label>
-						<input type="radio" name="dev" id="toggleOption2" value="0" <?php if ($_SESSION['dev'] == 0) echo "checked=\"checked\""; ?>>
-					</div>
-					<span class="help-block">Enable this setting if you are using Tsunamp Development Virtual Machine</span>
-				</div>
-			</div>
+			
 			<div class="control-group">
 				<label class="control-label">Hide debug informations</label>
 				<div class="controls">

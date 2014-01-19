@@ -108,6 +108,7 @@ $dbh  = cfgdb_connect($db);
         $wlan0 = "\n";
         $wlan0 .= "auto wlan0\n";
         $wlan0 .= "iface wlan0 inet dhcp\n";
+		$wlan0 .= "wireless-power off\n";
         if ($_POST['wifisec']['encryption'] == 'wpa') {
         $wlan0 .= "wpa-ssid ".$_POST['wifisec']['ssid']."\n";
         $wlan0 .= "wpa-psk ".$_POST['wifisec']['password']."\n";

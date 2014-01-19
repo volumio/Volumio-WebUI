@@ -1,5 +1,14 @@
 <?php 
-
+/*
+ *  2013/2014 Diego Tafuto (digx)
+ *		
+ *
+ * Created by digx on December 2013.
+ * Updated ver. 1.1  January 2014 
+ * for usage of dedicated Android Apps "Sound@Home"
+ *
+ * http://play.google.com/details?id=com.digx.soundhome
+ */
 // common include
 include('inc/connection.php');
 include('/var/www/inc/player_lib.php');
@@ -23,10 +32,26 @@ if (isset($_POST['syscmd'])){
 			
 		break;
 		
+		case 'addfolder':
+		$foldername=$_POST['foldername'];
+		$my_folder = "/var/lib/mpd/music/WEBRADIO/$foldername";
+		
+		if (!mkdir($my_folder, 0777)) {
+            die('Failed to create folders...');
+        }
+         break;
+		
 	  case 'delete':
 	    $filename=$_POST['filename'];
-			$my_file = "/var/lib/mpd/music/$filename";
-      unlink($my_file);
+		$my_file = "/var/lib/mpd/music/$filename";
+      	
+		if (!is_dir($my_file)) {
+				unlink($my_file);
+			}
+		else {
+			rmdir($my_file);
+			}
+			
 		break;
 		
 		
