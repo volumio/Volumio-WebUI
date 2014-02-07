@@ -26,9 +26,11 @@
 <script src="js/player_lib.js"></script>
 
 <!-- 'fixes' links to other pages so that when saved to the homescreen
-     on a iOS device all the links stay within the app -->
+     on a iOS device all the links stay within the app 
+	 Note from mikelangeloz -- 
+	 This breaks Dropdown menus, needs to be fixed
 <script type="text/javascript" src="js/links.js"></script>
-
+-->
 <?php if ($sezione == 'index') { ?>
 <script src="js/jquery.knob.js"></script>
 <script src="js/bootstrap-contextmenu.js"></script>
