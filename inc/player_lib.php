@@ -1111,11 +1111,6 @@ $file = '/proc/cpuinfo';
 					$arch = '06';
 					break;
 					
-					// Cubox-i
-					case 'SolidRun i.MX 6Quad/Dual/DualLite/Solo CuBox-i Board':
-					$arch = '07';
-					break;
-					
 					default:
 					$arch = '--';
 					break;
@@ -1162,11 +1157,6 @@ playerSession('write',$db,'playerid',$playerid);
 		
 		case '06':
 		playerSession('write',$db,'hwplatform','Wandboard');
-		playerSession('write',$db,'hwplatformid',$arch);
-		break;
-		
-		case '07':
-		playerSession('write',$db,'hwplatform','Cubox-i');
 		playerSession('write',$db,'hwplatformid',$arch);
 		break;
 		
