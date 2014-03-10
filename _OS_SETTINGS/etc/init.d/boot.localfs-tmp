@@ -1,0 +1,48 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides: boot.localfs-tmp
+# Required-Start: $remote_fs $time
+# Required-Stop: umountnfs $time
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: create log file system in tmpfs
+# Description: some services need a given file skel in /var/log - create it
+### END INIT INFO
+#
+# Author: http://www.nohl.eu/tech-resources/notes-to-linux/log-files-in-tmpfs-without-breaking-logging/ adapted for Debian by Pietro <pc@localhost>
+#
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="create log file system in tmpfs"
+NAME=boot.localfs-tmp
+
+SCRIPTNAME=/etc/init.d/$NAME
+
+case "$1" in
+# create skeleton of /var/log at /etc/log-skel.tgz
+create)
+for file in `/usr/bin/find /var/log -type f`; do
+> "$file";
+done
+files=`/usr/bin/find /var/log`;
+/bin/tar czf /etc/log-skel.tgz /var/log --absolute-names;
+/bin/chown root.root /etc/log-skel.tgz;
+/bin/chmod 500 /etc/log-skel.tgz;
+echo "created /etc/log-skel.tgz";
+;; 
+# when started uncompress skel into tmpfs at /var/log
+start)
+/bin/tar xzf /etc/log-skel.tgz --keep-old-files --absolute-names;
+echo -n "create log skeleton in tmpfs"
+;; 
+# dummy stop section
+stop)
+echo -n "ha ha, brainless tmpfs";
+;; 
+# usage:
+*) 
+echo "Usage: $0 {start|create}";
+exit 1
+;;
+esac

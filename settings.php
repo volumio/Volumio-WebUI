@@ -153,6 +153,7 @@ snd_soc_bcm2708_i2s
 bcm2708_dmaengine
 snd_soc_pcm5102a
 snd_soc_hifiberry_dac
+snd_soc_hifiberry_digi
 snd_soc_rpi_dac';
 
 	file_put_contents($file, $text);
