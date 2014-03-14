@@ -71,6 +71,9 @@ $db = 'sqlite:/var/www/db/player.db';
 	pcntl_signal(SIGHUP, SIG_IGN);
 // --- DEMONIZE --- //
 
+sysCmd('/usr/bin/aplay /var/www/command/silence.wav');
+sysCmd('/usr/bin/amixer set PCM `/usr/bin/amixer get PCM | grep % | cut -d[ -f2 | cut -d] -f1`');
+
 // --- INITIALIZE ENVIRONMENT --- //
 // change /run and session files for correct session file locking
 sysCmd('chmod 777 /run');
