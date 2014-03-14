@@ -1174,7 +1174,7 @@ return $playerid;
 }
 
 function wrk_sysChmod() {
-sysCmd('chmod -R 777 /var/www/db');
+sysCmd('chmod a+w /var/www/db/player.db');
 sysCmd('chmod a+x /var/www/command/orion_optimize.sh');
 sysCmd('chmod 777 /run');
 sysCmd('chmod 777 /run/sess*');

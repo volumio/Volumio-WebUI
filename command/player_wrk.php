@@ -76,7 +76,7 @@ $db = 'sqlite:/var/www/db/player.db';
 sysCmd('chmod 777 /run');
 
 // reset DB permission
-sysCmd('chmod -R 777 /var/www/db');
+sysCmd('chmod a+w /var/www/db/player.db');
 
 // initialize CLI session
 session_save_path('/run');
