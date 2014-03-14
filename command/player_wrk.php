@@ -91,7 +91,7 @@ playerSession('open',$db,'','');
 sysCmd('chmod 777 /run/sess*');
 
 // mount all sources
-wrk_sourcemount($db,'mountall');
+wrk_sourcemount($db,'mountall',null);
 
 // start MPD daemon
 sysCmd("service mpd start");

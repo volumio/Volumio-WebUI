@@ -301,7 +301,7 @@ $status = session_status();
 			// check presence of sessionID into SQLite datastore
 			//debug
 			// echo "<br>---------- READ SESSION -------------<br>";
-			$sessionid = playerSession('getsessionid',$db);
+			$sessionid = playerSession('getsessionid',$db,null,null);
 			if (!empty($sessionid)) {
 				// echo "<br>---------- SET SESSION ID-------------<br>";
 				session_id($sessionid);
@@ -309,12 +309,12 @@ $status = session_status();
 			} else {
 				session_start();
 				// echo "<br>---------- STORE SESSION -------------<br>";
-				playerSession('storesessionid',$db);
+				playerSession('storesessionid',$db,null,null);
 			}
 		}
 		$dbh  = cfgdb_connect($db);
 		// scan cfg_engine and store values in the new session
-		$params = cfgdb_read('cfg_engine',$dbh);
+		$params = cfgdb_read('cfg_engine',$dbh,null,null);
 		foreach ($params as $row) {
 		$_SESSION[$row['param']] = $row['value'];
 		}
@@ -364,7 +364,7 @@ $status = session_status();
 	// read PHP SESSION ID stored in SQLite datastore and use it to "attatch" the same SESSION (used in worker)
 	if ($action == 'getsessionid') {
 	$dbh  = cfgdb_connect($db);
-	$result = cfgdb_read('cfg_engine',$dbh,'sessionid');
+	$result = cfgdb_read('cfg_engine',$dbh,'sessionid',null);
 	$dbh = null;
 	return $result['0']['value'];
 	}
@@ -381,9 +381,9 @@ function cfgdb_connect($dbpath) {
 }
 
 function cfgdb_read($table,$dbh,$param,$id) {
-	if(!isset($param)) {
+	if(is_null($param)) {
 	$querystr = 'SELECT * from '.$table;
-	} else if (isset($id)) {
+	} else if (!is_null($id)) {
 	$querystr = "SELECT * from ".$table." WHERE id='".$id."'";
 	} else if ($param == 'mpdconf'){
 	$querystr = "SELECT param,value_player FROM cfg_mpd WHERE value_player!=''";
@@ -585,7 +585,7 @@ function pushFile($filepath) {
 
 // check if mpd.conf or interfaces was modified outside
 function hashCFG($action,$db) {
-playerSession('open',$db);
+playerSession('open',$db,null,null);
 	switch ($action) {
 		
 //		case 'check_net':
@@ -645,7 +645,7 @@ playerSession('open',$db);
 //		playerSession('write',$db,'sourceconfhash',$hash); 
 //		break;
 	} 
-playerSession('unlock');
+playerSession('unlock',null,null,null);
 return true;
 }
 
@@ -979,11 +979,15 @@ function wrk_sourcemount($db,$action,$id) {
 		
 		case 'mountall':
 		$dbh = cfgdb_connect($db);
-		$mounts = cfgdb_read('cfg_source',$dbh);
+		$mounts = cfgdb_read('cfg_source',$dbh,null,null);
+		if (is_array($mounts)) {
 		foreach ($mounts as $mp) {
 			if (!wrk_checkStrSysfile('/proc/mounts',$mp['name']) ) {
 			$return = wrk_sourcemount($db,'mount',$mp['id']);
 			}
+		}
+		} else {
+		$return = 1;
 		}
 		$dbh = null;
 		break;
@@ -999,7 +1003,7 @@ unset($queueargs['mount']['action']);
 
 		case 'reset': 
 		$dbh = cfgdb_connect($db);
-		$source = cfgdb_read('cfg_source',$dbh);
+		$source = cfgdb_read('cfg_source',$dbh,null,null);
 			foreach ($source as $mp) {
 			sysCmd("umount -f \"/mnt/NAS/".$mp['name']."\"");
 			sysCmd("rmdir \"/mnt/NAS/".$mp['name']."\"");
