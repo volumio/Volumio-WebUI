@@ -1,5 +1,5 @@
 echo "$(tput setaf 1)[+] Updating system...$(tput sgr 0)"
-apt-get -y update; apt-get -y upgrade
+apt-get -y update
 echo "$(tput setaf 1)[+] Installing Git$(tput sgr 0)"
 #install git
 apt-get -y install git-core
