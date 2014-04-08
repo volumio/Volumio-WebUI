@@ -1,0 +1,59 @@
+#! /bin/sh
+# /etc/init.d/transientlog
+#
+### BEGIN INIT INFO
+# Provides: transientlog
+# Required-Start: $local_fs
+# Required-Stop:  $local_fs
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Log to Ram
+# Description: Ramlogging
+### END INIT INFO
+
+case "$1" in
+  start)
+  # Return
+        #   0 if transient log has been started
+        #   1 if transient log was already running
+        #   2 if transient log could not be started
+
+        [ -f /var/lock/transientlog.lock ] && return 1
+        [ `id -u` -eq 0 ] || return 2
+        [ -d /var/log ] || return 2
+        [ -d /var/my_true_log ] || mkdir -p /var/my_true_log
+        mount --bind /var/log /var/my_true_log
+        mount -t tmpfs -o nosuid,noexec,nodev,mode=0755,size=16M \
+              transientlog /var/log
+        if [ $? -eq 0 ]; then
+		if cp -rfp /var/my_true_log -T /var/log; then
+			touch /var/lock/transientlog.lock
+			return 0
+		fi
+		# Rollback the mount
+		umount /var/log
+	fi
+        # Rollback the directory mangling
+        umount /var/my_true_log
+        return 2
+	;;
+  stop)
+    # Return
+        #   0 if transient log has been stopped
+        #   1 if transient log was already stopped
+        #   2 if transient log could not be stopped
+        #   other if a failure occurred
+
+        [ -f /var/lock/transientlog.lock ] || return 1
+
+        # Check if I am root
+        [ `id -u` -eq 0 ] || return 2
+
+        rm -r /var/lock/transientlog.lock
+        return 0
+    exit 1
+    ;;
+esac
+
+exit 0
+
