@@ -144,7 +144,63 @@ if (isset($_POST['syscmd'])){
 	case 'restore':
 		
 		break;
-	case 'i2son':
+	case 'Hifiberry':
+	
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+snd_soc_bcm2708_i2s
+bcm2708_dmaengine
+snd_soc_pcm5102a
+snd_soc_hifiberry_dac';
+
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
+		break;
+		
+	case 'HifiberryDigi':
+	
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+snd_soc_bcm2708_i2s
+bcm2708_dmaengine
+snd_soc_pcm5102a
+snd_soc_hifiberry_digi';
+
+
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
+		break;
+	
+	case 'RpiDac':
+	
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+snd_soc_bcm2708_i2s
+bcm2708_dmaengine
+snd_soc_pcm5102a
+snd_soc_rpi_dac';
+
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
+		break;
+		
+	case 'Iqaudio':
+	
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+bcm2708_dmaengine
+snd_soc_pcm5102a
+snd_soc_iqaudio-dac';
+
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
+		break;
+		
+	case 'Generic':
 	
 		session_start();
 	$file = '/etc/modules';
@@ -153,7 +209,6 @@ snd_soc_bcm2708_i2s
 bcm2708_dmaengine
 snd_soc_pcm5102a
 snd_soc_hifiberry_dac
-snd_soc_hifiberry_digi
 snd_soc_rpi_dac';
 
 	file_put_contents($file, $text);
