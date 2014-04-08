@@ -43,7 +43,7 @@
 <script src="js/jquery.tagsinput.js"></script>
 <script src="js/jquery.placeholder.js"></script>
 <script src="js/parsley.min.js"></script>
-<script src="js/i18n/messages.it.js" type="text/javascript"></script>
+<script src="js/i18n/_messages.en.js" type="text/javascript"></script>
 <script src="js/application.js"></script>
 <script src="js/scripts-configuration.js"></script>
 <script src="js/jquery.pnotify.min.js"></script>
