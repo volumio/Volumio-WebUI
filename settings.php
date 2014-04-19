@@ -192,12 +192,13 @@ snd_soc_rpi_dac';
 		session_start();
 	$file = '/etc/modules';
 	$text = 'snd_soc_bcm2708
+snd_soc_bcm2708_i2s
 bcm2708_dmaengine
-snd_soc_pcm5102a
-snd_soc_iqaudio-dac';
+snd_soc_pcm512x
+snd_soc_iqaudio_dac';
 
 	file_put_contents($file, $text);
-	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
+	$_SESSION['notify']['msg'] = 'IQAudio.com R-PI DAC Driver Activated. You must reboot for changes to take effect';
 		break;
 		
 	case 'Generic':
@@ -207,12 +208,13 @@ snd_soc_iqaudio-dac';
 	$text = 'snd_soc_bcm2708
 snd_soc_bcm2708_i2s
 bcm2708_dmaengine
-snd_soc_pcm5102a
+snd_soc_pcm512x
+snd_soc_pcm512x
 snd_soc_hifiberry_dac
 snd_soc_rpi_dac';
 
 	file_put_contents($file, $text);
-	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
+	$_SESSION['notify']['msg'] = 'I2S Generic Driver Activated. You must reboot for changes to take effect';
 		break;
 	case 'i2soff':
 	
