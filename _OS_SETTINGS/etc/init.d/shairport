@@ -10,11 +10,11 @@
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 1 6
 ### END INIT INFO
-NAME="$(cat /etc/hostname)"
+NAME="Volumio"
  
 case "$1" in
   start)
-    /usr/local/bin/shairport -d -a "$NAME"
+    /usr/local/bin/shairport -d -a "$NAME" -w -B "mpc stop"
     ;;
   stop)
     killall shairport
