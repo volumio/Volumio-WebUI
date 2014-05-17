@@ -146,7 +146,7 @@ return $datapath;
 
 function addQueue($sock,$path) {
 $fileext = parseFileStr($path,'.');
-if ($fileext == 'm3u' OR $fileext == 'pls') {
+if ($fileext == 'm3u' OR $fileext == 'pls' OR strpos($path, '/') === false) {
 sendMpdCommand($sock,"load \"".html_entity_decode($path)."\"");
 } else {
 sendMpdCommand($sock,"add \"".html_entity_decode($path)."\"");
