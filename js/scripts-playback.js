@@ -372,6 +372,11 @@ jQuery(document).ready(function($){ 'use strict';
         if ($(this).data('cmd') == 'addreplaceplay') {
             getDB('addreplaceplay', path);
             notify('addreplaceplay', path);
+            if (!path.contains("/")) {
+	            $("#pl-saveName").val(path);
+            } else {
+	            $("#pl-saveName").val("");
+	    }
         }
         if ($(this).data('cmd') == 'update') {
             getDB('update', path);
