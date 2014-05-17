@@ -26,7 +26,7 @@
  * version:						1.0
  *
  */
- 
+
 // common include
 include('../inc/connection.php');
 error_reporting(ERRORLEVEL);
@@ -89,6 +89,14 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 					echo json_encode(remTrackQueue($mpd,$_GET['songid']));
 					}
 				break;
+
+                                case 'savepl':
+                                        if (isset($_GET['plname']) && $_GET['plname'] != '') {
+                                        sendMpdCommand($mpd,"rm \"".html_entity_decode($_GET['plname'])."\"");
+                                        sendMpdCommand($mpd,"save \"".html_entity_decode($_GET['plname'])."\"");
+                                        echo json_encode(readMpdResponse($mpd));
+                                        }
+                                break;
 				
 				case 'search':
 					if (isset($_POST['query']) && $_POST['query'] != '' && isset($_GET['querytype']) && $_GET['querytype'] != '') {

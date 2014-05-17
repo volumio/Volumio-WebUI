@@ -275,10 +275,19 @@ jQuery(document).ready(function($){ 'use strict';
         event.preventDefault();
         var pos = $('.playlist .pl-action').index(this);
         var cmd = 'trackremove&songid=' + pos;
-        var path = $(this).parent().data('path');
-        // recuperare datapath
-		notify('remove', '');
+        notify('remove', '');
         sendPLCmd(cmd);
+    });
+
+    // click on playlist save button
+    $('#pl-controls').on('click', '#pl-btnSave', function(event) {
+	var plname = $("#pl-saveName").val();
+	if (plname) {
+	        sendPLCmd('savepl&plname=' + plname);
+		notify('savepl', plname);
+	} else {
+		notify('needplname', '');
+	}
     });
 
     // click on playlist tab

@@ -36,5 +36,24 @@ function notify(command, msg) {
 				opacity: .9
 			});
 		break;
+
+                case 'savepl':
+                        $.pnotify({
+                                title: 'Playlist has been saved',
+                                text: msg,
+                                icon: 'icon-remove',
+                                opacity: .9
+                        });
+                break;
+
+                case 'needplname':
+                        $.pnotify({
+                                title: 'Give a name for saving playlist',
+                                text: msg,
+                                icon: 'icon-remove',
+                                opacity: .9
+                        });
+                break;
+
 	}
 }

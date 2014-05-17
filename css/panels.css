@@ -438,7 +438,7 @@ a.btn-cmd {
 #db-0 em, #pl-filter-results i {
 	color: #34495E;
 }
-#db-search-keyword, #pl-filter {
+#db-search-keyword, #pl-filter, #pl-saveName {
 	width: 126px;
 	height: 20px;
 }
@@ -524,13 +524,28 @@ a.btn-cmd {
 }
 .btnlist.btnlist-bottom .btn {
 	margin-top: 6px;
-	font-size: 22px;
 }
 #db-search, #pl-search {
 	display: block;
 	float: right;
 	margin: 6px 0 0 20px;
 	z-index: 1001;
+}
+#pl-save {
+        display: block;
+        float: right;
+        margin-left: 20px;
+        z-index: 1001;
+}
+#pl-save input {
+	margin-top: 6px;
+        padding: 2px 0 2px 10px;
+        -webkit-border-top-right-radius: 0px;
+        -webkit-border-bottom-right-radius: 0px;
+        -moz-border-radius-topright: 0px;
+        -moz-border-radius-bottomright: 0px;
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;
 }
 #db-search input, #pl-search input {
 	margin: 0;
