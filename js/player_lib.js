@@ -155,9 +155,9 @@ function getPlaylist(json){
         }
         $('ul.playlist').html(output);
         var current = parseInt(json['song']);
-        if (current != json && GUI.halt != 1) {
-            customScroll('pl', current, 200); // active current song
-        }
+//        if (current != json && GUI.halt != 1) {
+//            customScroll('pl', current, 200); // active current song
+//        }
     });
 }
 
