@@ -287,7 +287,7 @@ html, body {
 #menu-bottom a {
 	display: block;
 	float: left;
-	width: 33.333%;
+	width: 25%;
 	line-height: 40px;
 	margin: 0;
 	padding: 0;
@@ -302,7 +302,7 @@ html, body {
 	outline: none;
 	color: #fff;
 }
-#open-playback a {
+#open-playback a, #open-panel-sx a {
 	background: #273B4F;
 }
 
@@ -893,3 +893,13 @@ body { background: #cf0; } */
 		display: none;
 	}
 }
+
+#lib-load {
+	color: #DDDDDD;
+	font-size: 18px;
+	font-weight: bold;
+	margin-left: -72px;
+	position: absolute;
+	top: 50%;
+}
+
