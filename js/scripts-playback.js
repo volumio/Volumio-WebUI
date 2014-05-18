@@ -305,32 +305,30 @@ jQuery(document).ready(function($){ 'use strict';
     // DATABASE
     // ----------------------------------------------------------------------------------------------------
 
+    // click on database "back"
+    $('#db-back').click(function() {
+        --GUI.currentDBpos[10];
+        var path = GUI.currentpath;
+        var cutpos=path.lastIndexOf("/");
+        if (cutpos !=-1) {
+            var path = path.slice(0,cutpos);
+        }  else {
+            path = '';
+        }
+        getDB('filepath', path, GUI.browsemode, 1);
+    });
+
     // click on database entry
     $('.database').on('click', '.db-browse', function() {
         $('.database li').removeClass('active');
         $(this).parent().addClass('active');
         if (!$(this).hasClass('sx')) {
-            var path = $(this).parent().data('path');
-            if ($(this).hasClass('levelup')) {
-                --GUI.currentDBpos[10];
-                var path = GUI.currentpath;
-                var cutpos=path.lastIndexOf("/");
-                if (cutpos !=-1) {
-                //console.log('cutpos = ', cutpos);
-                var path = path.slice(0,cutpos);
-                //console.log('oldpath = ', path);
-                }  else {
-                path = '';
-                }
-                getDB('filepath', path, 'file', 1);
-            }
-            else if ($(this).hasClass('db-folder')) {
-                //GUI.currentDBpos[GUI.currentDBpos[10]] = $('.database .db-entry').index(this);
+            if ($(this).hasClass('db-folder')) {
+                var path = $(this).parent().data('path');
                 var entryID = $(this).parent().attr('id');
                 entryID = entryID.replace('db-','');
                 GUI.currentDBpos[GUI.currentDBpos[10]] = entryID;
                 ++GUI.currentDBpos[10];
-                //console.log('getDB path = ', path);
                 getDB('filepath', path, 'file', 0);
             }
         }

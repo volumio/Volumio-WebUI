@@ -571,6 +571,17 @@ a.btn-cmd {
     color: white;
 }
 
+#db-back {
+        display: none;
+        margin: 6px 0 0 -6px;
+}
+
+#db-back .btn {
+    color: #DDDDDD;
+    font-size: 18px;
+    font-weight: bold;
+}
+
 /* Pages */
 .pl-pages {
 	list-style: none;

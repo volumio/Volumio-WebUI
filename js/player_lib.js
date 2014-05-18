@@ -268,9 +268,16 @@ function populateDB(data, path, uplevel, keyword){
 	if (keyword) {
 		var results = (data.length) ? data.length : '0';
 		var s = (data.length == 1) ? '' : 's';
-		DBlist.append('<li id="db-0" class="search-results clearfix" title="Close search results and go back to the DB"><div class="db-icon db-folder"><i class="icon-arrow-left sx"></i></div><div class="db-entry db-folder">' + results + ' result' + s + ' for "<em class="keyword">' + keyword + '</em>"</div></li>');
+		var text = "" + results + ' result' + s + ' for "<em class="keyword">' + keyword + '</em>"';
+		$("#db-back").attr("title", "Close search results and go back to the DB");
+		$("#db-back-text").html(text);
+		$("#db-back").show();
 	} else if (path != '') {
-		DBlist.append('<li id="db-0" class="clearfix"><div class="db-entry db-browse levelup"><i class="icon-arrow-left sx"></i> <em>back</em></div></li>');
+		$("#db-back").attr("title", "");
+		$("#db-back-text").html("back");
+		$("#db-back").show();
+	} else {
+        	$("#db-back").hide();
 	}
 	var content = '';
 	var i = 0;
