@@ -442,9 +442,6 @@ a.btn-cmd {
 	width: 126px;
 	height: 20px;
 }
-#browse-mode {
-	display: none; /* DA FAR FUNZIONARE */
-}
 
 .btnlist {
 	position: fixed;

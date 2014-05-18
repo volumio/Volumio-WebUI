@@ -39,7 +39,6 @@ var GUI = {
     halt: 0,
     volume: null,
     currentDBpos: new Array(0,0,0,0,0,0,0,0,0,0,0),
-    browsemode: 'file',
     DBentry: new Array('', '', ''),
     visibility: 'visible',
 	DBupdate: 0
@@ -54,7 +53,7 @@ jQuery(document).ready(function($){ 'use strict';
 
     // first GUI update
     updateGUI(GUI.json);
-    getDB('filepath', GUI.currentpath, GUI.browsemode);
+    getDB('filepath', GUI.currentpath, 'file');
     $.pnotify.defaults.history = false;
 
 	// hide "connecting" layer
@@ -323,7 +322,7 @@ jQuery(document).ready(function($){ 'use strict';
                 }  else {
                 path = '';
                 }
-                getDB('filepath', path, GUI.browsemode, 1);
+                getDB('filepath', path, 'file', 1);
             }
             else if ($(this).hasClass('db-folder')) {
                 //GUI.currentDBpos[GUI.currentDBpos[10]] = $('.database .db-entry').index(this);
@@ -332,7 +331,7 @@ jQuery(document).ready(function($){ 'use strict';
                 GUI.currentDBpos[GUI.currentDBpos[10]] = entryID;
                 ++GUI.currentDBpos[10];
                 //console.log('getDB path = ', path);
-                getDB('filepath', path, GUI.browsemode, 0);
+                getDB('filepath', path, 'file', 0);
             }
         }
     });
@@ -382,17 +381,6 @@ jQuery(document).ready(function($){ 'use strict';
             getDB('update', path);
             notify('update', path);
         }
-    });
-
-    // browse mode menu
-    $('.browse-mode a').click(function(){
-        $('.browse-mode').removeClass('active');
-        $(this).parent().addClass('active').closest('.dropdown').removeClass('open');
-        var browsemode = $(this).find('span').html();
-        GUI.browsemode = browsemode.slice(0,-1);
-        $('#browse-mode-current').html(GUI.browsemode);
-        getDB('filepath', '', GUI.browsemode);
-        // console.log('Browse mode set to: ', GUI.browsemode);
     });
 
     // scroll buttons

@@ -38,7 +38,6 @@
     halt: 0,
     volume: null,
     currentDBpos: new Array(0,0,0,0,0,0,0,0,0,0,0),
-    browsemode: 'file',
     DBentry: new Array('', '', ''),
     visibility: 'visible',
 	DBupdate: 0

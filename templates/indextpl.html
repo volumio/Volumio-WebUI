@@ -45,22 +45,14 @@
 	<!-- -------------------- DATABASE PANEL -------------------- -->
 	<div id="panel-sx" class="tab-pane">
 		<div class="btnlist btnlist-top">
-			<form id="db-search" action="javascript:getDB('search', '', GUI.browsemode);">
+			<form id="db-search" action="javascript:getDB('search', '', 'file');">
 				<div class="input-append">
 					<input class="span2" id="db-search-keyword" type="text" value="" placeholder="search in DB...">
 					<button class="btn" type="submit"><i class="icon-search"></i></button>
 				</div>
 			</form>
 			<form id="db-browse">
-				<div class="dropdown">
-					<a class="dropdown-toggle" id="browse-mode" role="button" data-toggle="dropdown" data-target="#" href="$_section.php"><i class="icon-caret-down sx"></i> <span id="browse-mode-current">files</span></a>
-					<ul class="dropdown-menu" role="menu" aria-labelledby="browse-mode">
-						<li class="browse-mode active"><a href="#notarget"><i class="icon-file sx"></i> <span>files</span></a></li>
-						<li class="browse-mode"><a href="#notarget"><i class="icon-user sx"></i> <span>artists</span></a></li>
-						<li class="browse-mode"><a href="#notarget"><i class="icon-tag sx"></i> <span>titles</span></a></li>
-						<li class="browse-mode"><a href="#notarget"><i class="icon-bullseye sx"></i> <span>albums</span></a></li>
-					</ul>
-				</div>
+				<div id="db-back"></div>
 			</form>
 		</div>
 		<div id="database">
