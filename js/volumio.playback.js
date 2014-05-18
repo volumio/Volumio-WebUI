@@ -17,48 +17,31 @@
  *  along with TsunAMP; see the file COPYING.  If not, see
  *  <http://www.gnu.org/licenses/>.
  *
- *
- *	 UI-design/JS code by: 	Andrea Coiutti (aka ACX)
- *  PHP/JS code by:			    Simone De Gregori (aka Orion)
+ *  Authors:
+ *  - v1, 1.1: Andrea Coiutti (aka ACX)
+ *  - v1, 1.1: Simone De Gregori (aka Orion)
+ *  - v2: Michelangelo Guarise
+ *  - v2: Joel Takvorian
  * 
- *  file:							scripts-playback.js
- *  version:						1.1
- *
+ *  file:                    volumio.playback.js
+ *  version:                 2
  */
- 
-// Global GUI Array
-// ----------------------------------------------------------------------------------------------------
-var GUI = {
-    json: 0,
-    cmd: 'status',
-    playlist: null,
-    currentsong: null,
-    currentknob: null,
-    state: '',
-    currentpath: '',
-    halt: 0,
-    volume: null,
-    currentDBpos: new Array(0,0,0,0,0,0,0,0,0,0,0),
-    DBentry: new Array('', '', ''),
-    visibility: 'visible',
-	DBupdate: 0
-};
 
 jQuery(document).ready(function($){ 'use strict';
 
     // INITIALIZATION
     // ----------------------------------------------------------------------------------------------------
     // first connection with MPD daemon
-    backendRequest(GUI.state);
+    backendRequest();
 
     // first GUI update
     updateGUI(GUI.json);
     getDB('filepath', GUI.currentpath, 'file');
     $.pnotify.defaults.history = false;
 
-	// hide "connecting" layer
+    // hide "connecting" layer
     if (GUI.state != 'disconnected') {
-    $('#loader').hide();
+        $('#loader').hide();
     }
 
     // BUTTONS
@@ -548,3 +531,4 @@ jQuery(document).ready(function($){ 'use strict';
         }
     }
 })();
+

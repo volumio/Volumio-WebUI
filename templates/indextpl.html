@@ -32,11 +32,8 @@
 						</div>
 					</div>
 				</div>
-				<div class="span4">
-				
-  </div> 
-				
-				
+				<div class="span4"></div> 
+
 				<div class="span4 volume">
 					<input class="volumeknob" id="volume" data-width="211" data-cursor="true" data-bgColor="#34495E" data-fgColor="#4BBE87" data-thickness=".25" data-angleArc="250" data-angleOffset="-125" data-skin="tron" value="66">	
 					<div class="btn-toolbar floatright">
@@ -116,13 +113,36 @@
 				<button class="btn pl-firstPage"><i class="fa fa-angle-double-up"></i></button>
 				<button class="btn pl-lastPage"><i class="fa fa-angle-double-down"></i></button>
 			</div>
-				<form id="clearqueue" method="post">	
-				<input class="btn" type="submit" name="syscmd" value="Clear Queue" id="syscmd-clearqueue">
-				</form>
+			<form id="clearqueue" method="post">	
+			<input class="btn" type="submit" name="syscmd" value="Clear Queue" id="syscmd-clearqueue">
+			</form>
+		</div>
+	</div>
+
+	<!-- -------------------- LIBRARY PANEL -------------------- -->
+	<div id="panel-lib" class="tab-pane">
+		<div class="container txtmid">
+			<div id="lib-loader"><div id="loaderbg"></div><div id="loadercontent"><i class="fa fa-refresh icon-spin"></i>loading...</div></div>
+			<div id="lib-content">
+				<div id="lib-genre">
+					<ul id="genresList"></ul>
+				</div>
+				<div id="lib-artist">
+					<ul id="artistsList"></ul>
+				</div>
+				<div id="lib-album">
+					<ul id="albumsList"></ul>
+				</div>
+				<div id="lib-file">
+					<ul id="songsList"></ul>
+					<div class="lib-showall"><a title="WARNING: depending on the number of songs to display, showing all songs may result in slowing down or freezing your navigation." href="#notarget" class="btn">Show all songs</a></div>
+					<div class="lib-playall"><a title="Play all" href="#notarget" class="btn"><i class="fa fa-play"></i></a></div>
+					<div class="lib-addall"><a title="Enqueue all" href="#notarget" class="btn"><i class="fa fa-plus"></i></a></div>
+				</div>
 			</div>
 		</div>
 	</div>
-	
+
 </div>
 
 <div id="context-menus">

@@ -17,24 +17,25 @@
  *  along with RaspyFi; see the file COPYING.  If not, see
  *  <http://www.gnu.org/licenses/>.
  *
- *
- *	 UI-design/JS code by: 	Andrea Coiutti (aka ACX)
- *  PHP/JS code by:			Simone De Gregori (aka Orion)
+ *  Authors:
+ *  - v1, 1.1: Andrea Coiutti (aka ACX)
+ *  - v1, 1.1: Simone De Gregori (aka Orion)
+ *  - v2: Michelangelo Guarise
+ *  - v2: Joel Takvorian
  * 
- *  file:							scripts-configuration.js
- *  version:						1.1
- *
+ *  file:                    volumio.settings.js
+ *  version:                 2
  */
 
 jQuery(document).ready(function($){ 'use strict';
-	
-	backendRequest(GUI.state);
-	
-	if (GUI.state != 'disconnected') {
-    $('#loader').hide();
+
+    backendRequest();
+
+    if (GUI.state != 'disconnected') {
+        $('#loader').hide();
     }
-	
-	// BUTTONS
+
+    // BUTTONS
     // ----------------------------------------------------------------------------------------------------
     // playback
     $('.btn-cmd').click(function(){
@@ -43,8 +44,8 @@ jQuery(document).ready(function($){ 'use strict';
         if ($(this).attr('id') == 'stop') {
             $(this).addClass('btn-primary');
             $('#play').removeClass('btn-primary');
-            refreshTimer(0, 0, 'stop')
-			window.clearInterval(GUI.currentKnob);
+            refreshTimer(0, 0, 'stop');
+            window.clearInterval(GUI.currentKnob);
             $('.playlist li').removeClass('active');
             $('#total').html('');
         }
@@ -64,7 +65,6 @@ jQuery(document).ready(function($){ 'use strict';
                 //$(this).find('i').toggleClass('icon-play').toggleClass('icon-pause');
                 window.clearInterval(GUI.currentKnob);
                 sendCmd(cmd);
-                //console.log('sendCmd(' + cmd + ');');
                 return;
             // } else {
                 // $(this).addClass('btn-primary');
@@ -76,9 +76,8 @@ jQuery(document).ready(function($){ 'use strict';
         // previous/next
         else if ($(this).attr('id') == 'previous' || $(this).attr('id') == 'next') {
             GUI.halt = 1;
-            // console.log('GUI.halt (next/prev)= ', GUI.halt);
-			$('#countdown-display').countdown('pause');
-			window.clearInterval(GUI.currentKnob);
+            $('#countdown-display').countdown('pause');
+            window.clearInterval(GUI.currentKnob);
         }
         // step volume control
         else if ($(this).hasClass('btn-volume')) {
@@ -103,7 +102,6 @@ jQuery(document).ready(function($){ 'use strict';
                     var vol = GUI.volume;
                 }
             }
-            //console.log('volume = ', GUI.volume);
             sendCmd('setvol ' + vol);
             return;
         }
@@ -121,52 +119,49 @@ jQuery(document).ready(function($){ 'use strict';
             cmd = $(this).attr('id');
         }
         sendCmd(cmd);
-        //console.log('sendCmd(' + cmd + ');');
     });
 
-	
-	// show / hide static configuration based on select value
-	if( $('#dhcp').length ){
-		if ($('#dhcp').val() == 'false') {
-			$('#network-manual-config').show();
-		}                        
-		$('#dhcp').change(function(){          
-			if ($(this).val() == 'true') {
-				$('#network-manual-config').hide();
-				console.log('TRUE');
-			}
-			else {
-				$('#network-manual-config').show();
-				console.log('FALSE');
-			}                                                            
-		});
-	}
-	
-	// show advanced options
-	if( $('.show-advanced-config').length ){
-		$('.show-advanced-config').click(function(e){
-			e.preventDefault();
-			if ($(this).hasClass('active'))
-			{
-				$('.advanced-config').hide();
-				$(this).removeClass('active');
-				$(this).find('i').removeClass('fa fa-minus').addClass('fa fa-plus');
-				$(this).find('span').html('Show advanced options');
-			} else {
-				$('.advanced-config').show();
-				$(this).addClass('active');
-				$(this).find('i').removeClass('fa fa-plus').addClass('fa fa-minus');
-				$(this).find('span').html('Hide advanced options');
-			}
-		});	
-	}
-	
-	// confirm manual data
-	if( $('.manual-edit-confirm').length ){
-		$(this).find('.btn-primary').click(function(){
-			$('#mpdconf_editor').show().removeClass('hide');
-			$(this).hide();
-		});
-	}
-	
+    // show / hide static configuration based on select value
+    if ($('#dhcp').length) {
+        if ($('#dhcp').val() == 'false') {
+            $('#network-manual-config').show();
+        }
+        $('#dhcp').change(function() {
+            if ($(this).val() == 'true') {
+                $('#network-manual-config').hide();
+            } else {
+                $('#network-manual-config').show();
+            }
+        });
+    }
+
+    // show advanced options
+    if ($('.show-advanced-config').length) {
+        $('.show-advanced-config').click(
+                function(e) {
+                    e.preventDefault();
+                    if ($(this).hasClass('active')) {
+                        $('.advanced-config').hide();
+                        $(this).removeClass('active');
+                        $(this).find('i')
+                            .removeClass('fa fa-minus')
+                            .addClass('fa fa-plus');
+                        $(this).find('span').html('Show advanced options');
+                    } else {
+                        $('.advanced-config').show();
+                        $(this).addClass('active');
+                        $(this).find('i').removeClass('fa fa-plus')
+                            .addClass('fa fa-minus');
+                        $(this).find('span').html('Hide advanced options');
+                    }
+                });
+    }
+
+    // confirm manual data
+    if ($('.manual-edit-confirm').length) {
+        $(this).find('.btn-primary').click(function() {
+            $('#mpdconf_editor').show().removeClass('hide');
+            $(this).hide();
+        });
+    }
 });
