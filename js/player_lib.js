@@ -353,12 +353,12 @@ function updateGUI(json){
 function refreshState(state) {
     if (state == 'play') {
         $('#play').addClass('btn-primary');
-        $('#play i').removeClass('icon-play').addClass('icon-pause');
+        $('#play i').removeClass('icon-pause').addClass('icon-play');
         $('#stop').removeClass('btn-primary');
     } else if (state == 'pause') {
         $('#playlist-position').html('Not playing');
         $('#play').addClass('btn-primary');
-        $('#play i').removeClass('icon-pause').addClass('icon-play');
+        $('#play i').removeClass('icon-play').addClass('icon-pause');
         $('#stop').removeClass('btn-primary');
     } else if (state == 'stop') {
         $('#play').removeClass('btn-primary');
