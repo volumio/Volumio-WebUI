@@ -642,6 +642,9 @@ a.btn-cmd {
 	z-index: 99999;
 	display: none;
 }
+#lib-loader {
+	display: none;
+}
 #loaderbg {
 	position: absolute;
 	top: 0;
@@ -901,5 +904,70 @@ body { background: #cf0; } */
 	margin-left: -72px;
 	position: absolute;
 	top: 50%;
+	left: 50%;
 }
+
+#lib-content {
+	display: none;
+        position: absolute;
+        top: 40px;
+        left: 0px;
+        right: 0px;
+        bottom: 40px;
+}
+
+#lib-genre {
+        position: absolute;
+	overflow: auto;
+	width: 25%;
+	height: 25%;
+	border-bottom: 3px solid #212D39;
+}
+#lib-artist {
+        position: absolute;
+	overflow: auto;
+        top: 25%;
+        width: 25%;
+        height: 75%;
+	margin-top: 3px;
+}
+#lib-album {
+        position: absolute;
+	overflow: auto;
+        left: 25%;
+	width: 25%;
+	height: 100%;
+}
+#lib-file {
+        position: absolute;
+	overflow: auto;
+        left: 50%;
+	width: 50%;
+	height: 100%;
+}
+
+#lib-content ul {
+	margin: 5px 2px;
+}
+
+#lib-content li {
+	display: block;
+	position: relative;
+	height: 22px;
+	margin: 0;
+	background: #000;
+	border-bottom: 1px solid #111D29;
+	color: #ddd;
+	cursor: pointer;
+	font-size: 13px;
+	text-align: left;
+	font-weight: bold;
+}
+
+#lib-content span {
+	color: #34495E;
+	font-size: 12px;
+	font-weight: normal;
+}
+
 

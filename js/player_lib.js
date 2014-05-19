@@ -42,6 +42,8 @@
     visibility: 'visible',
 	DBupdate: 0
 };
+
+// fullLib = [];
  
 // FUNZIONI
 // ----------------------------------------------------------------------------------------------------
@@ -153,10 +155,6 @@ function getPlaylist(json){
             }
         }
         $('ul.playlist').html(output);
-        var current = parseInt(json['song']);
-//        if (current != json && GUI.halt != 1) {
-//            customScroll('pl', current, 200); // active current song
-//        }
     });
 }
 
@@ -505,3 +503,102 @@ function randomScrollDB() {
     var random = 1 + Math.floor(Math.random() * n);
     customScroll('db', random);
 }
+
+function loadLibrary(data) {
+    fullLib = data;
+    allGenres = distinctGenres(fullLib);
+    allArtists = { "all" : "" };
+    allAlbums = { "all" : "" };
+    allSongs = [];
+    for (var genre in data) {
+//        allGenres[genre] = true;
+        var dataByGenre = data[genre];
+        for (var artist in dataByGenre) {
+            allArtists[artist] = true;
+            var dataByArtist = dataByGenre[artist];
+            for (var album in dataByArtist) {
+                allAlbums[album] = artist;
+                var dataByAlbum = dataByArtist[album];
+                for (var i in dataByAlbum) {
+                    var song = dataByAlbum[i];
+                    song.Album = album;
+                    allSongs.push(song);
+                }
+            }
+        }
+    }
+
+    // Insert data in DOM
+    renderLib();
+}
+
+function distinctGenres(lib) {
+    // Find unique set
+    var genreMap = {};
+    for (var genre in lib) {
+        genreMap[genre] = true;
+    }
+    // Fill array
+    var genres = ["All"];
+    for (var genre in genreMap) {
+        genres.push(genre);
+    }
+    return genres;
+}
+
+function renderLib() {
+    renderGenres();
+    renderArtists();
+    renderAlbums();
+    renderSongs();
+}
+
+function renderGenres() {
+    var output = '';
+    for (var i = 0; i < allGenres.length; i++) {
+        output += '<li class="clearfix"><div class="lib-entry">' + allGenres[i] + '</div></li>';
+    }
+    $('#genresList').html(output);
+}
+
+function renderArtists() {
+    var output = '';
+    var i = 1;
+    for (var artist in allArtists) {
+        output += '<li id="lib-artist-' + i + '" class="clearfix"><div class="lib-entry">' + artist + '</div></li>';
+        i++;
+    }
+    $('#artistsList').html(output);
+}
+
+function renderAlbums() {
+    var output = '';
+    var i = 1;
+    for (var album in allAlbums) {
+        output += '<li id="lib-album-' + i + '" class="clearfix"><div class="lib-entry">' + album + ' <span> ' + allAlbums[album] + '</span></div></li>';
+        i++;
+    }
+    $('#albumsList').html(output);
+}
+
+function renderSongs() {
+    var output = '';
+    for (var i = 0; i < allSongs.length; i++) {
+        output += '<li id="lib-song-' + (i + 1) + '" class="clearfix"><div class="lib-entry">' + allSongs[i].Display
+                + ' <span> ' + allSongs[i].Album + '</div></li>';
+    }
+    $('#songsList').html(output);
+}
+
+// click on playlist entry
+$('#genresList').on('click', '.lib-entry', function() {
+    var pos = $('#genresList .lib-entry').index(this);
+    console.log("clicked on " + allGenres[pos]); // WIP
+//    var cmd = 'play ' + pos;
+//    sendCmd(cmd);
+//    GUI.halt = 1;
+//    $('.playlist li').removeClass('active');
+//    $(this).parent().addClass('active');
+});
+
+
