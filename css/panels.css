@@ -964,6 +964,10 @@ body { background: #cf0; } */
 	font-weight: bold;
 }
 
+#lib-content li div.active {
+        background-color: #1ABC9C;
+}
+
 #lib-content span {
 	color: #34495E;
 	font-size: 12px;
