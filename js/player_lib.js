@@ -517,9 +517,9 @@ function loadLibrary(data) {
 }
 
 function filterLib() {
-    allGenres = ["All"];
-    allArtists = ["All"];
-    allAlbums = [{"album": "All", "artist": ""}];
+    allGenres = [];
+    allArtists = [];
+    allAlbums = [];
     allSongs = [];
     var needReload = false;
     for (var genre in fullLib) {
@@ -535,6 +535,7 @@ function filterLib() {
                             for (var i in fullLib[genre][artist][album]) {
                                 var song = fullLib[genre][artist][album][i];
                                 song.album = album;
+                                song.artist = artist;
                                 allSongs.push(song);
                             }
                         }
@@ -544,6 +545,7 @@ function filterLib() {
         }
     }
 
+    // Check filters validity
     var newFilters = checkFilters(filters.albums, allAlbums, function(o) { return keyAlbum(o); });
     if (newFilters.length != filters.albums.length) {
         needReload = true;
@@ -557,6 +559,14 @@ function filterLib() {
 
     if (needReload) {
         filterLib();
+    } else {
+        // Sort lists
+        allGenres.sort();
+        allGenres = ["All genres"].concat(allGenres);
+        allArtists.sort();
+        allArtists = ["All artists"].concat(allArtists);
+        allAlbums.sort(function(a, b) { return a.album.toLowerCase() > b.album.toLowerCase() ? 1 : -1; });
+        allAlbums = [{"album": "All albums", "artist": ""}].concat(allAlbums);
     }
 }
 
@@ -578,86 +588,99 @@ function keyAlbum(objAlbum) {
     return objAlbum.album + "@" + objAlbum.artist;
 }
 
-function renderGenres() {
+var renderGenres = function() {
     var output = '';
     for (var i = 0; i < allGenres.length; i++) {
-        output += '<li class="clearfix"><div class="lib-entry' + (filters.genres.indexOf(allGenres[i]) >= 0 ? ' active' : '') + '">' + allGenres[i] + '</div></li>';
+        output += '<li class="clearfix"><div class="lib-entry'
+               + (filters.genres.indexOf(allGenres[i]) >= 0 ? ' active' : '')
+               + '">' + allGenres[i] + '</div></li>';
     }
     $('#genresList').html(output);
     renderArtists();
 }
 
-function renderArtists() {
+var renderArtists = function() {
     var output = '';
     for (var i = 0; i < allArtists.length; i++) {
-        output += '<li class="clearfix"><div class="lib-entry' + (filters.artists.indexOf(allArtists[i]) >= 0 ? ' active' : '') + '">' + allArtists[i] + '</div></li>';
+        output += '<li class="clearfix"><div class="lib-entry'
+               + (filters.artists.indexOf(allArtists[i]) >= 0 ? ' active' : '')
+               + '">' + allArtists[i] + '</div></li>';
     }
     $('#artistsList').html(output);
     renderAlbums();
 }
 
-function renderAlbums() {
+var renderAlbums = function() {
     var output = '';
     for (var i = 0; i < allAlbums.length; i++) {
-        output += '<li class="clearfix"><div class="lib-entry' + (filters.albums.indexOf(keyAlbum(allAlbums[i])) >= 0 ? ' active' : '') + '">' + allAlbums[i].album + ' <span> ' + allAlbums[i].artist + '</span></div></li>';
+        output += '<li class="clearfix"><div class="lib-entry'
+               + (filters.albums.indexOf(keyAlbum(allAlbums[i])) >= 0 ? ' active' : '')
+               + '">' + allAlbums[i].album + (i > 0 ? ' <span> (' + allAlbums[i].artist + ')</span>' : '') + '</div></li>';
     }
     $('#albumsList').html(output);
     renderSongs();
 }
 
-function renderSongs() {
+var renderSongs = function() {
     var output = '';
     for (var i = 0; i < allSongs.length; i++) {
-        output += '<li id="lib-song-' + (i + 1) + '" class="clearfix"><div class="lib-entry">' + allSongs[i].Display
-                + ' <span> ' + allSongs[i].album + '</div></li>';
+        output += '<li id="lib-song-' + (i + 1) + '" class="clearfix"><div class="lib-entry">' + allSongs[i].display
+                + ' <span> (' + allSongs[i].artist + ', '  + allSongs[i].album
+                + ')<div class="lib-play"><a title="Play" href="#notarget" class="btn"><i class="icon-play"></i></a></div>'
+                + '<div class="lib-add"><a title="Enqueue" href="#notarget" class="btn"><i class="icon-plus-sign"></i></a></div></div></li>';
     }
     $('#songsList').html(output);
 }
 
-// click on GENRE
-$('#genresList').on('click', '.lib-entry', function() {
-    var pos = $('#genresList .lib-entry').index(this);
-    if (pos == 0) {
+function clickedLibItem(event, item, currentFilter, renderFunc) {
+    if (item == undefined) {
         // All
-        filters.genres.length = 0;
+        currentFilter.length = 0;
+    } else if (event.ctrlKey) {
+        currentIndex = currentFilter.indexOf(item);
+        if (currentIndex >= 0) {
+            currentFilter.splice(currentIndex, 1);
+        } else {
+            currentFilter.push(item);
+        }
     } else {
-        filters.genres = [allGenres[pos]];
+        currentFilter.length = 0;
+        currentFilter.push(item);
     }
     // Updated filters
     filterLib();
-    // Render all
-    renderGenres();
+    // Render
+    renderFunc();
+}
+
+// click on GENRE
+$('#genresList').on('click', '.lib-entry', function(e) {
+    var pos = $('#genresList .lib-entry').index(this);
+    clickedLibItem(e, pos == 0 ? undefined : allGenres[pos], filters.genres, renderGenres);
 });
 
 // click on ARTIST
-$('#artistsList').on('click', '.lib-entry', function() {
+$('#artistsList').on('click', '.lib-entry', function(e) {
     var pos = $('#artistsList .lib-entry').index(this);
-    if (pos == 0) {
-        // All
-        filters.artists.length = 0;
-    } else {
-        filters.artists = [allArtists[pos]];
-    }
-    // Updated filters
-    filterLib();
-    // Render
-    renderArtists();
+    clickedLibItem(e, pos == 0 ? undefined : allArtists[pos], filters.artists, renderArtists);
 });
 
 // click on ALBUM
-$('#albumsList').on('click', '.lib-entry', function() {
+$('#albumsList').on('click', '.lib-entry', function(e) {
     var pos = $('#albumsList .lib-entry').index(this);
-    if (pos == 0) {
-        // All
-        filters.albums.length = 0;
-    } else {
-        filters.albums = [keyAlbum(allAlbums[pos])];
-    }
-    // Updated filters
-    filterLib();
-    // Render
-    renderAlbums();
+    clickedLibItem(e, pos == 0 ? undefined : keyAlbum(allAlbums[pos]), filters.albums, renderAlbums);
 });
 
+// click on PLAY
+$('#songsList').on('click', '.lib-play', function(e) {
+    var pos = $('#songsList .lib-play').index(this);
+    console.log("Play " + allSongs[pos].file);
+});
+
+// click on ENQUEUE
+$('#songsList').on('click', '.lib-add', function(e) {
+    var pos = $('#songsList .lib-add').index(this);
+    console.log("Enqueue " + allSongs[pos].file);
+});
 
 

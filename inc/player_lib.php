@@ -125,9 +125,9 @@ function _organizeJsonLib($flat) {
                 if (!$lib[$genre][$artist][$album]) {
                         $lib[$genre][$artist][$album] = array();
                 }
-		$songDataLight = array(	"File" => $songData['file'],
-					"Display" => ($songData['Track'] ? $songData['Track']." - " : "")
-						.$artist." - ".$songData['Title']);
+		$songDataLight = array(	"file" => $songData['file'],
+					"display" => ($songData['Track'] ? $songData['Track']." - " : "")
+						.$songData['Title']);
 		array_push($lib[$genre][$artist][$album], $songDataLight);
 	}
 	return $lib;
