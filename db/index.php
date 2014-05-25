@@ -107,7 +107,20 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
                                 case 'loadlib':
 					echo loadAllLib($mpd);
                                 	break;
-				}
+
+                                case 'playall':
+                                        if (isset($_POST['path']) && $_POST['path'] != '') {
+                                        	echo json_encode(playAll($mpd,$_POST['path']));
+                                        }
+                                break;
+
+                                case 'addall':
+                                        if (isset($_POST['path']) && $_POST['path'] != '') {
+        	                                echo json_encode(enqueueAll($mpd,$_POST['path']));
+	                                }
+                                break;
+			}
+
 				
 		closeMpdSocket($mpd);
 		}

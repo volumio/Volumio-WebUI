@@ -1012,4 +1012,21 @@ body { background: #cf0; } */
         height: 80%;
 }
 
+.lib-playall, .lib-addall {
+        position: fixed;
+        bottom: 42px;
+        opacity: 0.5;
+}
+
+.lib-playall:hover, .lib-addall:hover {
+        opacity: 1;
+}
+
+.lib-playall {
+	right: 92px;
+}
+
+.lib-addall {
+        right: 52px;
+}
 
