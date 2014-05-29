@@ -693,8 +693,7 @@ $('#songsList').on('click', '.lib-add', function(e) {
 
 // click on PLAY ALL
 $('.lib-playall').click(function(e) {
-    var res = getDB('playall', allSongs);
-console.log(res);
+    getDB('playall', allSongs);
 });
 
 // click on ADD ALL
