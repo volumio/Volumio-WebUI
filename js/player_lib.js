@@ -38,12 +38,18 @@
     halt: 0,
     volume: null,
     currentDBpos: new Array(0,0,0,0,0,0,0,0,0,0,0),
-    browsemode: 'file',
     DBentry: new Array('', '', ''),
     visibility: 'visible',
-	DBupdate: 0
+    DBupdate: 0
 };
- 
+
+filters = {
+    artists: [],
+    genres: [],
+    albums: []
+}
+
+
 // FUNZIONI
 // ----------------------------------------------------------------------------------------------------
 
@@ -126,38 +132,36 @@ function getPlaylist(json){
         var i = 0;
         var content = '';
         var output = '';
-        for (i = 0; i < data.length; i++){
-            if (json['state'] != 'stop' && i == parseInt(json['song'])) {
-                content = '<li id="pl-' + (i + 1) + '" class="active clearfix">';
-            } else {
-                content = '<li id="pl-' + (i + 1) + '" class="clearfix">';
-            }
-			content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="icon-remove-sign"></i></a></div>';
-            if (typeof data[i].Title != 'undefined') {
-                content += '<div class="pl-entry">';
-                content += data[i].Title + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
-                content += ' <span>';
-                content +=  data[i].Artist;
-                content += ' - ';
-                content +=  data[i].Album;
-                content += '</span></div></li>';
-                output = output + content;
-            } else {
-                songpath = parsePath(data[i].file);
-                content += '<div class="pl-entry">';
-                content += data[i].file.replace(songpath + '/', '') + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
-                content += ' <span>';
-                content += ' path \: ';
-                content += songpath;
-                content += '</span></div></li>';
-                output = output + content;
+        if (data) {
+            for (i = 0; i < data.length; i++){
+                if (json['state'] != 'stop' && i == parseInt(json['song'])) {
+                    content = '<li id="pl-' + (i + 1) + '" class="active clearfix">';
+                } else {
+                    content = '<li id="pl-' + (i + 1) + '" class="clearfix">';
+                }
+                content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="icon-remove-sign"></i></a></div>';
+                if (typeof data[i].Title != 'undefined') {
+                    content += '<div class="pl-entry">';
+                    content += data[i].Title + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
+                    content += ' <span>';
+                    content +=  data[i].Artist;
+                    content += ' - ';
+                    content +=  data[i].Album;
+                    content += '</span></div></li>';
+                    output = output + content;
+                } else {
+                    songpath = parsePath(data[i].file);
+                    content += '<div class="pl-entry">';
+                    content += data[i].file.replace(songpath + '/', '') + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
+                    content += ' <span>';
+                    content += ' path \: ';
+                    content += songpath;
+                    content += '</span></div></li>';
+                    output = output + content;
+                }
             }
         }
         $('ul.playlist').html(output);
-        var current = parseInt(json['song']);
-        if (current != json && GUI.halt != 1) {
-            customScroll('pl', current, 200); // active current song
-        }
     });
 }
 
@@ -258,7 +262,11 @@ function getDB(cmd, path, browsemode, uplevel){
 		$.post('db/?querytype=' + browsemode + '&cmd=search', { 'query': keyword }, function(data) {
 			populateDB(data, path, uplevel, keyword);
 		}, 'json');
-	}
+	} else if (cmd == 'playall') {
+                $.post('db/?cmd=playall', { 'path': path }, function(data) {}, 'json');
+        } else if (cmd == 'addall') {
+                $.post('db/?cmd=addall', { 'path': path }, function(data) {}, 'json');
+        }
 }
 
 function populateDB(data, path, uplevel, keyword){
@@ -269,9 +277,16 @@ function populateDB(data, path, uplevel, keyword){
 	if (keyword) {
 		var results = (data.length) ? data.length : '0';
 		var s = (data.length == 1) ? '' : 's';
-		DBlist.append('<li id="db-0" class="search-results clearfix" title="Close search results and go back to the DB"><div class="db-icon db-folder"><i class="icon-arrow-left sx"></i></div><div class="db-entry db-folder">' + results + ' result' + s + ' for "<em class="keyword">' + keyword + '</em>"</div></li>');
+		var text = "" + results + ' result' + s + ' for "<em class="keyword">' + keyword + '</em>"';
+		$("#db-back").attr("title", "Close search results and go back to the DB");
+		$("#db-back-text").html(text);
+		$("#db-back").show();
 	} else if (path != '') {
-		DBlist.append('<li id="db-0" class="clearfix"><div class="db-entry db-browse levelup"><i class="icon-arrow-left sx"></i> <em>back</em></div></li>');
+		$("#db-back").attr("title", "");
+		$("#db-back-text").html("back");
+		$("#db-back").show();
+	} else {
+        	$("#db-back").hide();
 	}
 	var content = '';
 	var i = 0;
@@ -347,12 +362,12 @@ function updateGUI(json){
 function refreshState(state) {
     if (state == 'play') {
         $('#play').addClass('btn-primary');
-        $('#play i').removeClass('icon-play').addClass('icon-pause');
+        $('#play i').removeClass('icon-pause').addClass('icon-play');
         $('#stop').removeClass('btn-primary');
     } else if (state == 'pause') {
         $('#playlist-position').html('Not playing');
         $('#play').addClass('btn-primary');
-        $('#play i').removeClass('icon-pause').addClass('icon-play');
+        $('#play i').removeClass('icon-play').addClass('icon-pause');
         $('#stop').removeClass('btn-primary');
     } else if (state == 'stop') {
         $('#play').removeClass('btn-primary');
@@ -382,7 +397,7 @@ function refreshState(state) {
 	if (typeof GUI.json['updating_db'] != 'undefined') {
 		$('.open-panel-sx').html('<i class="icon-refresh icon-spin"></i> Updating');
 	} else {
-		$('.open-panel-sx').html('<i class="icon-music sx"></i> Browse');
+		$('.open-panel-sx').html('<i class="icon-folder-open sx"></i> Browse');
 	}
 }
 
@@ -499,3 +514,191 @@ function randomScrollDB() {
     var random = 1 + Math.floor(Math.random() * n);
     customScroll('db', random);
 }
+
+function loadLibrary(data) {
+    fullLib = data;
+    filterLib();
+    // Insert data in DOM
+    renderGenres();
+}
+
+function filterLib() {
+    allGenres = [];
+    allArtists = [];
+    allAlbums = [];
+    allSongs = [];
+    var needReload = false;
+    for (var genre in fullLib) {
+        allGenres.push(genre);
+        if (filters.genres.length == 0 || filters.genres.indexOf(genre) >= 0) {
+            for (var artist in fullLib[genre]) {
+                allArtists.push(artist);
+                if (filters.artists.length == 0 || filters.artists.indexOf(artist) >= 0) {
+                    for (var album in fullLib[genre][artist]) {
+                        var objAlbum = {"album": album, "artist": artist};
+                        allAlbums.push(objAlbum);
+                        if (filters.albums.length == 0 || filters.albums.indexOf(keyAlbum(objAlbum)) >= 0) {
+                            for (var i in fullLib[genre][artist][album]) {
+                                var song = fullLib[genre][artist][album][i];
+                                song.album = album;
+                                song.artist = artist;
+                                allSongs.push(song);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Check filters validity
+    var newFilters = checkFilters(filters.albums, allAlbums, function(o) { return keyAlbum(o); });
+    if (newFilters.length != filters.albums.length) {
+        needReload = true;
+        filters.albums = newFilters;
+    }
+    newFilters = checkFilters(filters.artists, allArtists, function(o) { return o; });
+    if (newFilters.length != filters.artists.length) {
+        needReload = true;
+        filters.artists = newFilters;
+    }
+
+    if (needReload) {
+        filterLib();
+    } else {
+        // Sort lists
+        allGenres.sort();
+        allGenres = ["All genres"].concat(allGenres);
+        allArtists.sort();
+        allArtists = ["All artists"].concat(allArtists);
+        allAlbums.sort(function(a, b) { return a.album.toLowerCase() > b.album.toLowerCase() ? 1 : -1; });
+        allAlbums = [{"album": "All albums", "artist": ""}].concat(allAlbums);
+    }
+}
+
+function checkFilters(filters, collection, func) {
+    // Check for invalid filters
+    var newFilters = [];
+    for (var filter in filters) {
+        for (var obj in collection) {
+            if (filters[filter] == func(collection[obj])) {
+                newFilters.push(filters[filter]);
+                break;
+            }
+        }
+    }
+    return newFilters;
+}
+
+function keyAlbum(objAlbum) {
+    return objAlbum.album + "@" + objAlbum.artist;
+}
+
+var renderGenres = function() {
+    var output = '';
+    for (var i = 0; i < allGenres.length; i++) {
+        output += '<li class="clearfix"><div class="lib-entry'
+               + (filters.genres.indexOf(allGenres[i]) >= 0 ? ' active' : '')
+               + '">' + allGenres[i] + '</div></li>';
+    }
+    $('#genresList').html(output);
+    renderArtists();
+}
+
+var renderArtists = function() {
+    var output = '';
+    for (var i = 0; i < allArtists.length; i++) {
+        output += '<li class="clearfix"><div class="lib-entry'
+               + (filters.artists.indexOf(allArtists[i]) >= 0 ? ' active' : '')
+               + '">' + allArtists[i] + '</div></li>';
+    }
+    $('#artistsList').html(output);
+    renderAlbums();
+}
+
+var renderAlbums = function() {
+    var output = '';
+    for (var i = 0; i < allAlbums.length; i++) {
+        output += '<li class="clearfix"><div class="lib-entry'
+               + (filters.albums.indexOf(keyAlbum(allAlbums[i])) >= 0 ? ' active' : '')
+               + '">' + allAlbums[i].album + (i > 0 ? ' <span> (' + allAlbums[i].artist + ')</span>' : '') + '</div></li>';
+    }
+    $('#albumsList').html(output);
+    renderSongs();
+}
+
+var renderSongs = function() {
+    var output = '';
+    for (var i = 0; i < allSongs.length; i++) {
+        output += '<li id="lib-song-' + (i + 1) + '" class="clearfix"><div class="lib-entry">' + allSongs[i].display
+                + ' <span> (' + allSongs[i].artist + ', '  + allSongs[i].album
+                + ')<div class="lib-play"><a title="Play" href="#notarget" class="btn"><i class="icon-play"></i></a></div>'
+                + '<div class="lib-add"><a title="Enqueue" href="#notarget" class="btn"><i class="icon-plus-sign"></i></a></div></div></li>';
+    }
+    $('#songsList').html(output);
+}
+
+function clickedLibItem(event, item, currentFilter, renderFunc) {
+    if (item == undefined) {
+        // All
+        currentFilter.length = 0;
+    } else if (event.ctrlKey) {
+        currentIndex = currentFilter.indexOf(item);
+        if (currentIndex >= 0) {
+            currentFilter.splice(currentIndex, 1);
+        } else {
+            currentFilter.push(item);
+        }
+    } else {
+        currentFilter.length = 0;
+        currentFilter.push(item);
+    }
+    // Updated filters
+    filterLib();
+    // Render
+    renderFunc();
+}
+
+// click on GENRE
+$('#genresList').on('click', '.lib-entry', function(e) {
+    var pos = $('#genresList .lib-entry').index(this);
+    clickedLibItem(e, pos == 0 ? undefined : allGenres[pos], filters.genres, renderGenres);
+});
+
+// click on ARTIST
+$('#artistsList').on('click', '.lib-entry', function(e) {
+    var pos = $('#artistsList .lib-entry').index(this);
+    clickedLibItem(e, pos == 0 ? undefined : allArtists[pos], filters.artists, renderArtists);
+});
+
+// click on ALBUM
+$('#albumsList').on('click', '.lib-entry', function(e) {
+    var pos = $('#albumsList .lib-entry').index(this);
+    clickedLibItem(e, pos == 0 ? undefined : keyAlbum(allAlbums[pos]), filters.albums, renderAlbums);
+});
+
+// click on PLAY
+$('#songsList').on('click', '.lib-play', function(e) {
+    var pos = $('#songsList .lib-play').index(this);
+    getDB('addreplaceplay', allSongs[pos].file);
+    notify('addreplaceplay', allSongs[pos].display);
+});
+
+// click on ENQUEUE
+$('#songsList').on('click', '.lib-add', function(e) {
+    var pos = $('#songsList .lib-add').index(this);
+    getDB('add', allSongs[pos].file);
+    notify('add', allSongs[pos].display);
+});
+
+// click on PLAY ALL
+$('.lib-playall').click(function(e) {
+    getDB('playall', allSongs);
+});
+
+// click on ADD ALL
+$('.lib-addall').click(function(e) {
+    getDB('addall', allSongs);
+});
+
+

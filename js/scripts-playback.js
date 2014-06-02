@@ -39,7 +39,6 @@ var GUI = {
     halt: 0,
     volume: null,
     currentDBpos: new Array(0,0,0,0,0,0,0,0,0,0,0),
-    browsemode: 'file',
     DBentry: new Array('', '', ''),
     visibility: 'visible',
 	DBupdate: 0
@@ -54,7 +53,7 @@ jQuery(document).ready(function($){ 'use strict';
 
     // first GUI update
     updateGUI(GUI.json);
-    getDB('filepath', GUI.currentpath, GUI.browsemode);
+    getDB('filepath', GUI.currentpath, 'file');
     $.pnotify.defaults.history = false;
 
 	// hide "connecting" layer
@@ -65,6 +64,20 @@ jQuery(document).ready(function($){ 'use strict';
     // BUTTONS
     // ----------------------------------------------------------------------------------------------------
     // playback
+    $("#play").mouseenter(function() {
+        if (GUI.state == "play") {
+            $("#play i").removeClass("icon-play").addClass("icon-pause");
+        } else if (GUI.state == "pause") {
+            $("#play i").removeClass("icon-pause").addClass("icon-play");
+        }
+    }).mouseleave(function() {
+        if (GUI.state == "play") {
+            $("#play i").removeClass("icon-pause").addClass("icon-play");
+        } else if (GUI.state == "pause") {
+            $("#play i").removeClass("icon-play").addClass("icon-pause");
+        }
+    });
+
     $('.btn-cmd').click(function(){
         var cmd;
         // stop
@@ -275,10 +288,19 @@ jQuery(document).ready(function($){ 'use strict';
         event.preventDefault();
         var pos = $('.playlist .pl-action').index(this);
         var cmd = 'trackremove&songid=' + pos;
-        var path = $(this).parent().data('path');
-        // recuperare datapath
-		notify('remove', '');
+        notify('remove', '');
         sendPLCmd(cmd);
+    });
+
+    // click on playlist save button
+    $('#pl-controls').on('click', '#pl-btnSave', function(event) {
+	var plname = $("#pl-saveName").val();
+	if (plname) {
+	        sendPLCmd('savepl&plname=' + plname);
+		notify('savepl', plname);
+	} else {
+		notify('needplname', '');
+	}
     });
 
     // click on playlist tab
@@ -297,33 +319,31 @@ jQuery(document).ready(function($){ 'use strict';
     // DATABASE
     // ----------------------------------------------------------------------------------------------------
 
+    // click on database "back"
+    $('#db-back').click(function() {
+        --GUI.currentDBpos[10];
+        var path = GUI.currentpath;
+        var cutpos=path.lastIndexOf("/");
+        if (cutpos !=-1) {
+            var path = path.slice(0,cutpos);
+        }  else {
+            path = '';
+        }
+        getDB('filepath', path, GUI.browsemode, 1);
+    });
+
     // click on database entry
     $('.database').on('click', '.db-browse', function() {
         $('.database li').removeClass('active');
         $(this).parent().addClass('active');
         if (!$(this).hasClass('sx')) {
-            var path = $(this).parent().data('path');
-            if ($(this).hasClass('levelup')) {
-                --GUI.currentDBpos[10];
-                var path = GUI.currentpath;
-                var cutpos=path.lastIndexOf("/");
-                if (cutpos !=-1) {
-                //console.log('cutpos = ', cutpos);
-                var path = path.slice(0,cutpos);
-                //console.log('oldpath = ', path);
-                }  else {
-                path = '';
-                }
-                getDB('filepath', path, GUI.browsemode, 1);
-            }
-            else if ($(this).hasClass('db-folder')) {
-                //GUI.currentDBpos[GUI.currentDBpos[10]] = $('.database .db-entry').index(this);
+            if ($(this).hasClass('db-folder')) {
+                var path = $(this).parent().data('path');
                 var entryID = $(this).parent().attr('id');
                 entryID = entryID.replace('db-','');
                 GUI.currentDBpos[GUI.currentDBpos[10]] = entryID;
                 ++GUI.currentDBpos[10];
-                //console.log('getDB path = ', path);
-                getDB('filepath', path, GUI.browsemode, 0);
+                getDB('filepath', path, 'file', 0);
             }
         }
     });
@@ -363,22 +383,16 @@ jQuery(document).ready(function($){ 'use strict';
         if ($(this).data('cmd') == 'addreplaceplay') {
             getDB('addreplaceplay', path);
             notify('addreplaceplay', path);
+            if (!path.contains("/")) {
+	            $("#pl-saveName").val(path);
+            } else {
+	            $("#pl-saveName").val("");
+	    }
         }
         if ($(this).data('cmd') == 'update') {
             getDB('update', path);
             notify('update', path);
         }
-    });
-
-    // browse mode menu
-    $('.browse-mode a').click(function(){
-        $('.browse-mode').removeClass('active');
-        $(this).parent().addClass('active').closest('.dropdown').removeClass('open');
-        var browsemode = $(this).find('span').html();
-        GUI.browsemode = browsemode.slice(0,-1);
-        $('#browse-mode-current').html(GUI.browsemode);
-        getDB('filepath', '', GUI.browsemode);
-        // console.log('Browse mode set to: ', GUI.browsemode);
     });
 
     // scroll buttons
@@ -462,6 +476,13 @@ jQuery(document).ready(function($){ 'use strict';
     if( $('.ttip').length ){
         $('.ttip').tooltip();
     }
+
+    $("#lib-loader").show();
+    $.post('db/?cmd=loadlib', {}, function(data) {
+        $("#lib-loader").hide();
+        $("#lib-content").show();
+        loadLibrary(data);
+    }, 'json');
 
 });
 

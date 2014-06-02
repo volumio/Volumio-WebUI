@@ -273,7 +273,7 @@ html, body {
 #menu-bottom a {
 	display: block;
 	float: left;
-	width: 33.333%;
+	width: 25%;
 	line-height: 40px;
 	margin: 0;
 	padding: 0;
@@ -288,7 +288,7 @@ html, body {
 	outline: none;
 	color: #fff;
 }
-#open-playback a {
+#open-playback a, #open-panel-sx a {
 	background: #273B4F;
 }
 
@@ -424,12 +424,9 @@ a.btn-cmd {
 #db-0 em, #pl-filter-results i {
 	color: #34495E;
 }
-#db-search-keyword, #pl-filter {
+#db-search-keyword, #pl-filter, #pl-saveName {
 	width: 126px;
 	height: 20px;
-}
-#browse-mode {
-	display: none; /* DA FAR FUNZIONARE */
 }
 
 .btnlist {
@@ -510,13 +507,28 @@ a.btn-cmd {
 }
 .btnlist.btnlist-bottom .btn {
 	margin-top: 6px;
-	font-size: 22px;
 }
 #db-search, #pl-search {
 	display: block;
 	float: right;
 	margin: 6px 0 0 20px;
 	z-index: 1001;
+}
+#pl-save {
+        display: block;
+        float: right;
+        margin-left: 20px;
+        z-index: 1001;
+}
+#pl-save input {
+	margin-top: 6px;
+        padding: 2px 0 2px 10px;
+        -webkit-border-top-right-radius: 0px;
+        -webkit-border-bottom-right-radius: 0px;
+        -moz-border-radius-topright: 0px;
+        -moz-border-radius-bottomright: 0px;
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;
 }
 #db-search input, #pl-search input {
 	margin: 0;
@@ -543,6 +555,17 @@ a.btn-cmd {
 #panel-sx .btn.disabled, #panel-sx .btn[disabled] {
     background-color: #34495E;
     color: white;
+}
+
+#db-back {
+        display: none;
+        margin: 6px 0 0 -6px;
+}
+
+#db-back .btn {
+    color: #DDDDDD;
+    font-size: 18px;
+    font-weight: bold;
 }
 
 /* Pages */
@@ -603,6 +626,9 @@ a.btn-cmd {
 	width: 100%;
 	height: 100%;
 	z-index: 99999;
+	display: none;
+}
+#lib-loader {
 	display: none;
 }
 #loaderbg {
@@ -859,3 +885,147 @@ body { background: #cf0; } */
 		display: none;
 	}
 }
+
+#lib-load {
+	color: #DDDDDD;
+	font-size: 18px;
+	font-weight: bold;
+	margin-left: -72px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+}
+
+#lib-content {
+	display: none;
+        position: absolute;
+        top: 40px;
+        left: 0px;
+        right: 0px;
+        bottom: 40px;
+}
+
+#lib-genre {
+        position: absolute;
+	overflow: auto;
+	width: 25%;
+	height: 25%;
+	border-bottom: 3px solid #212D39;
+        border-right: 3px solid #212D39;
+	z-index: 12;
+}
+#lib-artist {
+        position: absolute;
+	overflow: auto;
+        top: 25%;
+        width: 25%;
+        height: 75%;
+	margin-top: 3px;
+        border-right: 3px solid #212D39;
+	z-index: 12;
+}
+#lib-album {
+        position: absolute;
+	overflow: auto;
+        left: 25%;
+	width: 25%;
+	height: 100%;
+        border-right: 3px solid #212D39;
+        z-index: 11;
+}
+#lib-file {
+        position: absolute;
+	overflow: auto;
+        left: 50%;
+	width: 50%;
+	height: 100%;
+        z-index: 10;
+}
+
+#lib-content ul {
+	margin: 5px 2px;
+}
+
+#lib-content li {
+	display: block;
+	position: relative;
+	height: 22px;
+	margin: 0;
+	border-bottom: 1px solid #111D29;
+	cursor: pointer;
+	color: #ddd;
+	font-size: 13px;
+	text-align: left;
+	font-weight: bold;
+}
+
+#lib-content li div:hover {
+	background-color: #7A848E;
+}
+
+#lib-content #lib-file li {
+        cursor: default;
+}
+
+#lib-content #lib-file li div:hover {
+	background-color: transparent;
+}
+
+#lib-content li div.active {
+        background-color: #4BBE87;
+}
+
+#lib-content span {
+	color: #14192E;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.lib-entry {
+	margin-left: 4px;
+}
+
+.lib-entry .btn {
+	font-size: 10px;
+	height: 80%;
+	line-height: 16px;
+	margin-top: -5px;
+	padding: 1px 3px;
+}
+
+.lib-entry .btn:hover {
+	background-color: #1ABC9C;
+}
+
+.lib-play {
+	position: absolute;
+	top: 2px;
+	right: 20px;
+	height: 80%;
+}
+
+.lib-add {
+        position: absolute;
+        top: 2px;
+        right: 1px;
+        height: 80%;
+}
+
+.lib-playall, .lib-addall {
+        position: fixed;
+        bottom: 42px;
+        opacity: 0.5;
+}
+
+.lib-playall:hover, .lib-addall:hover {
+        opacity: 1;
+}
+
+.lib-playall {
+	right: 92px;
+}
+
+.lib-addall {
+        right: 52px;
+}
+

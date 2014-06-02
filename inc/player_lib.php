@@ -44,8 +44,8 @@ $response = readMpdResponse($sock);
 } //end openMpdSocket()
 
 function closeMpdSocket($sock) {
-sendMpdCommand($sock,"close");
-fclose($sock);
+	sendMpdCommand($sock,"close");
+	fclose($sock);
 }
 
 // v2
@@ -61,7 +61,7 @@ function sendMpdCommand($sock,$cmd) {
 
 // v3
 function readMpdResponse($sock) {
-$output = "";
+	$output = "";
 			while(!feof($sock)) {
 				$response =  fgets($sock,1024);
 				$output .= $response;
@@ -73,7 +73,91 @@ $output = "";
 					break;
 					}
 			}
-return $output;
+	return $output;
+}
+
+function chainMpdCommands($sock, $commands) {
+        foreach ($commands as $command) {
+                sendMpdCommand($sock, $command);
+                readMpdResponse($sock);
+        }
+}
+
+function loadAllLib($sock) {
+	$flat = _loadDirForLib($sock, array(), "");
+	return json_encode(_organizeJsonLib($flat));
+}
+
+function _loadDirForLib($sock, $flat, $dir) {
+	sendMpdCommand($sock, "lsinfo \"".html_entity_decode($dir)."\"");
+	$resp = readMpdResponse($sock);
+
+	if (!is_null($resp)) {
+		$lines = explode("\n", $resp);
+		$iItem = 0;
+		$skip = true;
+		for ($iLine = 0; $iLine < count($lines); $iLine++) {
+			list($element, $value) = explode(": ", $lines[$iLine]);
+			if ($element == "file") {
+				$skip = false;
+				$iItem = count($flat);
+			} else if ($element == "directory") {
+				$flat = _loadDirForLib($sock, $flat, $value);
+				$skip = true;
+			} else if ($element == "playlist") {
+				$skip = true;
+			}
+			if (!$skip) {
+				$flat[$iItem][$element] = $value;
+			}
+		} 
+	}
+	return $flat;
+}
+
+function _organizeJsonLib($flat) {
+	// Build json like "{Genre1: {Artist1: {Album1: [{song1}, {song2}], Album2:...}, Artist2:...}, Genre2:...}
+	$lib = array();
+	foreach ($flat as $songData) {
+		$genre = $songData["Genre"] ? $songData["Genre"] : "Unknown";
+		$artist = $songData["Artist"] ? $songData["Artist"] : "Unknown";
+		$album = $songData["Album"] ? $songData["Album"] : "Unknown";
+
+		if (!$lib[$genre]) {
+			$lib[$genre] = array();
+		}
+		if (!$lib[$genre][$artist]) {
+			$lib[$genre][$artist] = array();
+		}
+                if (!$lib[$genre][$artist][$album]) {
+                        $lib[$genre][$artist][$album] = array();
+                }
+		$songDataLight = array(	"file" => $songData['file'],
+					"display" => ($songData['Track'] ? $songData['Track']." - " : "")
+						.$songData['Title']);
+		array_push($lib[$genre][$artist][$album], $songDataLight);
+	}
+	return $lib;
+}
+
+function playAll($sock, $json) {
+        $commands = array();
+	array_push($commands, "clear");
+	foreach ($json as $song) {
+		$path = $song["file"];
+		array_push($commands, "add \"".html_entity_decode($path)."\"");
+	}
+	array_push($commands, "play");
+	chainMpdCommands($sock, $commands);
+}
+
+function enqueueAll($sock, $json) {
+	$commands = array();
+        foreach ($json as $song) {
+                $path = $song["file"];
+		array_push($commands, "add \"".html_entity_decode($path)."\"");
+        }
+	chainMpdCommands($sock, $commands);
 }
 
 // v2
@@ -146,7 +230,7 @@ return $datapath;
 
 function addQueue($sock,$path) {
 $fileext = parseFileStr($path,'.');
-if ($fileext == 'm3u' OR $fileext == 'pls') {
+if ($fileext == 'm3u' OR $fileext == 'pls' OR strpos($path, '/') === false) {
 sendMpdCommand($sock,"load \"".html_entity_decode($path)."\"");
 } else {
 sendMpdCommand($sock,"add \"".html_entity_decode($path)."\"");

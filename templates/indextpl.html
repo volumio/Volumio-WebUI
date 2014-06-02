@@ -45,23 +45,15 @@
 	<!-- -------------------- DATABASE PANEL -------------------- -->
 	<div id="panel-sx" class="tab-pane">
 		<div class="btnlist btnlist-top">
-			<form id="db-search" action="javascript:getDB('search', '', GUI.browsemode);">
+			<form id="db-search" action="javascript:getDB('search', '', 'file');">
 				<div class="input-append">
 					<input class="span2" id="db-search-keyword" type="text" value="" placeholder="search in DB...">
 					<button class="btn" type="submit"><i class="icon-search"></i></button>
 				</div>
 			</form>
-			<form id="db-browse">
-				<div class="dropdown">
-					<a class="dropdown-toggle" id="browse-mode" role="button" data-toggle="dropdown" data-target="#" href="$_section.php"><i class="icon-caret-down sx"></i> <span id="browse-mode-current">files</span></a>
-					<ul class="dropdown-menu" role="menu" aria-labelledby="browse-mode">
-						<li class="browse-mode active"><a href="#notarget"><i class="icon-file sx"></i> <span>files</span></a></li>
-						<li class="browse-mode"><a href="#notarget"><i class="icon-user sx"></i> <span>artists</span></a></li>
-						<li class="browse-mode"><a href="#notarget"><i class="icon-tag sx"></i> <span>titles</span></a></li>
-						<li class="browse-mode"><a href="#notarget"><i class="icon-bullseye sx"></i> <span>albums</span></a></li>
-					</ul>
-				</div>
-			</form>
+			<div id="db-back">
+				<button class="btn"><i class="icon-arrow-left sx"></i> <em id="db-back-text">back</em></button>
+			</div>
 		</div>
 		<div id="database">
 			<ul class="database">
@@ -100,6 +92,12 @@
 		</div>
 		<div class="btnlist btnlist-bottom">
 			<div id="pl-controls">
+				<form id="pl-save" method="post" onSubmit="return false;">
+                                	<div class="input-append">
+						<input id="pl-saveName" class="ttip" type="text" value="" placeholder="Type playlist name" data-placement="bottom" data-toggle="tooltip">
+						<button id="pl-btnSave" class="btn"><i class="icon-save"></i></button>
+					</div>
+				</form>
 				<button id="pl-debug-btn" class="btn hide"><i class="icon-random"></i></button>
 				<button class="btn pl-firstPage"><i class="icon-double-angle-up"></i></button>
 				<button class="btn pl-prevPage"><i class="icon-angle-up"></i></button>
@@ -108,7 +106,30 @@
 			</div>
 		</div>
 	</div>
-	
+
+	<!-- -------------------- LIBRARY PANEL -------------------- -->
+        <div id="panel-lib" class="tab-pane">
+		<div class="container txtmid">
+			<div id="lib-loader"><div id="loaderbg"></div><div id="loadercontent"><i class="icon-refresh icon-spin"></i>loading...</div></div>
+			<div id="lib-content">
+				<div id="lib-genre">
+					<ul id="genresList"></ul>
+				</div>
+				<div id="lib-artist">
+					<ul id="artistsList"></ul>
+				</div>
+				<div id="lib-album">
+					<ul id="albumsList"></ul>
+				</div>
+				<div id="lib-file">
+					<ul id="songsList"></ul>
+					<div class="lib-playall"><a title="Play all" href="#notarget" class="btn"><i class="icon-play"></i></a></div>
+					<div class="lib-addall"><a title="Enqueue all" href="#notarget" class="btn"><i class="icon-plus-sign"></i></a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 <div id="context-menus">
