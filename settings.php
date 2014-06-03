@@ -285,6 +285,65 @@ if (isset($_POST['cmediafix']) && $_POST['cmediafix'] != $_SESSION['cmediafix'])
 	playerSession('unlock');
 }
 
+if (isset($_POST['shairport']) && $_POST['shairport'] != $_SESSION['shairport']){
+	// load worker queue 
+	// start / respawn session
+	session_start();
+	// save new value on SQLite datastore
+	if ($_POST['shairport'] == 1 OR $_POST['shairport'] == 0) {
+	playerSession('write',$db,'shairport',$_POST['shairport']);
+	}
+	// set UI notify
+	if ($_POST['shairport'] == 1) {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'shairport enabled';
+	} else {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'shairport disabled';
+	}
+	// unlock session file
+	playerSession('unlock');
+}
+
+if (isset($_POST['upnpmpdcli']) && $_POST['upnpmpdcli'] != $_SESSION['upnpmpdcli']){
+	// load worker queue 
+	// start / respawn session
+	session_start();
+	// save new value on SQLite datastore
+	if ($_POST['upnpmpdcli'] == 1 OR $_POST['upnpmpdcli'] == 0) {
+	playerSession('write',$db,'upnpmpdcli',$_POST['upnpmpdcli']);
+	}
+	// set UI notify
+	if ($_POST['upnpmpdcli'] == 1) {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'upnpmpdcli enabled';
+	} else {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'upnpmpdcli disabled';
+	}
+	// unlock session file
+	playerSession('unlock');
+}
+
+if (isset($_POST['djmount']) && $_POST['djmount'] != $_SESSION['djmount']){
+	// load worker queue 
+	// start / respawn session
+	session_start();
+	// save new value on SQLite datastore
+	if ($_POST['djmount'] == 1 OR $_POST['djmount'] == 0) {
+	playerSession('write',$db,'djmount',$_POST['djmount']);
+	}
+	// set UI notify
+	if ($_POST['djmount'] == 1) {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'djmount enabled';
+	} else {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'djmount disabled';
+	}
+	// unlock session file
+	playerSession('unlock');
+}
 
 // configure html select elements
 $_system_select['orionprofile'] .= "<option value=\"default\" ".(($_SESSION['orionprofile'] == 'default') ? "selected" : "").">default</option>\n";
@@ -294,7 +353,12 @@ $_system_select['orionprofile'] .= "<option value=\"Mike\" ".(($_SESSION['orionp
 $_system_select['orionprofile'] .= "<option value=\"Orion\" ".(($_SESSION['orionprofile'] == 'Orion') ? "selected" : "").">Orion</option>\n";
 $_system_select['cmediafix1'] .= "<input type=\"radio\" name=\"cmediafix\" id=\"toggleOption1\" value=\"1\" ".(($_SESSION['cmediafix'] == 1) ? "checked=\"checked\"" : "").">\n";
 $_system_select['cmediafix0'] .= "<input type=\"radio\" name=\"cmediafix\" id=\"toggleOption2\" value=\"0\" ".(($_SESSION['cmediafix'] == 0) ? "checked=\"checked\"" : "").">\n";
-
+$_system_select['djmount1'] .= "<input type=\"radio\" name=\"djmount\" id=\"toggleOption1\" value=\"1\" ".(($_SESSION['djmount'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['djmount0'] .= "<input type=\"radio\" name=\"djmount\" id=\"toggleOption2\" value=\"0\" ".(($_SESSION['djmount'] == 0) ? "checked=\"checked\"" : "").">\n";
+$_system_select['shairport1'] .= "<input type=\"radio\" name=\"shairport\" id=\"toggleOption1\" value=\"1\" ".(($_SESSION['shairport'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['shairport0'] .= "<input type=\"radio\" name=\"shairport\" id=\"toggleOption2\" value=\"0\" ".(($_SESSION['shairport'] == 0) ? "checked=\"checked\"" : "").">\n";
+$_system_select['upnpmpdcli1'] .= "<input type=\"radio\" name=\"upnpmpdcli\" id=\"toggleOption1\" value=\"1\" ".(($_SESSION['upnpmpdcli'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['upnpmpdcli0'] .= "<input type=\"radio\" name=\"upnpmpdcli\" id=\"toggleOption2\" value=\"0\" ".(($_SESSION['upnpmpdcli'] == 0) ? "checked=\"checked\"" : "").">\n";
 // set template
 $tpl = "settings.html";
 ?>

@@ -279,6 +279,25 @@ if (isset($_SESSION['cmediafix']) && $_SESSION['cmediafix'] == 1) {
 	sendMpdCommand($mpd,'cmediafix');
 	closeMpdSocket($mpd);
 } 
+// Utilities to start with Volumio
+
+// Shairport for Airplay Capability
+if (isset($_SESSION['shairport']) && $_SESSION['shairport'] == 1) {
+	$cmd = '/usr/local/bin/shairport -a "Volumio" -w -B "mpc stop" -o alsa -- -d hw:0,0 > /dev/null 2>&1 &';
+	sysCmd($cmd);
+} 
+
+// Djmount daemon start for DLNA Browsing
+if (isset($_SESSION['djmount']) && $_SESSION['djmount'] == 1) {
+	$cmd = 'djmount -o allow_other,nonempty,iocharset=utf-8 /mnt/UPNP > /dev/null 2>&1 &';
+	sysCmd($cmd);
+} 
+
+// Mpdupnpcli for UPNP control
+if (isset($_SESSION['upnpmpdcli']) && $_SESSION['upnpmpdcli'] == 1) {
+	$cmd = '/etc/init.d/upmpdcli start > /dev/null 2>&1 &';
+	sysCmd($cmd);
+} 
 // --- NORMAL STARTUP --- //
 
 // --- WORKER MAIN LOOP --- //

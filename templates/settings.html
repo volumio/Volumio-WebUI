@@ -2,6 +2,60 @@
 	<h1>Settings</h1>
 	<form class="form-horizontal" method="post">
 		<fieldset>
+			<legend>Services</legend>
+			<p>Enable or disable certain Volumio functionalities</p>
+			<!-- <div class="control-group">
+				<label class="control-label">Airplay</label>
+				<div class="controls">
+					<div class="toggle">
+						<label class="toggle-radio" for="toggleOption2" >ON</label>
+						
+$_system_select[shairport1]
+
+						<label class="toggle-radio" for="toggleOption1">OFF</label>
+
+$_system_select[shairport0]				
+						
+					</div>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">UPNP Control</label>
+				<div class="controls">
+					<div class="toggle">
+						<label class="toggle-radio" for="toggleOption2" >ON</label>
+						
+$_system_select[upnpmpdcli1]
+
+						<label class="toggle-radio" for="toggleOption1">OFF</label>
+
+$_system_select[upnpmpdcli0]				
+						
+					</div>
+				</div>
+			</div> -->
+			<div class="control-group">
+				<label class="control-label">UPNP\DLNA Music Indexing</label>
+				<div class="controls">
+					<div class="toggle">
+						<label class="toggle-radio" for="toggleOption2" >ON</label>
+						
+$_system_select[djmount1]
+
+						<label class="toggle-radio" for="toggleOption1">OFF</label>
+
+$_system_select[djmount0]				
+						
+					</div>
+				</div>
+			</div>
+			<div class="form-actions">
+				<button class="btn btn-primary btn-large" value="apply" name="apply" type="submit">Apply</button>
+			</div>
+		</fieldset>
+	</form>
+	<form class="form-horizontal" method="post">
+		<fieldset>
 			<legend>Sound quality tweaks</legend>
 			<p>
 				These profiles include a set of performance tweaks that act on some system kernel parameters.<br>
@@ -96,7 +150,7 @@ $_system_select[orionprofile]
 	</div>		
 		</fieldset>
 	</form>
-	<form class="form-horizontal" method="post">
+	<!-- <form class="form-horizontal" method="post">
 		<fieldset>
 			<legend>Compatibility fixes</legend>
 			<p>For people suffering problems with some receivers and DACs.</p>
@@ -121,7 +175,7 @@ $_system_select[cmediafix0]
 				<button class="btn btn-primary btn-large" value="apply" name="apply" type="submit">Apply fixes</button>
 			</div>
 		</fieldset>
-	</form>
+	</form> -->
 	<!--
 	<form class="form-horizontal" data-validate="parsley" action="" method="post">
         <fieldset>
