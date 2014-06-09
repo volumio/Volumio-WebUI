@@ -14,7 +14,7 @@ NAME="Volumio"
  
 case "$1" in
   start)
-    /usr/local/bin/shairport -d -a "$NAME" -w -B "mpc stop"
+    /usr/local/bin/shairport -d -a "$NAME" -B "mpc stop"
     ;;
   stop)
     killall shairport
