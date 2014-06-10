@@ -282,8 +282,24 @@ if (isset($_SESSION['cmediafix']) && $_SESSION['cmediafix'] == 1) {
 // Utilities to start with Volumio
 
 // Shairport for Airplay Capability
+//Retrieve Output Device
 if (isset($_SESSION['shairport']) && $_SESSION['shairport'] == 1) {
-	$cmd = '/usr/local/bin/shairport -a "Volumio" -w -B "mpc stop" -o alsa -- -d hw:0,0 > /dev/null 2>&1 &';
+	$dbh = cfgdb_connect($db);
+	$query_cfg = "SELECT param,value_player FROM cfg_mpd WHERE value_player!=''";
+	$mpdcfg = sdbquery($query_cfg,$dbh);
+	$dbh = null;
+	foreach ($mpdcfg as $cfg) {
+		if ($cfg['param'] == 'audio_output_format' && $cfg['value_player'] == 'disabled'){
+		$output .= '';
+		} else if ($cfg['param'] == 'device') {
+		$device = $cfg['value_player'];
+		var_export($device);
+		}  else {
+		$output .= $cfg['param']." \t\"".$cfg['value_player']."\"\n";
+		}
+	}
+// Start Shairport with Volumio name, stopping Mpd on start, with Selected output device
+	$cmd = '/usr/local/bin/shairport -a "Volumio" -w -B "mpc stop" -o alsa -- -d "hw:"'.$device.'",0" > /dev/null 2>&1 &';
 	sysCmd($cmd);
 } 
 
