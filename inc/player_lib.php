@@ -1111,6 +1111,11 @@ $file = '/proc/cpuinfo';
 					$arch = '06';
 					break;
 					
+					// Cubieboard 
+					case 'sun7i':
+					$arch = '07';
+					break;
+					
 					default:
 					$arch = '--';
 					break;
@@ -1157,6 +1162,11 @@ playerSession('write',$db,'playerid',$playerid);
 		
 		case '06':
 		playerSession('write',$db,'hwplatform','Wandboard');
+		playerSession('write',$db,'hwplatformid',$arch);
+		break;
+		
+		case '07':
+		playerSession('write',$db,'hwplatform','Cubieboard\Cubietruck');
 		playerSession('write',$db,'hwplatformid',$arch);
 		break;
 		
