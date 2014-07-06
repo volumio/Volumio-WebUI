@@ -44,8 +44,8 @@ $response = readMpdResponse($sock);
 } //end openMpdSocket()
 
 function closeMpdSocket($sock) {
-	sendMpdCommand($sock,"close");
-	fclose($sock);
+sendMpdCommand($sock,"close");
+fclose($sock);
 }
 
 // v2
@@ -59,9 +59,19 @@ function sendMpdCommand($sock,$cmd) {
 	}
 }
 
+function chainMpdCommands($sock, $commands) {
+	foreach ($commands as $command) {
+		fputs($sock, $command."\n");
+		fflush($sock);
+		// MPD seems to be disoriented when it receives several commands chained. Need to sleep a little bit
+		// 200 ms
+		usleep(200000);
+	}
+}
+
 // v3
 function readMpdResponse($sock) {
-	$output = "";
+$output = "";
 			while(!feof($sock)) {
 				$response =  fgets($sock,1024);
 				$output .= $response;
@@ -73,14 +83,7 @@ function readMpdResponse($sock) {
 					break;
 					}
 			}
-	return $output;
-}
-
-function chainMpdCommands($sock, $commands) {
-        foreach ($commands as $command) {
-                sendMpdCommand($sock, $command);
-                readMpdResponse($sock);
-        }
+return $output;
 }
 
 function loadAllLib($sock) {
@@ -141,14 +144,21 @@ function _organizeJsonLib($flat) {
 }
 
 function playAll($sock, $json) {
-        $commands = array();
-	array_push($commands, "clear");
-	foreach ($json as $song) {
-		$path = $song["file"];
-		array_push($commands, "add \"".html_entity_decode($path)."\"");
+	if (count($json) > 0) {
+		// Clear, add first file and play
+	        $commands = array();
+		array_push($commands, "clear");
+		array_push($commands, "add \"".html_entity_decode($json[0]['file'])."\"");
+		array_push($commands, "play");
+	        chainMpdCommands($sock, $commands);
+
+		// Then add remaining
+		$commands = array();
+		for ($i = 1; $i < count($json); $i++) {
+	                array_push($commands, "add \"".html_entity_decode($json[$i]['file'])."\"");
+	        }
+	        chainMpdCommands($sock, $commands);
 	}
-	array_push($commands, "play");
-	chainMpdCommands($sock, $commands);
 }
 
 function enqueueAll($sock, $json) {
