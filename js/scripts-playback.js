@@ -477,12 +477,6 @@ jQuery(document).ready(function($){ 'use strict';
         $('.ttip').tooltip();
     }
 
-    $("#lib-load").click(function() {
-        $.post('db/?cmd=loadlib', {}, function(data) {
-            console.log(data);
-        }, 'json');
-    });
-
 });
 
 

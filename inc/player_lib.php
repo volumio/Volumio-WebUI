@@ -76,38 +76,6 @@ $output = "";
 return $output;
 }
 
-function loadAllLib($sock) {
-	$lib = array();
-	return json_encode(_loadDirForLib($sock, $lib, ""));
-}
-
-function _loadDirForLib($sock, $lib, $dir) {
-	sendMpdCommand($sock, "lsinfo \"".html_entity_decode($dir)."\"");
-	$resp = readMpdResponse($sock);
-
-	if (!is_null($resp)) {
-		$lines = explode("\n", $resp);
-		$iItem = 0;
-		$skip = true;
-		for ($iLine = 0; $iLine < count($lines); $iLine++) {
-			list($element, $value) = explode(": ", $lines[$iLine]);
-			if ($element == "file") {
-				$skip = false;
-				$iItem = count($lib);
-			} else if ($element == "directory") {
-				$lib = _loadDirForLib($sock, $lib, $value);
-				$skip = true;
-			} else if ($element == "playlist") {
-				$skip = true;
-			}
-			if (!$skip) {
-				$lib[$iItem][$element] = $value;
-			}
-		} 
-	}
-	return $lib;
-}
-
 // v2
 function sendMpdIdle($sock) {
 sendMpdCommand($sock,"idle"); 

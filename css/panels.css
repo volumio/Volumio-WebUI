@@ -273,7 +273,7 @@ html, body {
 #menu-bottom a {
 	display: block;
 	float: left;
-	width: 25%;
+	width: 33.333%;
 	line-height: 40px;
 	margin: 0;
 	padding: 0;
@@ -288,7 +288,7 @@ html, body {
 	outline: none;
 	color: #fff;
 }
-#open-playback a, #open-panel-sx a {
+#open-playback a {
 	background: #273B4F;
 }
 
@@ -882,6 +882,7 @@ body { background: #cf0; } */
 		display: none;
 	}
 }
+<<<<<<< HEAD
 
 #lib-load {
 	color: #DDDDDD;
@@ -961,3 +962,5 @@ body { background: #cf0; } */
 >>>>>>> parent of 31382c7... Load and display library (WIP)
 =======
 >>>>>>> parent of 31382c7... Load and display library (WIP)
+=======
+>>>>>>> parent of d788af1... New panel: library

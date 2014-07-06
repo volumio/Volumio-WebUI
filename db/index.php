@@ -103,10 +103,6 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 					echo json_encode(searchDB($mpd,$_GET['querytype'],$_POST['query']));
 					}
 				break;
-
-                                case 'loadlib':
-					echo loadAllLib($mpd);
-                                	break;
 				}
 				
 		closeMpdSocket($mpd);
