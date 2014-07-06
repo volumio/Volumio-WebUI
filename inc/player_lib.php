@@ -77,11 +77,11 @@ return $output;
 }
 
 function loadAllLib($sock) {
-	$flat = _loadDirForLib($sock, array(), "");
-	return json_encode(_organizeJsonLib($flat));
+	$lib = array();
+	return json_encode(_loadDirForLib($sock, $lib, ""));
 }
 
-function _loadDirForLib($sock, $flat, $dir) {
+function _loadDirForLib($sock, $lib, $dir) {
 	sendMpdCommand($sock, "lsinfo \"".html_entity_decode($dir)."\"");
 	$resp = readMpdResponse($sock);
 
@@ -93,42 +93,17 @@ function _loadDirForLib($sock, $flat, $dir) {
 			list($element, $value) = explode(": ", $lines[$iLine]);
 			if ($element == "file") {
 				$skip = false;
-				$iItem = count($flat);
+				$iItem = count($lib);
 			} else if ($element == "directory") {
-				$flat = _loadDirForLib($sock, $flat, $value);
+				$lib = _loadDirForLib($sock, $lib, $value);
 				$skip = true;
 			} else if ($element == "playlist") {
 				$skip = true;
 			}
 			if (!$skip) {
-				$flat[$iItem][$element] = $value;
+				$lib[$iItem][$element] = $value;
 			}
 		} 
-	}
-	return $flat;
-}
-
-function _organizeJsonLib($flat) {
-	// Build json like "{Genre1: {Artist1: {Album1: [{song1}, {song2}], Album2:...}, Artist2:...}, Genre2:...}
-	$lib = array();
-	foreach ($flat as $songData) {
-		$genre = $songData["Genre"] ? $songData["Genre"] : "Unknown";
-		$artist = $songData["Artist"] ? $songData["Artist"] : "Unknown";
-		$album = $songData["Album"] ? $songData["Album"] : "Unknown";
-
-		if (!$lib[$genre]) {
-			$lib[$genre] = array();
-		}
-		if (!$lib[$genre][$artist]) {
-			$lib[$genre][$artist] = array();
-		}
-                if (!$lib[$genre][$artist][$album]) {
-                        $lib[$genre][$artist][$album] = array();
-                }
-		$songDataLight = array(	"File" => $songData['file'],
-					"Display" => ($songData['Track'] ? $songData['Track']." - " : "")
-						.$artist." - ".$songData['Title']);
-		array_push($lib[$genre][$artist][$album], $songDataLight);
 	}
 	return $lib;
 }

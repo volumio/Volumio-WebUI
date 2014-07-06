@@ -628,9 +628,6 @@ a.btn-cmd {
 	z-index: 99999;
 	display: none;
 }
-#lib-loader {
-	display: none;
-}
 #loaderbg {
 	position: absolute;
 	top: 0;
@@ -893,9 +890,9 @@ body { background: #cf0; } */
 	margin-left: -72px;
 	position: absolute;
 	top: 50%;
-	left: 50%;
 }
 
+<<<<<<< HEAD
 #lib-content {
 	display: none;
         position: absolute;
@@ -959,3 +956,5 @@ body { background: #cf0; } */
 }
 
 
+=======
+>>>>>>> parent of 31382c7... Load and display library (WIP)
