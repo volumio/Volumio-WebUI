@@ -477,12 +477,16 @@ jQuery(document).ready(function($){ 'use strict';
         $('.ttip').tooltip();
     }
 
-    $("#lib-loader").show();
-    $.post('db/?cmd=loadlib', {}, function(data) {
-        $("#lib-loader").hide();
-        $("#lib-content").show();
-        loadLibrary(data);
-    }, 'json');
+    $("#lib-load").click(function() {
+        $("#lib-loader").show();
+        $("#lib-load").hide();
+        $.post('db/?cmd=loadlib', {}, function(data) {
+            $("#lib-loader").hide();
+            $("#lib-content").show();
+            console.log(data);
+            loadLibrary(data);
+        }, 'json');
+    });
 
 });
 

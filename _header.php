@@ -96,12 +96,12 @@
 <div id="menu-bottom" class="ui-footer ui-bar-f ui-footer-fixed slidedown" data-position="fixed" data-role="footer"  role="banner">
 	<ul>
 		<?php if ($sezione == 'index') { ?>
-		<li id="open-panel-sx"><a href="#panel-sx" class="open-panel-sx" data-toggle="tab"><i class="icon-folder-open sx"></i> Browse</a></li>
+		<li id="open-panel-sx"><a href="#panel-sx" class="open-panel-sx" data-toggle="tab"><i class="icon-music sx"></i> Browse</a></li>
 		<li id="open-panel-lib"><a href="#panel-lib" class="open-panel-lib" data-toggle="tab"><i class="icon-music sx"></i> Library</a></li>
 		<li id="open-playback" class="active"><a href="#playback" class="close-panels" data-toggle="tab"><i class="icon-play sx"></i> Playback</a></li>
 		<li id="open-panel-dx"><a href="#panel-dx" class="open-panel-dx" data-toggle="tab"><i class="icon-list sx"></i> Playlist</a></li>
 		<?php } else { ?>
-		<li id="open-panel-sx"><a href="index.php#panel-sx" class="open-panel-sx"><i class="icon-folder-open sx"></i> Browse</a></li>
+		<li id="open-panel-sx"><a href="index.php#panel-sx" class="open-panel-sx"><i class="icon-music sx"></i> Browse</a></li>
 		<li id="open-panel-lib"><a href="index.php#panel-lib" class="open-panel-lib"><i class="icon-music sx"></i> Library</a></li>
 		<li id="open-playback"><a href="index.php#playback" class="close-panels"><i class="icon-play sx"></i> Playback</a></li>
 		<li id="open-panel-dx"><a href="index.php#panel-dx" class="open-panel-dx"><i class="icon-list sx"></i> Playlist</a></li>

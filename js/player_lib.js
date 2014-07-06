@@ -386,7 +386,7 @@ function refreshState(state) {
 	if (typeof GUI.json['updating_db'] != 'undefined') {
 		$('.open-panel-sx').html('<i class="icon-refresh icon-spin"></i> Updating');
 	} else {
-		$('.open-panel-sx').html('<i class="icon-folder-open sx"></i> Browse');
+		$('.open-panel-sx').html('<i class="icon-music sx"></i> Browse');
 	}
 }
 
@@ -506,18 +506,18 @@ function randomScrollDB() {
 
 function loadLibrary(data) {
     fullLib = data;
-    allGenres = filterGenres(fullLib);
-    allArtists = filterArtists(fullLib);
-    allAlbums = filterAlbums(fullLib);
+    allGenres = distinctGenres(fullLib);
+    allArtists = { "all" : "" };
+    allAlbums = { "all" : "" };
     allSongs = [];
     for (var genre in data) {
 //        allGenres[genre] = true;
         var dataByGenre = data[genre];
         for (var artist in dataByGenre) {
-//            allArtists[artist] = true;
+            allArtists[artist] = true;
             var dataByArtist = dataByGenre[artist];
             for (var album in dataByArtist) {
-//                allAlbums[album] = artist;
+                allAlbums[album] = artist;
                 var dataByAlbum = dataByArtist[album];
                 for (var i in dataByAlbum) {
                     var song = dataByAlbum[i];
@@ -532,48 +532,18 @@ function loadLibrary(data) {
     renderLib();
 }
 
-function flatMap(map, first) {
-    var arr = [first];
-    for (var val in map) {
-        arr.push(val);
-    }
-    return arr;
-}
-
-function filterGenres(lib) {
+function distinctGenres(lib) {
     // Find unique set
     var genreMap = {};
     for (var genre in lib) {
         genreMap[genre] = true;
     }
-    return flatMap(genreMap, "All");
-}
-
-function filterArtists(lib, byGenre) {
-    var filteredLib = byGenre ? { byGenre: lib[byGenre] } : lib;
-    // Find unique set
-    var artistsMap = {};
-    for (var genre in filteredLib) {
-        for (var artist in filteredLib[genre]) {
-            artistsMap[artist] = true;
-        }
+    // Fill array
+    var genres = ["All"];
+    for (var genre in genreMap) {
+        genres.push(genre);
     }
-    return flatMap(artistsMap, "All");
-}
-
-function filterAlbums(lib, byGenre, byArtist) {
-    var filteredByGenre = byGenre ? { byGenre: lib[byGenre] } : lib;
-    // Find unique set
-    var albumsMap = [{"Album": "All", "Artist": ""}];
-    for (var genre in filteredByGenre) {
-        var filteredByArtist = byArtist ? { byArtist: filteredByGenre[byArtist] } : filteredByGenre;
-        for (var artist in filteredByArtist[genre]) {
-            for (var album in filteredByArtist[genre][artist]) {
-                albumsMap.push({"Album": album, "Artist": artist});
-            }
-        }
-    }
-    return albumsMap;
+    return genres;
 }
 
 function renderLib() {
@@ -593,16 +563,20 @@ function renderGenres() {
 
 function renderArtists() {
     var output = '';
-    for (var i = 0; i < allArtists.length; i++) {
-        output += '<li class="clearfix"><div class="lib-entry">' + allArtists[i] + '</div></li>';
+    var i = 1;
+    for (var artist in allArtists) {
+        output += '<li id="lib-artist-' + i + '" class="clearfix"><div class="lib-entry">' + artist + '</div></li>';
+        i++;
     }
     $('#artistsList').html(output);
 }
 
 function renderAlbums() {
     var output = '';
-    for (var i = 0; i < allAlbums.length; i++) {
-        output += '<li class="clearfix"><div class="lib-entry">' + allAlbums[i].Album + ' <span> ' + allAlbums[i].Artist + '</span></div></li>';
+    var i = 1;
+    for (var album in allAlbums) {
+        output += '<li id="lib-album-' + i + '" class="clearfix"><div class="lib-entry">' + album + ' <span> ' + allAlbums[album] + '</span></div></li>';
+        i++;
     }
     $('#albumsList').html(output);
 }
@@ -616,36 +590,15 @@ function renderSongs() {
     $('#songsList').html(output);
 }
 
-// click on GENRE
+// click on playlist entry
 $('#genresList').on('click', '.lib-entry', function() {
     var pos = $('#genresList .lib-entry').index(this);
-    console.log("clicked on " + allGenres[pos]);
-    if (pos == 0) {
-        // All
-        allArtists = filterArtists(fullLib);
-        allAlbums = filterAlbums(fullLib);
-    } else {
-        allArtists = filterArtists(fullLib, allGenres[pos]);
-        allAlbums = filterAlbums(fullLib, allGenres[pos]);
-    }
-    renderArtists();
-    renderAlbums();
+    console.log("clicked on " + allGenres[pos]); // WIP
+//    var cmd = 'play ' + pos;
+//    sendCmd(cmd);
+//    GUI.halt = 1;
 //    $('.playlist li').removeClass('active');
 //    $(this).parent().addClass('active');
 });
 
-// click on ARTIST
-$('#artistsList').on('click', '.lib-entry', function() {
-    var pos = $('#artistsList .lib-entry').index(this);
-    console.log("clicked on " + allArtists[pos]);
-    if (pos == 0) {
-        // All
-        //allAlbums = filterAlbums(fullLib);
-    } else {
-        //allAlbums = filterAlbums(fullLib, allGenres[pos]);
-    }
-//    renderAlbums();
-//    $('.playlist li').removeClass('active');
-//    $(this).parent().addClass('active');
-});
 
