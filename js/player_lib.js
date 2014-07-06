@@ -132,33 +132,31 @@ function getPlaylist(json){
         var i = 0;
         var content = '';
         var output = '';
-        if (data) {
-            for (i = 0; i < data.length; i++){
-                if (json['state'] != 'stop' && i == parseInt(json['song'])) {
-                    content = '<li id="pl-' + (i + 1) + '" class="active clearfix">';
-                } else {
-                    content = '<li id="pl-' + (i + 1) + '" class="clearfix">';
-                }
-                content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="icon-remove-sign"></i></a></div>';
-                if (typeof data[i].Title != 'undefined') {
-                    content += '<div class="pl-entry">';
-                    content += data[i].Title + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
-                    content += ' <span>';
-                    content +=  data[i].Artist;
-                    content += ' - ';
-                    content +=  data[i].Album;
-                    content += '</span></div></li>';
-                    output = output + content;
-                } else {
-                    songpath = parsePath(data[i].file);
-                    content += '<div class="pl-entry">';
-                    content += data[i].file.replace(songpath + '/', '') + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
-                    content += ' <span>';
-                    content += ' path \: ';
-                    content += songpath;
-                    content += '</span></div></li>';
-                    output = output + content;
-                }
+        for (i = 0; i < data.length; i++){
+            if (json['state'] != 'stop' && i == parseInt(json['song'])) {
+                content = '<li id="pl-' + (i + 1) + '" class="active clearfix">';
+            } else {
+                content = '<li id="pl-' + (i + 1) + '" class="clearfix">';
+            }
+			content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="icon-remove-sign"></i></a></div>';
+            if (typeof data[i].Title != 'undefined') {
+                content += '<div class="pl-entry">';
+                content += data[i].Title + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
+                content += ' <span>';
+                content +=  data[i].Artist;
+                content += ' - ';
+                content +=  data[i].Album;
+                content += '</span></div></li>';
+                output = output + content;
+            } else {
+                songpath = parsePath(data[i].file);
+                content += '<div class="pl-entry">';
+                content += data[i].file.replace(songpath + '/', '') + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
+                content += ' <span>';
+                content += ' path \: ';
+                content += songpath;
+                content += '</span></div></li>';
+                output = output + content;
             }
         }
         $('ul.playlist').html(output);
@@ -262,11 +260,7 @@ function getDB(cmd, path, browsemode, uplevel){
 		$.post('db/?querytype=' + browsemode + '&cmd=search', { 'query': keyword }, function(data) {
 			populateDB(data, path, uplevel, keyword);
 		}, 'json');
-	} else if (cmd == 'playall') {
-                $.post('db/?cmd=playall', { 'path': path }, function(data) {}, 'json');
-        } else if (cmd == 'addall') {
-                $.post('db/?cmd=addall', { 'path': path }, function(data) {}, 'json');
-        }
+	}
 }
 
 function populateDB(data, path, uplevel, keyword){
@@ -680,26 +674,13 @@ $('#albumsList').on('click', '.lib-entry', function(e) {
 // click on PLAY
 $('#songsList').on('click', '.lib-play', function(e) {
     var pos = $('#songsList .lib-play').index(this);
-    getDB('addreplaceplay', allSongs[pos].file);
-    notify('addreplaceplay', allSongs[pos].display);
+    console.log("Play " + allSongs[pos].file);
 });
 
 // click on ENQUEUE
 $('#songsList').on('click', '.lib-add', function(e) {
     var pos = $('#songsList .lib-add').index(this);
-    getDB('add', allSongs[pos].file);
-    notify('add', allSongs[pos].display);
-});
-
-// click on PLAY ALL
-$('.lib-playall').click(function(e) {
-    var res = getDB('playall', allSongs);
-console.log(res);
-});
-
-// click on ADD ALL
-$('.lib-addall').click(function(e) {
-    getDB('addall', allSongs);
+    console.log("Enqueue " + allSongs[pos].file);
 });
 
 
