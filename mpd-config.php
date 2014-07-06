@@ -154,6 +154,7 @@ $_mpd_select['dsd_usb'] .= "<option value=\"no\" ".(($_mpd['dsd_usb'] == 'no') ?
 $dev1 = file_get_contents('/proc/asound/card0/id');
 $dev2 = file_get_contents('/proc/asound/card1/id');
 $dev3 = file_get_contents('/proc/asound/card2/id');
+$dev4 = file_get_contents('/proc/asound/card3/id');
 
 // output devices  selector
 $_mpd_select['device'] .= "<option value=\"0\" ".(($_mpd['device'] == '0') ? "selected" : "")." >$dev1</option>\n";	
