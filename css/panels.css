@@ -952,27 +952,15 @@ body { background: #cf0; } */
 	height: 22px;
 	margin: 0;
 	border-bottom: 1px solid #111D29;
-	cursor: pointer;
 	color: #ddd;
+	cursor: pointer;
 	font-size: 13px;
 	text-align: left;
 	font-weight: bold;
 }
 
-#lib-content li div:hover {
-	background-color: #7A848E;
-}
-
-#lib-content #lib-file li {
-        cursor: default;
-}
-
-#lib-content #lib-file li div:hover {
-	background-color: transparent;
-}
-
 #lib-content li div.active {
-        background-color: #4BBE87;
+        background-color: #1ABC9C;
 }
 
 #lib-content span {
