@@ -911,7 +911,6 @@ body { background: #cf0; } */
 	width: 25%;
 	height: 25%;
 	border-bottom: 3px solid #212D39;
-        border-right: 3px solid #212D39;
 }
 #lib-artist {
         position: absolute;
@@ -920,7 +919,6 @@ body { background: #cf0; } */
         width: 25%;
         height: 75%;
 	margin-top: 3px;
-        border-right: 3px solid #212D39;
 }
 #lib-album {
         position: absolute;
@@ -928,8 +926,6 @@ body { background: #cf0; } */
         left: 25%;
 	width: 25%;
 	height: 100%;
-        border-right: 3px solid #212D39;
-        margin-left: 1px;
 }
 #lib-file {
         position: absolute;
@@ -937,7 +933,6 @@ body { background: #cf0; } */
         left: 50%;
 	width: 50%;
 	height: 100%;
-        margin-left: 2px;
 }
 
 #lib-content ul {
@@ -965,37 +960,6 @@ body { background: #cf0; } */
 	color: #14192E;
 	font-size: 12px;
 	font-weight: normal;
-}
-
-.lib-entry {
-	margin-left: 4px;
-}
-
-.lib-entry .btn {
-	padding: 0 4px;
-	font-size: 10px;
-	height: 80%;
-	line-height: 16px;
-	margin-top: -5px;
-	padding: 1px 3px;
-}
-
-.lib-entry .btn:hover {
-	background-color: #1ABC9C;
-}
-
-.lib-play {
-	position: absolute;
-	top: 2px;
-	right: 20px;
-	height: 80%;
-}
-
-.lib-add {
-        position: absolute;
-        top: 2px;
-        right: 1px;
-        height: 80%;
 }
 
 
