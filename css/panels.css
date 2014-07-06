@@ -912,7 +912,6 @@ body { background: #cf0; } */
 	height: 25%;
 	border-bottom: 3px solid #212D39;
         border-right: 3px solid #212D39;
-	z-index: 12;
 }
 #lib-artist {
         position: absolute;
@@ -922,7 +921,6 @@ body { background: #cf0; } */
         height: 75%;
 	margin-top: 3px;
         border-right: 3px solid #212D39;
-	z-index: 12;
 }
 #lib-album {
         position: absolute;
@@ -931,7 +929,7 @@ body { background: #cf0; } */
 	width: 25%;
 	height: 100%;
         border-right: 3px solid #212D39;
-        z-index: 11;
+        margin-left: 1px;
 }
 #lib-file {
         position: absolute;
@@ -939,7 +937,7 @@ body { background: #cf0; } */
         left: 50%;
 	width: 50%;
 	height: 100%;
-        z-index: 10;
+        margin-left: 2px;
 }
 
 #lib-content ul {
