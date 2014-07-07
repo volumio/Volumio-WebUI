@@ -82,7 +82,7 @@ $_POST['mount']['remotedir'] = str_replace('\\', '/', $_POST['mount']['remotedir
 
 	if ($_POST['mount']['options'] == '') {
 		if ($_POST['mount']['type'] == 'cifs') {
-		$_POST['mount']['options'] = "cache=strict,ro,noatime,dir_mode=0777,file_mode=0777";
+		$_POST['mount']['options'] = "ro,dir_mode=0777,file_mode=0777";
 		} else {
 		$_POST['mount']['options'] = "nfsvers=3,ro,noatime";
 		}
