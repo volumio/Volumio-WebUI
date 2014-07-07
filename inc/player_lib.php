@@ -954,6 +954,9 @@ function wrk_sourcemount($db,$action,$id) {
 			sysCmd("mkdir \"/mnt/NAS/".$mp[0]['name']."\"");
 			if ($mp[0]['type'] == 'cifs') {
 			// smb/cifs mount
+			if (empty($mp[0]['username'])) {
+			$mp[0]['username'] = 'guest';
+			}
 			$mountstr = "mount -t cifs \"//".$mp[0]['address']."/".$mp[0]['remotedir']."\" -o username=".$mp[0]['username'].",password=".$mp[0]['password'].",rsize=".$mp[0]['rsize'].",wsize=".$mp[0]['wsize'].",iocharset=".$mp[0]['charset'].",".$mp[0]['options']." \"/mnt/NAS/".$mp[0]['name']."\"";
 			} else {
 			// nfs mount
