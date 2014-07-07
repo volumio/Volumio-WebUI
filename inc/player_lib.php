@@ -1166,7 +1166,7 @@ playerSession('write',$db,'playerid',$playerid);
 		break;
 		
 		case '07':
-		playerSession('write',$db,'hwplatform','Cubieboard\Cubietruck');
+		playerSession('write',$db,'hwplatform','Cubieboard');
 		playerSession('write',$db,'hwplatformid',$arch);
 		break;
 		
