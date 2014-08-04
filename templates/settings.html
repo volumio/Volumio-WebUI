@@ -2,6 +2,22 @@
 	<h1>Settings</h1>
 	<form class="form-horizontal" method="post">
 		<fieldset>
+			<legend>Player Name</legend>
+            <div class="control-group" id="environment">
+				<div class="control-group">
+				<label class="control-label" for="hostname">Player name</label>
+					<div class="controls">
+						<input class="input-large" class="input-large" type="text" id="hostname" name="hostname" value="$_hostname" autocomplete="off">
+					</div>
+				</div>
+			</div>
+		<div class="form-actions">
+				<button class="btn btn-primary btn-large" value="apply" name="apply" type="submit">Apply</button>
+			</div>
+		</fieldset>
+	</form>
+	<form class="form-horizontal" method="post">
+		<fieldset>
 			<legend>Services management</legend>
 			<p>Enable or disable certain Volumio functionalities</p>
 			<div class="control-group">
