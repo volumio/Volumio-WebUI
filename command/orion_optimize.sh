@@ -48,7 +48,7 @@ killall -9 atd
 #killall -9 dhclient
 killall -9 startpar
 #Automatic unmuting
-/home/volumio/unmute.sh
+sh /home/volumio/unmute.sh
 echo "flush startup settings"
 fi
 
