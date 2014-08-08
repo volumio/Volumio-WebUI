@@ -372,12 +372,12 @@ $status = session_status();
 }
 
 function cfgdb_connect($dbpath) {
-	if ($dbh  = new PDO($dbpath)) {
-	return $dbh;
-	} else {
-		echo "cannot open the database";
-	return false;
- }
+    if ($dbh = new PDO($dbpath)) {
+        return $dbh;
+    } else {
+        echo "cannot open the database";
+        return false;
+    }
 }
 
 function cfgdb_read($table,$dbh,$param,$id) {
@@ -455,24 +455,24 @@ error_log(">>>>> cfgdb_delete(".$table.",dbh,".$id.") >>>>> \n".$querystr, 0);
 	}
 }
 
-function sdbquery($querystr,$dbh) {
-	$query = $dbh->prepare($querystr);
-	if ($query->execute()) {
-			$result = array();
-			  $i = 0;
-				  foreach ($query as $value) {
-					$result[$i] = $value;
-					$i++;
-				  }
-		$dbh = null;
-		if (empty($result)) {
-		return true;
-		} else {
-		return $result;
-		}
-	} else {
-	 return false;
-	}
+function sdbquery($querystr, $dbh) {
+    $query = $dbh->prepare($querystr);
+    if ($query->execute()) {
+        $result = array();
+        $i = 0;
+        foreach ($query as $value) {
+            $result[$i] = $value;
+            $i++;
+        }
+        $dbh = null;
+        if (empty($result)) {
+            return true;
+        } else {
+            return $result;
+        }
+    } else {
+        return false;
+    }
 }
 
 // Ramplay functions
