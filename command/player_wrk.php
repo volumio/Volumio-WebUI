@@ -242,6 +242,8 @@ if (!empty($ip_wlan0[0])) {
 $_SESSION['netconf']['wlan0']['ip'] = $ip_wlan0[0];
 }
 
+//start minidlna only if selected by user
+if (isset($_SESSION['minidlna']) && $_SESSION['minidlna'] == 1) {
 // Copy /etc/minidlna.conf to /run/minidlna.conf
 copy('/etc/minidlna.conf', '/run/minidlna.conf');
 // minidlna.conf
@@ -262,7 +264,7 @@ fwrite($fp, implode("",$newArray));
 fclose($fp);
 // Start minidlna service
 sysCmd('/usr/bin/minidlna -f /run/minidlna.conf');
-
+}
 // check /etc/network/interfaces integrity
 hashCFG('check_net',$db);
 // check /etc/mpd.conf integrity

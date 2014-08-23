@@ -364,6 +364,26 @@ if (isset($_POST['djmount']) && $_POST['djmount'] != $_SESSION['djmount']){
 	playerSession('unlock');
 }
 
+if (isset($_POST['minidlna']) && $_POST['minidlna'] != $_SESSION['minidlna']){
+	// load worker queue 
+	// start / respawn session
+	session_start();
+	// save new value on SQLite datastore
+	if ($_POST['minidlna'] == 1 OR $_POST['minidlna'] == 0) {
+	playerSession('write',$db,'minidlna',$_POST['minidlna']);
+	}
+	// set UI notify
+	if ($_POST['minidlna'] == 1) {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'DLNA Library Server enabled';
+	} else {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'DLNA Library Server disabled';
+	}
+	// unlock session file
+	playerSession('unlock');
+}
+
 if (isset($_POST['hostname']) && $_POST['hostname'] != $_SESSION['hostname']){
 	// load worker queue 
 	// start / respawn session
@@ -408,6 +428,8 @@ $_system_select['shairport1'] .= "<input type=\"radio\" name=\"shairport\" id=\"
 $_system_select['shairport0'] .= "<input type=\"radio\" name=\"shairport\" id=\"toggleshairport2\" value=\"0\" ".(($_SESSION['shairport'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_system_select['upnpmpdcli1'] .= "<input type=\"radio\" name=\"upnpmpdcli\" id=\"toggleupnpmpdcli1\" value=\"1\" ".(($_SESSION['upnpmpdcli'] == 1) ? "checked=\"checked\"" : "").">\n";
 $_system_select['upnpmpdcli0'] .= "<input type=\"radio\" name=\"upnpmpdcli\" id=\"toggleupnpmpdcli2\" value=\"0\" ".(($_SESSION['upnpmpdcli'] == 0) ? "checked=\"checked\"" : "").">\n";
+$_system_select['minidlna1'] .= "<input type=\"radio\" name=\"minidlna\" id=\"toggleminidlna1\" value=\"1\" ".(($_SESSION['minidlna'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['minidlna0'] .= "<input type=\"radio\" name=\"minidlna\" id=\"toggleminidlna2\" value=\"0\" ".(($_SESSION['minidlna'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_hostname = $_SESSION['hostname'];
 // set template
 $tpl = "settings.html";
