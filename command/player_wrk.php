@@ -313,7 +313,7 @@ if (isset($_SESSION['djmount']) && $_SESSION['djmount'] == 1) {
 
 // Mpdupnpcli for UPNP control
 if (isset($_SESSION['upnpmpdcli']) && $_SESSION['upnpmpdcli'] == 1) {
-	$cmd = '/etc/init.d/upmpdcli start > /dev/null 2>&1 &';
+	$cmd = '/usr/bin/upmpdcli -f "'.$hostname.'" -l 0 > /dev/null 2>&1 &';
 	sysCmd($cmd);
 } 
 // --- NORMAL STARTUP --- //
