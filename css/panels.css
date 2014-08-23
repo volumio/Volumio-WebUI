@@ -520,6 +520,13 @@ a.btn-cmd {
         margin-left: 20px;
         z-index: 1001;
 }
+
+#clearqueue {
+        display: block;
+        float: right;
+        margin-right: 10px;
+        z-index: 1001;
+}
 #pl-save input {
 	margin-top: 6px;
         padding: 2px 0 2px 10px;

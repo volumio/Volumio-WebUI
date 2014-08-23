@@ -47,7 +47,25 @@ include('_header.php');
 eval("echoTemplate(\"".getTemplate("templates/$tpl")."\");");
 ?>
 <!-- content -->
-
+<?php
+//generic functions in home
+if (isset($_POST['syscmd'])){
+	if ($_SESSION['w_lock'] != 1 && $_SESSION['w_queue'] == '') {
+			session_start();
+			sendMpdCommand($mpd,'clear');
+			// set UI notify
+			$_SESSION['notify']['title'] = 'Clear Queue';
+			$_SESSION['notify']['msg'] = 'Play Queue Cleared';
+			// unlock session file
+			playerSession('unlock');
+			} else {
+			echo "background worker busy";
+			}
+			// unlock session file
+			playerSession('unlock');
+			}
+			
+?>
 <?php 
 // debug($_POST);
 ?>

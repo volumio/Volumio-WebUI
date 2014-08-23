@@ -91,6 +91,7 @@
 			</ul>
 		</div>
 		<div class="btnlist btnlist-bottom">
+		
 			<div id="pl-controls">
 				<form id="pl-save" method="post" onSubmit="return false;">
                                 	<div class="input-append">
@@ -100,9 +101,11 @@
 				</form>
 				<button id="pl-debug-btn" class="btn hide"><i class="icon-random"></i></button>
 				<button class="btn pl-firstPage"><i class="icon-double-angle-up"></i></button>
-				<button class="btn pl-prevPage"><i class="icon-angle-up"></i></button>
-				<button class="btn pl-nextPage"><i class="icon-angle-down"></i></button>
 				<button class="btn pl-lastPage"><i class="icon-double-angle-down"></i></button>
+			</div>
+				<form id="clearqueue" method="post">	
+				<input class="btn" type="submit" name="syscmd" value="Clear Queue" id="syscmd-clearqueue">
+				</form>
 			</div>
 		</div>
 	</div>
