@@ -123,18 +123,37 @@ if (isset($_POST['syscmd'])){
 		break;
 	
 	case 'updatempdDB':
-			
-			if ( !$mpd) {
+		
+			if ($_SESSION['w_lock'] != 1 && $_SESSION['w_queue'] == '') {
 				session_start();
-				$_SESSION['notify']['title'] = 'Error';
-				$_SESSION['notify']['msg'] = 'Cannot connect to MPD Daemon';
-			} else {
 				sendMpdCommand($mpd,'update');
-				session_start();
+				// set UI notify
 				$_SESSION['notify']['title'] = 'MPD Update';
 				$_SESSION['notify']['msg'] = 'database update started...';
+				// unlock session file
+				playerSession('unlock');
+			} else {
+				echo "background worker busy";
+				playerSession('unlock');
 			}
 			
+	break;
+	
+	case 'clearqueue':
+			
+			if ($_SESSION['w_lock'] != 1 && $_SESSION['w_queue'] == '') {
+			session_start();
+			sendMpdCommand($mpd,'clear');
+			// set UI notify
+			$_SESSION['notify']['title'] = 'Clear Queue';
+			$_SESSION['notify']['msg'] = 'Play Queue Cleared';
+			// unlock session file
+			playerSession('unlock');
+			} else {
+			echo "background worker busy";
+			}
+			// unlock session file
+			playerSession('unlock');
 	break;
 		
 	case 'totalbackup':
