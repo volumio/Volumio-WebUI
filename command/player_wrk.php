@@ -301,7 +301,7 @@ if (isset($_SESSION['shairport']) && $_SESSION['shairport'] == 1) {
 // Start Shairport with Volumio name, stopping Mpd on start, with Selected output device
 	playerSession('open',$db);
 	$hostname = $_SESSION['hostname'];	
-	$cmd = '/usr/local/bin/shairport -a "'.$hostname.'" -w -B "mpc stop" -o alsa -- -d "hw:'.$device.',0" > /dev/null 2>&1 &';
+	$cmd = '/usr/local/bin/shairport -a "'.$hostname.'" -w -B "mpc stop" -o alsa -- -d default:'.$device.' > /dev/null 2>&1 &';
 	sysCmd($cmd);
 } 
 
