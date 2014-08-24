@@ -236,11 +236,11 @@ if (!empty($ipwlan0)) {
 	$_wlan0 .= "<div><b>BitRate:</b> ".$bitrate." Mb/s</div>\n";
     $_wlan0 .= "</div>\n";
     $_wlan0ssid = $wifisec[0]['ssid'];
-
+}
     $_wlan0security .= "<option value=\"none\"".(($wifisec[0]['security'] == 'none') ? "selected" : "").">No security</option>\n";
     $_wlan0security .= "<option value=\"wep\"".(($wifisec[0]['security'] == 'wep') ? "selected" : "").">WEP</option>\n";
     $_wlan0security .= "<option value=\"wpa\"".(($wifisec[0]['security'] == 'wpa') ? "selected" : "").">WPA/WPA2 - Personal</option>\n";
-	}
+	
     
 
 $tpl = "net-config.html";
