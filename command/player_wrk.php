@@ -215,6 +215,10 @@ $cmd = "/var/www/command/orion_optimize.sh ".$_SESSION['orionprofile']." startup
 sysCmd($cmd);
 }
 
+//Additional Fix for WLAN power management
+$cmd = "iwconfig wlan0 power off" ;
+sysCmd($cmd);
+
 // check current eth0 / wlan0 IP Address
 $cmd1 = "ip addr list eth0 |grep \"inet \" |cut -d' ' -f6|cut -d/ -f1";
 $cmd2 = "ip addr list wlan0 |grep \"inet \" |cut -d' ' -f6|cut -d/ -f1";
