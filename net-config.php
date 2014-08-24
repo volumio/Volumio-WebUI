@@ -99,7 +99,7 @@ $dbh  = cfgdb_connect($db);
     }
 
     // wlan0
-    if (isset($_POST['wifisec']['ssid']) && !empty($_POST['wifisec']['ssid']) && $_POST['wifisec']['password'] && !empty($_POST['wifisec']['password'])) {
+    if (isset($_POST['wifisec']['ssid']) && !empty($_POST['wifisec']['ssid'])) {
     $value = array('ssid' => $_POST['wifisec']['ssid'], 'encryption' => $_POST['wifisec']['encryption'], 'password' => $_POST['wifisec']['password']);
     cfgdb_update('cfg_wifisec',$dbh,'',$value);
     $wifisec = cfgdb_read('cfg_wifisec',$dbh);
@@ -115,10 +115,12 @@ $dbh  = cfgdb_connect($db);
         } else {
         $wlan0 .= "wireless-essid ".$_POST['wifisec']['ssid']."\n";
             if ($_POST['wifisec']['encryption'] == 'wep') {
-            $wlan0 .= "wireless-key ".bin2hex($_POST['wifisec']['password'])."\n";
+            $wlan0 .= "wireless-key ".$_POST['wifisec']['password']."\n";
             } else {
+			if ($_POST['wifisec']['encryption'] == 'none') {
             $wlan0 .= "wireless-mode managed\n";
             }
+			}
         }
        
        $eth0 = "\nauto eth0\niface eth0 inet dhcp\n";
