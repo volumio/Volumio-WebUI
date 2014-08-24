@@ -3,15 +3,15 @@
 	<p>If you mess up with this configuration you can <a data-toggle="modal" href="#net-config-defaults">reset to default</a>.</p>
 	<form class="form-horizontal" data-validate="parsley" method="post">
 		<fieldset>
-			<legend>Interface $_int0name </legend>
+			<legend>Wired Connection </legend>
 $_eth0
 			<div class="control-group" >
-				<label class="control-label" for="eth0[dhcp]">DHCP</label>
+				<label class="control-label" for="eth0[dhcp]">IP Address</label>
 				<div class="controls">
 					<select id="dhcp" name="eth0[dhcp]" class="input-large">
 $_int0dhcp
 					</select>
-					<span class="help-block">Choose between DHCP and Static configuration</span>
+					<span class="help-block">Choose between Automatic IP Attribution or Static configuration</span>
 				</div>
 			</div>
 			<div id="network-manual-config" class="hide">
@@ -62,13 +62,14 @@ $_int0dhcp
 <!--<div $_wlan0hide >-->
 	<form class="form-horizontal" data-validate="parsley"  method="post" > 
 		<fieldset>
-		$_wlan0
-			<legend>Wi-Fi Setup</legend>
+		
+			<legend>Wireless Connection</legend>
+$_wlan0
 			<div class="control-group">
-				<label class="control-label" for="wifisec[ssid]">SSID</label>
+				<label class="control-label" for="wifisec[ssid]">Network Name</label>
 				<div class="controls">
 					<input class="input-large" class="input-block-level" type="text" id="wifi-name" name="wifisec[ssid]" value="$_wlan0ssid" data-trigger="change" >
-					<span class="help-block">Set the SSID name of the Wi-Fi you want to connect.</span>
+					<span class="help-block">Set the SSID of the Network you want to connect.</span>
 				</div>
 			</div>
 			<div class="control-group">

@@ -185,30 +185,62 @@ $dbh = cfgdb_connect($db);
 $net = cfgdb_read('cfg_lan',$dbh);
 $wifisec = cfgdb_read('cfg_wifisec',$dbh);
 $dbh = null;
+$ipe = "ip addr list eth0 |grep \"inet \" |cut -d' ' -f6|cut -d/ -f1";
+$ipw = "ip addr list wlan0 |grep \"inet \" |cut -d' ' -f6|cut -d/ -f1";
+$ipeth0 = exec($ipe);
+$ipwlan0 = exec($ipw);
+$spe = "ethtool eth0 | grep -i speed | tr -d 'Speed:'";
+$speth0 = exec($spe);
+//getting signal quality percentage
+$quw = "iwconfig wlan0 | grep 'Link Quality' | awk '{print $2}' | tr -d 'Quality=' |  cut -c 1-2";
+$quwg = exec($quw);
+$quwlan0  = round(($quwg / 70) * 100);
+$bitr = "iwconfig wlan0 | grep 'Bit Rate' | awk '{print $2}' | tr -d 'Bit Rate='";
+$bitrate = exec($bitr);
+
+
+if (!empty($ipeth0)) {
+    $statuset = 'Connected <i class="icon-ok green sx"></i>';
+	} else {
+	$statuset = 'Not Connected <i class="icon-remove red sx"></i>';
+	}
+if (!empty($ipwlan0)) {
+    $statuswl = 'Connected <i class="icon-ok green sx"></i>';
+	} else {
+	if (wrk_checkStrSysfile('/proc/net/wireless','wlan0')) {
+	$statuswl = 'Not Connected <i class="icon-remove red sx"></i>';
+	} else {
+	$statuswl = 'No Wireless Interface Present';
+	}
+	}
 
     // eth0
     if (isset($_SESSION['netconf']['eth0']) && !empty($_SESSION['netconf']['eth0'])) {
     $_eth0 .= "<div class=\"alert alert-info\">\n";
-    $_eth0 .= " IP address: ".$_SESSION['netconf']['eth0']['ip']."\n";
+	$_eth0 .= "<div><b>Status:</b>   ".$statuset."</div>\n";
+	$_eth0 .= "<div><b>IP address:</b>   ".$ipeth0."</div>\n";
+    $_eth0 .= "<div><b>Speed:</b> ".$speth0."</div>\n";
     $_eth0 .= "</div>\n";
     $_int0name .= $net[0]['name'];
-    $_int0dhcp .= "<option value=\"true\" ".((isset($net[0]['dhcp']) && $net[0]['dhcp']=="true") ? "selected" : "")." >enabled (Auto)</option>\n";
-    $_int0dhcp .= "<option value=\"false\" ".((isset($net[0]['dhcp']) && $net[0]['dhcp']=="false") ? "selected" : "")." >disabled (Static)</option>\n";
+    $_int0dhcp .= "<option value=\"true\" ".((isset($net[0]['dhcp']) && $net[0]['dhcp']=="true") ? "selected" : "")." >Automatic (DHCP)</option>\n";
+    $_int0dhcp .= "<option value=\"false\" ".((isset($net[0]['dhcp']) && $net[0]['dhcp']=="false") ? "selected" : "")." >Static</option>\n";
     $_int0 = $net[0];
     }
 
     // wlan0
-    
-    $_wlan0 .= "<legend>Interface ".$net[1]['name']."</legend>\n";
+    if (isset($_SESSION['netconf']['wlan0']) && !empty($_SESSION['netconf']['wlan0'])) {
     $_wlan0 .= "<div class=\"alert alert-info\">\n";
-    $_wlan0 .= $net[1]['name']." IP address: ".$_SESSION['netconf']['wlan0']['ip']."\n";
+	$_wlan0 .= "<div><b>Status:</b>   ".$statuswl."</div>\n";
+    $_wlan0 .= "<div><b>IP address:</b> ".$ipwlan0."</div>\n";
+	$_wlan0 .= "<div><b>Signal Strenght:</b> ".$quwlan0."%</div>\n";
+	$_wlan0 .= "<div><b>BitRate:</b> ".$bitrate." Mb/s</div>\n";
     $_wlan0 .= "</div>\n";
     $_wlan0ssid = $wifisec[0]['ssid'];
 
     $_wlan0security .= "<option value=\"none\"".(($wifisec[0]['security'] == 'none') ? "selected" : "").">No security</option>\n";
     $_wlan0security .= "<option value=\"wep\"".(($wifisec[0]['security'] == 'wep') ? "selected" : "").">WEP</option>\n";
     $_wlan0security .= "<option value=\"wpa\"".(($wifisec[0]['security'] == 'wpa') ? "selected" : "").">WPA/WPA2 - Personal</option>\n";
-
+	}
     
 
 $tpl = "net-config.html";
