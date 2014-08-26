@@ -322,6 +322,11 @@ if (isset($_SESSION['upnpmpdcli']) && $_SESSION['upnpmpdcli'] == 1) {
 	$cmd = '/usr/bin/upmpdcli -f "'.$hostname.'" -l 0 > /dev/null 2>&1 &';
 	sysCmd($cmd);
 } 
+
+//Startup Sound
+$cmd = 'mpg123 -a hw:'.$device.' /var/www/inc/Sounds/startup.mp3 > /dev/null 2>&1 &';
+sysCmd($cmd);
+
 // --- NORMAL STARTUP --- //
 
 // --- WORKER MAIN LOOP --- //
