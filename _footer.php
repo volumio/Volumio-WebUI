@@ -36,6 +36,7 @@
 <script src="js/bootstrap-contextmenu.js"></script>
 <script src="js/jquery.pnotify.min.js"></script>
 <script src="js/scripts-playback.js"></script>
+<script src="js/player_lib.js"></script>
 <?php } else { ?>
 <!--<script src="js/jquery.dropkick-1.0.0.js"></script>-->
 <script src="js/custom_checkbox_and_radio.js"></script>

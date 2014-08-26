@@ -66,7 +66,7 @@ html, body {
 	font-size: 18px;
 }
 #currentalbum {
-	margin-bottom: 20px;
+	margin-bottom: 5px;
 }
 #currentsong {
 	font-size: 30px;
@@ -610,10 +610,10 @@ a.btn-cmd {
 	font-size: 16px;
 	line-height: 24px;
 }
-.social-buttons a {
+.socialsh-buttons a {
 	padding: 10px 15px;
 }
-.social-buttons a i {
+.socialsh-buttons a i {
 	display: inline-block;
 	width: 34px;
 	font-size: 34px;
@@ -963,6 +963,42 @@ body { background: #cf0; } */
 	font-size: 12px;
 	font-weight: normal;
 }
+
+/* Social Sharing Buttons */
+
+.social {
+    font-size: 20px;
+	text-decoration: none;
+	color: #eee;
+	padding: 5px ;
+}
+
+#twbutton {
+    text-decoration: none;
+	padding-right: 10px;
+}
+#twbutton:hover {
+    color: #4099FF;
+}
+
+#fbbutton {
+    text-decoration: none;
+}
+
+#fbbutton:hover {
+    color: #3b5998;
+}
+
+#gbutton {
+    text-decoration: none;
+	padding-left: 10px;
+}
+
+#gbutton:hover {
+    color: #d34836;
+    text-decoration: none;
+}
+
 
 
 =======

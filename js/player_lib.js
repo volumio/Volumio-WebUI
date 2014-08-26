@@ -347,6 +347,7 @@ function updateGUI(json){
     GUI.halt = 0;
     // console.log('GUI.halt (azioni comuni2)= ', GUI.halt);
     GUI.currentsong = json['currentsong'];
+	GUI.currentartist = json['currentartist'];
 }
 
 // update status on playback view
@@ -376,7 +377,7 @@ function refreshState(state) {
         $('#total').html(timeConvert(GUI.json['time']));
         //$('#time').val(json['song_percent']).trigger('change');
         $('#playlist-position').html('Playlist position ' + (parseInt(GUI.json['song']) + 1) +'/'+GUI.json['playlistlength']);
-        var fileinfo = (GUI.json['audio_channels'] && GUI.json['audio_sample_depth'] && GUI.json['audio_sample_rate']) ? (GUI.json['audio_channels'] + ', ' + GUI.json['audio_sample_depth'] + ' bit, ' + GUI.json['audio_sample_rate'] +' kHz, '+GUI.json['bitrate']+' kbps') : '&nbsp;';
+        var fileinfo = (GUI.json['audio_channels'] && GUI.json['audio_sample_depth'] && GUI.json['audio_sample_rate']) ? (GUI.json['audio_channels'] + ' - ' + GUI.json['audio_sample_depth'] + ' bit - ' + GUI.json['audio_sample_rate'] +' kHz ') : '&nbsp;';
         $('#format-bitrate').html(fileinfo);
         $('.playlist li').removeClass('active');
         var current = parseInt(GUI.json['song']) + 1;
@@ -505,3 +506,17 @@ function randomScrollDB() {
     var random = 1 + Math.floor(Math.random() * n);
     customScroll('db', random);
 }
+
+//Social Sharing
+$('a.tweet').click(function(e){
+var urlTwitter = 'https://twitter.com/home?status=%E2%99%AB%20%23NowPlaying+' + GUI.currentartist.replace(/\s+/g, '+') + '+-+' + GUI.currentsong.replace(/\s+/g, '+') + '+with+%40Volumio+http%3A%2F%2Fvolumio.org%2F+';
+$('a.tweet').attr('href', urlTwitter);
+});
+$('a.facebook').click(function(e){
+var urlFacebook = 'https://www.facebook.com/sharer.php?u=http%3A%2F%2Fvolumio.org%2F&display=popup';
+$('a.facebook').attr('href', urlFacebook);
+});
+$('a.googleplus').click(function(e){
+var urlGooglePlus = 'https://plus.google.com/share?url=http%3A%2F%2Fvolumio.org%2F';;
+$('a.googleplus').attr('href', urlGooglePlus);
+});
