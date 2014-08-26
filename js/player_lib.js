@@ -348,6 +348,12 @@ function updateGUI(json){
     // console.log('GUI.halt (azioni comuni2)= ', GUI.halt);
     GUI.currentsong = json['currentsong'];
 	GUI.currentartist = json['currentartist'];
+	//Change Name according to Now Playing
+	if (GUI.currentartist!=null && GUI.currentsong!=null) {
+	document.title = json['currentsong'] + ' - ' + json['currentartist'] + ' - ' + 'Volumio';
+	} else {
+            document.title = 'Volumio - Audiophile Music Player';
+        }
 }
 
 // update status on playback view
