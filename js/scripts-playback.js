@@ -64,20 +64,6 @@ jQuery(document).ready(function($){ 'use strict';
     // BUTTONS
     // ----------------------------------------------------------------------------------------------------
     // playback
-    $("#play").mouseenter(function() {
-        if (GUI.state == "play") {
-            $("#play i").removeClass("icon-play").addClass("icon-pause");
-        } else if (GUI.state == "pause") {
-            $("#play i").removeClass("icon-pause").addClass("icon-play");
-        }
-    }).mouseleave(function() {
-        if (GUI.state == "play") {
-            $("#play i").removeClass("icon-pause").addClass("icon-play");
-        } else if (GUI.state == "pause") {
-            $("#play i").removeClass("icon-play").addClass("icon-pause");
-        }
-    });
-
     $('.btn-cmd').click(function(){
         var cmd;
         // stop
