@@ -201,11 +201,20 @@ jQuery(document).ready(function($){ 'use strict';
 
     // volume knob
     $('.volumeknob').knob({
-        change : function (value) {
-            setvol(value);
-        },
-        release : function (value) {
-            setvol(value);
+    	//onChange is triggered every step on the knob,
+    	//we want to fire a volume change after the user has finished moving the knob: onrelease
+    	//which is the same for playback
+    	//change : function (value) {
+            //setvol(value);
+        //},
+    	waitforit: null,
+        release: function (value) {
+            var that = this;
+            clearTimeout(this.waitforit);
+            this.waitforit = setTimeout(function(){
+                clearTimeout(that.waitforit);
+                setvol(value);
+            }, 200);
         },
         cancel : function () {
             //console.log('cancel : ', this);
