@@ -325,7 +325,6 @@ function updateGUI(json){
     // check MPD status
     refreshState(GUI.state);
     // check song update
-    //console.log('A = ', json['currentsong']); console.log('B = ', GUI.currentsong);
     if (GUI.currentsong != json['currentsong']) {
         countdownRestart(0);
         if ($('#panel-dx').hasClass('active')) {
@@ -334,38 +333,38 @@ function updateGUI(json){
         }
     }
     // common actions
-    // console.log('GUI.halt (azioni comuni)= ', GUI.halt);
-    //if (!GUI.halt) {
-        //refreshTimer(parseInt(json['elapsed']), parseInt(json['time']), json['state']);
 
-        $('#volume').val((json['volume'] == '-1') ? 100 : json['volume']).trigger('change');
-        $('#currentartist').html(json['currentartist']);
-        $('#currentsong').html(json['currentsong']);
-        $('#currentalbum').html(json['currentalbum']);
-        if (json['repeat'] == 1) {
-            $('#repeat').addClass('btn-primary');
-        } else {
-            $('#repeat').removeClass('btn-primary');
-        }
-        if (json['random'] == 1) {
-            $('#random').addClass('btn-primary');
-        } else {
-            $('#random').removeClass('btn-primary');
-        }
-        if (json['consume'] == 1) {
-            $('#consume').addClass('btn-primary');
-        } else {
-            $('#consume').removeClass('btn-primary');
-        }
-        if (json['single'] == 1) {
-            $('#single').addClass('btn-primary');
-        } else {
-            $('#single').removeClass('btn-primary');
-        }
+    // Don't update the knob if it's currently being changed
+    var volume = $('#volume');
+    if (volume[0].knobEvents === undefined || !volume[0].knobEvents.isSliding) {
+        volume.val((json['volume'] == '-1') ? 100 : json['volume']).trigger(
+                'change');
+    }
+    $('#currentartist').html(json['currentartist']);
+    $('#currentsong').html(json['currentsong']);
+    $('#currentalbum').html(json['currentalbum']);
+    if (json['repeat'] == 1) {
+        $('#repeat').addClass('btn-primary');
+    } else {
+        $('#repeat').removeClass('btn-primary');
+    }
+    if (json['random'] == 1) {
+        $('#random').addClass('btn-primary');
+    } else {
+        $('#random').removeClass('btn-primary');
+    }
+    if (json['consume'] == 1) {
+        $('#consume').addClass('btn-primary');
+    } else {
+        $('#consume').removeClass('btn-primary');
+    }
+    if (json['single'] == 1) {
+        $('#single').addClass('btn-primary');
+    } else {
+        $('#single').removeClass('btn-primary');
+    }
 
-    //}
     GUI.halt = 0;
-    // console.log('GUI.halt (azioni comuni2)= ', GUI.halt);
     GUI.currentsong = json['currentsong'];
 	GUI.currentartist = json['currentartist'];
 	//Change Name according to Now Playing
@@ -481,13 +480,16 @@ function countdownRestart(startFrom) {
 }
 
 // set volume with knob
-function setvol(val) {
-    $('#volume').val(val);
+function setVolume(val) {
     GUI.volume = val;
     GUI.halt = 1;
-    // console.log('GUI.halt (setvol)= ', GUI.halt);
     $('#volumemute').removeClass('btn-primary');
     sendCmd('setvol ' + val);
+}
+
+// adjust knob with volume
+function adjustKnobVolume(val) {
+    $('#volume').val(val);
 }
 
 // scrolling

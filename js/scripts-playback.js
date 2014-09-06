@@ -200,29 +200,40 @@ jQuery(document).ready(function($){ 'use strict';
     });
 
     // volume knob
-    $('.volumeknob').knob({
+    var volumeKnob = $('#volume');
+    volumeKnob[0].isSliding = function() {
+        return volumeKnob[0].knobEvents.isSliding;
+    }
+    volumeKnob[0].setSliding = function(sliding) {
+        volumeKnob[0].knobEvents.isSliding = sliding;
+    }
+    volumeKnob[0].knobEvents = {
+        isSliding: false,
         // on release => set volume
-    	release : function (value) {
+    	release: function (value) {
     	    if (this.hTimeout != null) {
                 clearTimeout(this.hTimeout);
                 this.hTimeout = null;
     	    }
-            setvol(value);
+    	    volumeKnob[0].setSliding(false);
+            adjustKnobVolume(value);
+    	    setVolume(value);
         },
     	hTimeout: null,
     	// on change => set volume only after a given timeout, to avoid flooding with volume requests
     	change: function (value) {
+            volumeKnob[0].setSliding(true);
             var that = this;
             if (this.hTimeout == null) {
                 this.hTimeout = setTimeout(function(){
                     clearTimeout(that.hTimeout);
                     that.hTimeout = null;
-                    setvol(value);
+                    setVolume(value);
                 }, 200);
             }
         },
         cancel : function () {
-            //console.log('cancel : ', this);
+            volumeKnob[0].setSliding(false);
         },
         draw : function () {
             // "tron" case
@@ -266,7 +277,8 @@ jQuery(document).ready(function($){ 'use strict';
                 return false;
             }
         }
-    });
+    };
+    volumeKnob.knob(volumeKnob[0].knobEvents);
 
     // "pulse" effect knob
     /*
