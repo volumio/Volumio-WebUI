@@ -201,14 +201,16 @@ function parseResponse(inputArr,respType,i,inpath) {
 					content += ' - ';
 					content +=  inputArr[i].Album;
 					content += '</span></div></li>';
-
+					showtype = 'music'
 				} else {
 					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 					content += inputArr[i].file;
 					if (inpath == 'WEBRADIO') {
 					content += '"><div class="db-icon db-song db-browse"><i class="icon-microphone sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="icon-reorder"></i></a></div><div class="db-entry db-song db-browse">';
+					showtype = 'radio'
 					} else {
 					content += '"><div class="db-icon db-song db-browse"><i class="icon-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="icon-reorder"></i></a></div><div class="db-entry db-song db-browse">';
+					showtype = 'file'
 					}
 					content += inputArr[i].file.replace(inpath + '/', '').replace('.pls', '') + ' <em class="songtime">' + timeConvert(inputArr[i].Time) + '</em>';
 					//content += ' <span>';
@@ -216,21 +218,20 @@ function parseResponse(inputArr,respType,i,inpath) {
 					//content += inpath;
 					//content += '</span></div></li>';
 					content += '</div></li>';
+					
 				}
 			} else {
 			//debug
 			//console.log('inputArr[i].directory: ', data[i].directory);
 				content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 				content += inputArr[i].directory;
+				showtype = 'file'
 				if (inpath != '') {
 					content += '"><div class="db-icon db-folder db-browse"><i class="icon-folder-open sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="icon-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-					mediatype = 'unknown';
 				} else if (inputArr[i].directory == 'WEBRADIO') {
 					content += '"><div class="db-icon db-folder db-browse"><i class="icon-microphone icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="icon-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-					mediatype = 'webradio';
 				} else if (inputArr[i].directory == 'NAS') {
 					content += '"><div class="db-icon db-folder db-browse"><i class="icon-code-fork icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="icon-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-					mediatype = 'nas';
 				} else if (inputArr[i].directory == 'USB') {
 					content += '"><div class="db-icon db-folder db-browse"><i class="icon-hdd icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="icon-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
 				} else if (inputArr[i].directory == 'RAMPLAY') {
@@ -307,6 +308,11 @@ function populateDB(data, path, uplevel, keyword){
 	} else {
 		// console.log('NEXT LEVEL');
 		customScroll('db', 0, 0);
+	}
+	if (showtype == 'radio') {
+	$("#webradio-add").show();
+	} else {
+	$("#webradio-add").hide();
 	}
 	// debug
 	// console.log('GUI.currentDBpos = ', GUI.currentDBpos);

@@ -12,7 +12,28 @@
 			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
 		</div>
 	</div>
-</form>
+	</form>
+	<form class="form-horizontal" action="" method="post">
+	<div id="webradio-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="webradio-modal-label" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3 id="poweroff-modal-label">Add New WebRadio</h3>
+		</div>
+		<div class="modal-body">
+			<form action="settings.php" method="POST">	
+		<input name="radio-name" type="text" placeholder="WebRadio Name" />
+		<input name="radio-url" type="text" placeholder="WebRadio URL"/>
+		</form>
+		</div>
+		<div class="modal-footer">
+			<div class="form-actions">
+            <button class="btn btn-large"" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-large" name="save" value="save">Add</button>
+        </div>
+		</div>
+	</div>
+	</form>
+
 <!-- loader -->
 <div id="loader"><div id="loaderbg"></div><div id="loadercontent"><i class="icon-refresh icon-spin"></i>connecting...</div></div>
 <script src="js/jquery-1.8.2.min.js"></script>
@@ -48,7 +69,20 @@
 <script src="js/scripts-configuration.js"></script>
 <script src="js/jquery.pnotify.min.js"></script>
 <script src="js/bootstrap-fileupload.js"></script>
-<?php } ?>
+<?php } 
+//WebRadio Add Dialog
+if(isset($_POST['radio-name']) && isset($_POST['radio-url'])) {
+    $url = $_POST['radio-url'];
+	$name = $_POST['radio-name'];
+    $ret = file_put_contents('/var/lib/mpd/music/WEBRADIO/'.$name.'.pls', $url);
+	session_start();
+	sendMpdCommand($mpd,'update WEBRADIO');
+	// set UI notify
+	$_SESSION['notify']['msg'] = 'New WebRadio Added';
+	// unlock session file
+	playerSession('unlock');
+}
+?>
 <!--[if lt IE 8]>
 <script src="js/icon-font-ie7.js"></script>
 <script src="js/icon-font-ie7-24.js"></script>

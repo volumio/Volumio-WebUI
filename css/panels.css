@@ -575,6 +575,12 @@ a.btn-cmd {
     font-size: 18px;
     font-weight: bold;
 }
+#webradio-add {
+    margin: 0px 0 0px 0px;
+    float: right;
+}
+
+
 
 /* Pages */
 .pl-pages {
