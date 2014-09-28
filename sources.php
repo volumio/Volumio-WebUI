@@ -161,9 +161,9 @@ $tpl = "sources.html";
 playerSession('unlock',$db,'','');
 foreach ($source as $mp) {
 if (wrk_checkStrSysfile('/proc/mounts',$mp['name']) ) {
-	$icon = "<i class='fa-check green sx'></i>";
+	$icon = "<i class='fa fa-check green sx'></i>";
 	} else {
-	$icon = "<i class='fa-remove red sx'></i>";
+	$icon = "<i class='fa fa-remove red sx'></i>";
 	}
 $_mounts .= "<p><a href=\"sources.php?p=edit&id=".$mp['id']."\" class='btn btn-large btn-block'> ".$icon." NAS/".$mp['name']."&nbsp;&nbsp;&nbsp;&nbsp;//".$mp['address']."/".$mp['remotedir']." </a></p>";
 }
