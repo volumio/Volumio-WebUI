@@ -44,7 +44,7 @@
 <script src="js/jquery.countdown.js"></script>
 <script src="js/jquery.countdown-it.js"></script>
 <script src="js/jquery.scrollTo.min.js"></script>
-
+<script src="js/player_lib.js"></script>
 <!-- 'fixes' links to other pages so that when saved to the homescreen
      on a iOS device all the links stay within the app 
 	 Note from mikelangeloz -- 
