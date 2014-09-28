@@ -131,7 +131,7 @@ function getPlaylist(json){
             } else {
                 content = '<li id="pl-' + (i + 1) + '" class="clearfix">';
             }
-			content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="icon-remove-sign"></i></a></div>';
+			content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="fa fa-remove"></i></a></div>';
             if (typeof data[i].Title != 'undefined') {
                 content += '<div class="pl-entry">';
                 content += data[i].Title + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
@@ -194,7 +194,7 @@ function parseResponse(inputArr,respType,i,inpath) {
 				if (typeof inputArr[i].Title != 'undefined') {
 					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 					content += inputArr[i].file;
-					content += '"><div class="db-icon db-song db-browse"><i class="icon-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="icon-reorder"></i></a></div><div class="db-entry db-song db-browse">';
+					content += '"><div class="db-icon db-song db-browse"><i class="fa fa-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-song db-browse">';
 					content += inputArr[i].Title + ' <em class="songtime">' + timeConvert(inputArr[i].Time) + '</em>';
 					content += ' <span>';
 					content +=  inputArr[i].Artist;
@@ -206,10 +206,10 @@ function parseResponse(inputArr,respType,i,inpath) {
 					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 					content += inputArr[i].file;
 					if (inpath == 'WEBRADIO') {
-					content += '"><div class="db-icon db-song db-browse"><i class="icon-microphone sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="icon-reorder"></i></a></div><div class="db-entry db-song db-browse">';
+					content += '"><div class="db-icon db-song db-browse"><i class="fa fa-microphone sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-song db-browse">';
 					showtype = 'radio'
 					} else {
-					content += '"><div class="db-icon db-song db-browse"><i class="icon-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="icon-reorder"></i></a></div><div class="db-entry db-song db-browse">';
+					content += '"><div class="db-icon db-song db-browse"><i class="fa fa-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-song db-browse">';
 					showtype = 'file'
 					}
 					content += inputArr[i].file.replace(inpath + '/', '').replace('.pls', '') + ' <em class="songtime">' + timeConvert(inputArr[i].Time) + '</em>';
@@ -227,15 +227,15 @@ function parseResponse(inputArr,respType,i,inpath) {
 				content += inputArr[i].directory;
 				showtype = 'file'
 				if (inpath != '') {
-					content += '"><div class="db-icon db-folder db-browse"><i class="icon-folder-open sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="icon-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-folder-open sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
 				} else if (inputArr[i].directory == 'WEBRADIO') {
-					content += '"><div class="db-icon db-folder db-browse"><i class="icon-microphone icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="icon-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-microphone icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
 				} else if (inputArr[i].directory == 'NAS') {
-					content += '"><div class="db-icon db-folder db-browse"><i class="icon-code-fork icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="icon-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-code-fork icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
 				} else if (inputArr[i].directory == 'USB') {
-					content += '"><div class="db-icon db-folder db-browse"><i class="icon-hdd icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="icon-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-hdd-o icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
 				} else if (inputArr[i].directory == 'RAMPLAY') {
-					content += '"><div class="db-icon db-folder db-browse"><i class="icon-spinner icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="icon-reorder"></i></a></div><div class="db-entry db-folder db-browse">';	
+					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spinner icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';	
 				}	
 				content += inputArr[i].directory.replace(inpath + '/', '');
 				content += '</div></li>';
@@ -380,16 +380,16 @@ function updateGUI(json){
 function refreshState(state) {
     if (state == 'play') {
         $('#play').addClass('btn-primary');
-        $('#play i').removeClass('icon-pause').addClass('icon-play');
+        $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
         $('#stop').removeClass('btn-primary');
     } else if (state == 'pause') {
         $('#playlist-position').html('Not playing');
         $('#play').addClass('btn-primary');
-        $('#play i').removeClass('icon-play').addClass('icon-pause');
+        $('#play i').removeClass('fa fa-play').addClass('fa fa-pause');
         $('#stop').removeClass('btn-primary');
     } else if (state == 'stop') {
         $('#play').removeClass('btn-primary');
-        $('#play i').removeClass('icon-pause').addClass('icon-play');
+        $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
         $('#stop').addClass('btn-primary');
         $('#countdown-display').countdown('destroy');
         $('#elapsed').html('00:00');
@@ -413,9 +413,9 @@ function refreshState(state) {
 	// show UpdateDB icon
 	// console.log('dbupdate = ', GUI.json['updating_db']);
 	if (typeof GUI.json['updating_db'] != 'undefined') {
-		$('.open-panel-sx').html('<i class="icon-refresh icon-spin"></i> Updating');
+		$('.open-panel-sx').html('<i class="fa fa-refresh icon-spin"></i> Updating');
 	} else {
-		$('.open-panel-sx').html('<i class="icon-music sx"></i> Browse');
+		$('.open-panel-sx').html('<i class="fa fa-music sx"></i> Browse');
 	}
 }
 

@@ -5,8 +5,8 @@
 			<h3 id="poweroff-modal-label">Turn off the player</h3>
 		</div>
 		<div class="modal-body">
-			<button id="syscmd-poweroff" name="syscmd" value="poweroff" class="btn btn-primary btn-large btn-block"><i class="icon-power-off sx"></i> Power off</button>
-			<button id="syscmd-reboot" name="syscmd" value="reboot" class="btn btn-primary btn-large btn-block"><i class="icon-refresh sx"></i> Reboot</button>
+			<button id="syscmd-poweroff" name="syscmd" value="poweroff" class="btn btn-primary btn-large btn-block"><i class="fa fa-power-off sx"></i> Power off</button>
+			<button id="syscmd-reboot" name="syscmd" value="reboot" class="btn btn-primary btn-large btn-block"><i class="fa fa-refresh sx"></i> Reboot</button>
 		</div>
 		<div class="modal-footer">
 			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
@@ -35,7 +35,7 @@
 	</form>
 
 <!-- loader -->
-<div id="loader"><div id="loaderbg"></div><div id="loadercontent"><i class="icon-refresh icon-spin"></i>connecting...</div></div>
+<div id="loader"><div id="loaderbg"></div><div id="loadercontent"><i class="fa fa-refresh icon-spin"></i>connecting...</div></div>
 <script src="js/jquery-1.8.2.min.js"></script>
 <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
 <script src="js/bootstrap.min.js"></script>

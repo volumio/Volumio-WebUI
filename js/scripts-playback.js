@@ -66,15 +66,15 @@ jQuery(document).ready(function($){ 'use strict';
     // playback
     $("#play").mouseenter(function() {
         if (GUI.state == "play") {
-            $("#play i").removeClass("icon-play").addClass("icon-pause");
+            $("#play i").removeClass("fa fa-play").addClass("fa fa-pause");
         } else if (GUI.state == "pause") {
-            $("#play i").removeClass("icon-pause").addClass("icon-play");
+            $("#play i").removeClass("fa fa-pause").addClass("fa fa-play");
         }
     }).mouseleave(function() {
         if (GUI.state == "play") {
-            $("#play i").removeClass("icon-pause").addClass("icon-play");
+            $("#play i").removeClass("fa fa-pause").addClass("fa fa-play");
         } else if (GUI.state == "pause") {
-            $("#play i").removeClass("icon-play").addClass("icon-pause");
+            $("#play i").removeClass("fa fa-play").addClass("fa fa-pause");
         }
     });
 
@@ -475,7 +475,7 @@ jQuery(document).ready(function($){ 'use strict';
         var numberItems = count;
         var s = (count == 1) ? '' : 's';
         if (filter != '') {
-            $('#pl-filter-results').html('<i class="icon-search sx"></i> ' + (+count) + ' result' + s + ' for "<em class="keyword">' + filter + '</em>"');
+            $('#pl-filter-results').html('<i class="fa fa-search sx"></i> ' + (+count) + ' result' + s + ' for "<em class="keyword">' + filter + '</em>"');
         } else {
             $('#pl-filter-results').html('');
         }

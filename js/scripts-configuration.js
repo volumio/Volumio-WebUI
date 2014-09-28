@@ -150,12 +150,12 @@ jQuery(document).ready(function($){ 'use strict';
 			{
 				$('.advanced-config').hide();
 				$(this).removeClass('active');
-				$(this).find('i').removeClass('icon-minus-sign').addClass('icon-plus-sign');
+				$(this).find('i').removeClass('fa fa-minus').addClass('fa fa-plus');
 				$(this).find('span').html('Show advanced options');
 			} else {
 				$('.advanced-config').show();
 				$(this).addClass('active');
-				$(this).find('i').removeClass('icon-plus-sign').addClass('icon-minus-sign');
+				$(this).find('i').removeClass('fa fa-plus').addClass('fa fa-minus');
 				$(this).find('span').html('Hide advanced options');
 			}
 		});	

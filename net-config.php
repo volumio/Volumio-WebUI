@@ -200,15 +200,15 @@ $bitrate = exec($bitr);
 
 
 if (!empty($ipeth0)) {
-    $statuset = 'Connected <i class="icon-ok green sx"></i>';
+    $statuset = 'Connected <i class="fa fa-check green sx"></i>';
 	} else {
-	$statuset = 'Not Connected <i class="icon-remove red sx"></i>';
+	$statuset = 'Not Connected <i class="fa fa-remove red sx"></i>';
 	}
 if (!empty($ipwlan0)) {
-    $statuswl = 'Connected <i class="icon-ok green sx"></i>';
+    $statuswl = 'Connected <i class="fa fa-check green sx"></i>';
 	} else {
 	if (wrk_checkStrSysfile('/proc/net/wireless','wlan0')) {
-	$statuswl = 'Not Connected <i class="icon-remove red sx"></i>';
+	$statuswl = 'Not Connected <i class="fa fa-remove red sx"></i>';
 	} else {
 	$statuswl = 'No Wireless Interface Present';
 	}
