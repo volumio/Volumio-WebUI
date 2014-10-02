@@ -35,7 +35,7 @@ window.ParsleyConfig = window.ParsleyConfig || {};
 
       // parsley.extend ///////////////////////////////
       , minwords:       "Aquest valor ha de tenir %s paraules com a mínim."
-        minwords:       "This value should have %s words at least."
+      , minwords:       "This value should have %s words at least."
       , maxwords:       "This value should have %s words maximum."
       , rangewords:     "This value should have between %s and %s words."
       , greaterthan:    "This value should be greater than %s."

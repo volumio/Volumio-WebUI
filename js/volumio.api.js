@@ -17,17 +17,18 @@
  *  along with TsunAMP; see the file COPYING.  If not, see
  *  <http://www.gnu.org/licenses/>.
  *
- *
- *	UI-design/JS code by: 	Andrea Coiutti (aka ACX)
- * PHP/JS code by:			Simone De Gregori (aka Orion)
+ *  Authors:
+ *  - v1, 1.1: Andrea Coiutti (aka ACX)
+ *  - v1, 1.1: Simone De Gregori (aka Orion)
+ *  - v2: Michelangelo Guarise
+ *  - v2: Joel Takvorian
  * 
- * file:							player_lib.js
- * version:						1.1
- *
+ *  file:                    volumio.api.js
+ *  version:                 2
  */
- 
- // Initialize GUI array
- var GUI = {
+
+ // Global GUI object
+ GUI = {
     json: 0,
     cmd: 'status',
     playlist: null,
@@ -40,123 +41,115 @@
     currentDBpos: new Array(0,0,0,0,0,0,0,0,0,0,0),
     DBentry: new Array('', '', ''),
     visibility: 'visible',
-	DBupdate: 0
+    DBupdate: 0
 };
- 
+
 // FUNZIONI
 // ----------------------------------------------------------------------------------------------------
 
 function sendCmd(inputcmd) {
-	$.ajax({
-		type: 'GET',
-		url: 'command/?cmd=' + inputcmd,
-		async: true,
-		cache: false,
-		success: function(data){
-			GUI.halt = 1;
-			// console.log('GUI.halt (sendCmd)= ', GUI.halt);
-		},
+    $.ajax({
+        type : 'GET',
+        url : 'command/?cmd=' + inputcmd,
+        async : true,
+        cache : false,
+        success : function(data) {
+            GUI.halt = 1;
+        },
     });
 }
 
 function sendPLCmd(inputcmd) {
-	$.ajax({
-		type: 'GET',
-		url: 'db/?cmd=' + inputcmd,
-		async: true,
-		cache: false,
-		success: function(data){
-			GUI.halt = 1;
-			// console.log('GUI.halt (sendPLcmd)= ', GUI.halt);
-		},
+    $.ajax({
+        type : 'GET',
+        url : 'db/?cmd=' + inputcmd,
+        async : true,
+        cache : false,
+        success : function(data) {
+            GUI.halt = 1;
+        },
     });
 }
 
-function backendRequest(){
+function backendRequest() {
     $.ajax({
-		type: 'GET',
-		url: '_player_engine.php?state=' + GUI.state,
-		async: true,
-		cache: false,
-		success: function(data){
-			// console.log('GUI.halt (backendRequest)= ', GUI.halt);
-			renderUI(data);
-			GUI.currentsong = GUI.json['currentsong'];
-			// GUI.halt = 1;
-			backendRequest(GUI.state);
-		},
-		error: function(){
-			setTimeout(function(){
-				GUI.state = 'disconnected';
-				// console.log('GUI.state = ', GUI.state);
-				// console.log('GUI.halt (disconnected) = ',GUI.halt);
-				$('#loader').show();
-				$('#countdown-display').countdown('pause');
-				window.clearInterval(GUI.currentKnob);
-				backendRequest(GUI.state);
-			}, 5000);
-		}
+        type : 'GET',
+        url : '_player_engine.php?state=' + GUI.state,
+        async : true,
+        cache : false,
+        success : function(data) {
+            renderUI(data);
+            GUI.currentsong = GUI.json['currentsong'];
+            backendRequest();
+        },
+        error : function() {
+            setTimeout(function() {
+                GUI.state = 'disconnected';
+                $('#loader').show();
+                $('#countdown-display').countdown('pause');
+                window.clearInterval(GUI.currentKnob);
+                backendRequest();
+            }, 5000);
+        }
     });
 }
 
 function renderUI(data) {
-	// update global GUI array
-	GUI.json = eval('(' + data + ')');
-	GUI.state = GUI.json['state'];
-	// console.log('current song = ', GUI.json['currentsong']);
-	// console.log( 'GUI.state = ', GUI.state );
-	updateGUI(GUI.json);
-		if (GUI.state != 'disconnected') {
-	$('#loader').hide();
-	}
-	refreshTimer(parseInt(GUI.json['elapsed']), parseInt(GUI.json['time']), GUI.json['state']);
-	refreshKnob(GUI.json);
-	if (GUI.json['playlist'] != GUI.playlist) {
-		getPlaylist(GUI.json);
-		GUI.playlist = GUI.json['playlist'];
-		//console.log('playlist = ', GUI.playlist);
-	}
-	GUI.halt = 0;
-	// console.log('GUI.halt (renderUI)= ', GUI.halt);
+    // update global GUI array
+    GUI.json = eval('(' + data + ')');
+    GUI.state = GUI.json['state'];
+    updateGUI(GUI.json);
+    if (GUI.state != 'disconnected') {
+        $('#loader').hide();
+    }
+    refreshTimer(parseInt(GUI.json['elapsed']), parseInt(GUI.json['time']), GUI.json['state']);
+    refreshKnob(GUI.json);
+    if (GUI.json['playlist'] != GUI.playlist) {
+        getPlaylist(GUI.json);
+        GUI.playlist = GUI.json['playlist'];
+    }
+    GUI.halt = 0;
 }
 
 function getPlaylist(json){
     $.getJSON('db/?cmd=playlist', function(data) {
+        // We wait for playlist to be loaded before loading the library, which is much more time-consumming
+        loadLibraryIfNeeded();
+
+        // Read received data for playlist
         var i = 0;
         var content = '';
         var output = '';
-        for (i = 0; i < data.length; i++){
-            if (json['state'] != 'stop' && i == parseInt(json['song'])) {
-                content = '<li id="pl-' + (i + 1) + '" class="active clearfix">';
-            } else {
-                content = '<li id="pl-' + (i + 1) + '" class="clearfix">';
-            }
-			content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="fa fa-remove"></i></a></div>';
-            if (typeof data[i].Title != 'undefined') {
-                content += '<div class="pl-entry">';
-                content += data[i].Title + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
-                content += ' <span>';
-                content +=  data[i].Artist;
-                content += ' - ';
-                content +=  data[i].Album;
-                content += '</span></div></li>';
-                output = output + content;
-            } else {
-                songpath = parsePath(data[i].file);
-                content += '<div class="pl-entry">';
-                content += data[i].file.replace(songpath + '/', '') + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
-                content += ' <span>';
-                content += ' path \: ';
-                content += songpath;
-                content += '</span></div></li>';
-                output = output + content;
+        if (data) {
+            for (i = 0; i < data.length; i++){
+                if (json['state'] != 'stop' && i == parseInt(json['song'])) {
+                    content = '<li id="pl-' + (i + 1) + '" class="active clearfix">';
+                } else {
+                    content = '<li id="pl-' + (i + 1) + '" class="clearfix">';
+                }
+                content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="fa fa-remove"></i></a></div>';
+                if (typeof data[i].Title != 'undefined') {
+                    content += '<div class="pl-entry">';
+                    content += data[i].Title + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
+                    content += ' <span>';
+                    content +=  data[i].Artist;
+                    content += ' - ';
+                    content +=  data[i].Album;
+                    content += '</span></div></li>';
+                    output = output + content;
+                } else {
+                    songpath = parsePath(data[i].file);
+                    content += '<div class="pl-entry">';
+                    content += data[i].file.replace(songpath + '/', '') + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
+                    content += ' <span>';
+                    content += ' path \: ';
+                    content += songpath;
+                    content += '</span></div></li>';
+                    output = output + content;
+                }
             }
         }
         $('ul.playlist').html(output);
-        var current = parseInt(json['song']);
-//        if (current != json && GUI.halt != 1) {
-//            customScroll('pl', current, 200); // active current song
-//        }
     });
 }
 
@@ -164,13 +157,18 @@ function parsePath(str) {
 	var cutpos=str.lastIndexOf("/");
 	//-- verify this switch! (Orion)
 	if (cutpos !=-1) {
-	//console.log('cutpos = ', cutpos);
-	var songpath = str.slice(0,cutpos);
-	//console.log('songpath = ', songpath);
+        var songpath = str.slice(0,cutpos);
 	}  else {
-	songpath = '';
+        songpath = '';
 	}
 	return songpath;
+}
+
+function pluginListItem(id, text, faicon, onclick) {
+    return '<li id="#' + id + '" class="db-plugin" onclick="'
+        + onclick + '"><div class="db-icon db-other"><i class="fa '
+        + faicon + ' icon-root sx"></i></div><div class="db-entry db-other">'
+        + text + '</div></li>';
 }
 
 function parseResponse(inputArr,respType,i,inpath) {		
@@ -178,19 +176,12 @@ function parseResponse(inputArr,respType,i,inpath) {
 		case 'playlist':		
 			// code placeholder
 		break;
-		
+
 		case 'db':
-			//console.log('inpath= :',inpath);
-			//console.log('inputArr[i].file= :',inputArr[i].file);
 			if (inpath == '' && typeof inputArr[i].file != 'undefined') {
-			inpath = parsePath(inputArr[i].file)
+                inpath = parsePath(inputArr[i].file)
 			}
 			if (typeof inputArr[i].file != 'undefined') {
-				//debug
-				//console.log('inputArr[i].file: ', inputArr[i].file);
-				//console.log('inputArr[i].Title: ', inputArr[i].Title);
-				//console.log('inputArr[i].Artist: ', inputArr[i].Artist);
-				//console.log('inputArr[i].Album: ', inputArr[i].Album);
 				if (typeof inputArr[i].Title != 'undefined') {
 					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 					content += inputArr[i].file;
@@ -203,26 +194,21 @@ function parseResponse(inputArr,respType,i,inpath) {
 					content += '</span></div></li>';
 					showtype = 'music'
 				} else {
+                    var dbItemClass = (inputArr[i].Time === undefined) ? "db-other" : "db-song";
 					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 					content += inputArr[i].file;
 					if (inpath == 'WEBRADIO') {
-					content += '"><div class="db-icon db-song db-browse"><i class="fa fa-microphone sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-song db-browse">';
-					showtype = 'radio'
+                        content += '"><div class="db-icon ' + dbItemClass + ' db-browse"><i class="fa fa-microphone sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry ' + dbItemClass + ' db-browse">';
+                        showtype = 'radio'
 					} else {
-					content += '"><div class="db-icon db-song db-browse"><i class="fa fa-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-song db-browse">';
-					showtype = 'file'
+                        content += '"><div class="db-icon ' + dbItemClass + ' db-browse"><i class="fa fa-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry ' + dbItemClass + ' db-browse">';
+                        showtype = 'file'
 					}
 					content += inputArr[i].file.replace(inpath + '/', '').replace('.pls', '') + ' <em class="songtime">' + timeConvert(inputArr[i].Time) + '</em>';
-					//content += ' <span>';
-					//content += ' path \: ';
-					//content += inpath;
-					//content += '</span></div></li>';
 					content += '</div></li>';
 					
 				}
 			} else {
-			//debug
-			//console.log('inputArr[i].directory: ', data[i].directory);
 				content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 				content += inputArr[i].directory;
 				showtype = 'file'
@@ -253,31 +239,30 @@ function getDB(cmd, path, browsemode, uplevel){
 		}, 'json');
 	} else if (cmd == 'add') {
 		$.post('db/?cmd=add', { 'path': path }, function(path) {
-			// console.log('add= ', path);
 		}, 'json');
 	} else if (cmd == 'addplay') {
 		$.post('db/?cmd=addplay', { 'path': path }, function(path) {
-			// console.log('addplay= ',path);
 		}, 'json');
 	} else if (cmd == 'addreplaceplay') {
 		$.post('db/?cmd=addreplaceplay', { 'path': path }, function(path) {
-			// console.log('addreplaceplay= ',path);
 		}, 'json');
 	} else if (cmd == 'update') {
 		$.post('db/?cmd=update', { 'path': path }, function(path) {
-			// console.log('update= ',path);
 		}, 'json');
 	} else if (cmd == 'search') {
 		var keyword = $('#db-search-keyword').val();
 		$.post('db/?querytype=' + browsemode + '&cmd=search', { 'query': keyword }, function(data) {
 			populateDB(data, path, uplevel, keyword);
 		}, 'json');
-	}
+	} else if (cmd == 'playall') {
+                $.post('db/?cmd=playall', { 'path': path }, function(data) {}, 'json');
+        } else if (cmd == 'addall') {
+                $.post('db/?cmd=addall', { 'path': path }, function(data) {}, 'json');
+        }
 }
 
 function populateDB(data, path, uplevel, keyword){
 	if (path) GUI.currentpath = path;
-	// console.log(' new GUI.currentpath = ', GUI.currentpath);
 	var DBlist = $('ul.database');
 	DBlist.html('');
 	if (keyword) {
@@ -292,32 +277,27 @@ function populateDB(data, path, uplevel, keyword){
 		$("#db-back-text").html("back");
 		$("#db-back").show();
 	} else {
-        	$("#db-back").hide();
-	}
-	var content = '';
+        $("#db-back").hide();
+        if (library && library.isEnabled && !library.displayAsTab) {
+            DBlist.append(pluginListItem("db-plug-lib", "LIBRARY", "fa-columns", "showLibraryView()"));
+        }
+    }
 	var i = 0;
 	for (i = 0; i < data.length; i++){
-		content = parseResponse(data,'db',i,path);
-	 	DBlist.append(content);
+	 	DBlist.append(parseResponse(data,'db',i,path));
 	}
 	$('#db-currentpath span').html(path);
 	if (uplevel) {
-		// console.log('PREV LEVEL');
 		$('#db-' + GUI.currentDBpos[GUI.currentDBpos[10]]).addClass('active');
 		customScroll('db', GUI.currentDBpos[GUI.currentDBpos[10]]);
 	} else {
-		// console.log('NEXT LEVEL');
 		customScroll('db', 0, 0);
 	}
 	if (showtype == 'radio') {
-	$("#webradio-add").show();
+        $("#webradio-add").show();
 	} else {
-	$("#webradio-add").hide();
+        $("#webradio-add").hide();
 	}
-	// debug
-	// console.log('GUI.currentDBpos = ', GUI.currentDBpos);
-	// console.log('livello = ', GUI.currentDBpos[10]);
-	// console.log('elemento da illuminare = ', GUI.currentDBpos[GUI.currentDBpos[10]]);
 }
 
 // update interface
@@ -325,7 +305,6 @@ function updateGUI(json){
     // check MPD status
     refreshState(GUI.state);
     // check song update
-    //console.log('A = ', json['currentsong']); console.log('B = ', GUI.currentsong);
     if (GUI.currentsong != json['currentsong']) {
         countdownRestart(0);
         if ($('#panel-dx').hasClass('active')) {
@@ -334,38 +313,37 @@ function updateGUI(json){
         }
     }
     // common actions
-    // console.log('GUI.halt (azioni comuni)= ', GUI.halt);
-    //if (!GUI.halt) {
-        //refreshTimer(parseInt(json['elapsed']), parseInt(json['time']), json['state']);
 
-        $('#volume').val((json['volume'] == '-1') ? 100 : json['volume']).trigger('change');
-        $('#currentartist').html(json['currentartist']);
-        $('#currentsong').html(json['currentsong']);
-        $('#currentalbum').html(json['currentalbum']);
-        if (json['repeat'] == 1) {
-            $('#repeat').addClass('btn-primary');
-        } else {
-            $('#repeat').removeClass('btn-primary');
-        }
-        if (json['random'] == 1) {
-            $('#random').addClass('btn-primary');
-        } else {
-            $('#random').removeClass('btn-primary');
-        }
-        if (json['consume'] == 1) {
-            $('#consume').addClass('btn-primary');
-        } else {
-            $('#consume').removeClass('btn-primary');
-        }
-        if (json['single'] == 1) {
-            $('#single').addClass('btn-primary');
-        } else {
-            $('#single').removeClass('btn-primary');
-        }
+    // Don't update the knob if it's currently being changed
+    var volume = $('#volume');
+    if (volume[0] && (volume[0].knobEvents === undefined || !volume[0].knobEvents.isSliding)) {
+        volume.val((json['volume'] == '-1') ? 100 : json['volume']).trigger('change');
+    }
+    $('#currentartist').html(json['currentartist']);
+    $('#currentsong').html(json['currentsong']);
+    $('#currentalbum').html(json['currentalbum']);
+    if (json['repeat'] == 1) {
+        $('#repeat').addClass('btn-primary');
+    } else {
+        $('#repeat').removeClass('btn-primary');
+    }
+    if (json['random'] == 1) {
+        $('#random').addClass('btn-primary');
+    } else {
+        $('#random').removeClass('btn-primary');
+    }
+    if (json['consume'] == 1) {
+        $('#consume').addClass('btn-primary');
+    } else {
+        $('#consume').removeClass('btn-primary');
+    }
+    if (json['single'] == 1) {
+        $('#single').addClass('btn-primary');
+    } else {
+        $('#single').removeClass('btn-primary');
+    }
 
-    //}
     GUI.halt = 0;
-    // console.log('GUI.halt (azioni comuni2)= ', GUI.halt);
     GUI.currentsong = json['currentsong'];
 	GUI.currentartist = json['currentartist'];
 	//Change Name according to Now Playing
@@ -421,13 +399,10 @@ function refreshState(state) {
 
 // update countdown
 function refreshTimer(startFrom, stopTo, state){
-    //console.log('startFrom = ', startFrom);
-    //console.log('state = ', state);
     if (state == 'play') {
         $('#countdown-display').countdown('destroy');
         $('#countdown-display').countdown({since: -(startFrom), compact: true, format: 'MS'});
     } else if (state == 'pause') {
-        //console.log('startFrom = ', startFrom);
         $('#countdown-display').countdown('destroy');
         $('#countdown-display').countdown({since: -(startFrom), compact: true, format: 'MS'});
         $('#countdown-display').countdown('pause');
@@ -442,13 +417,10 @@ function refreshTimer(startFrom, stopTo, state){
 function refreshKnob(json){
     window.clearInterval(GUI.currentKnob)
     var initTime = json['song_percent'];
-    //console.log('percent = ', initTime);
     var delta = json['time'] / 1000;
     $('#time').val(initTime*10).trigger('change');
     if (GUI.state == 'play') {
         GUI.currentKnob = setInterval(function() {
-            // console.log('initTime = ', initTime);
-            // console.log('delta = ', delta);
             if (GUI.visibility == 'visible') {
                 initTime = initTime + 0.1;
             } else {
@@ -481,13 +453,16 @@ function countdownRestart(startFrom) {
 }
 
 // set volume with knob
-function setvol(val) {
-    $('#volume').val(val);
+function setVolume(val) {
     GUI.volume = val;
     GUI.halt = 1;
-    // console.log('GUI.halt (setvol)= ', GUI.halt);
     $('#volumemute').removeClass('btn-primary');
     sendCmd('setvol ' + val);
+}
+
+// adjust knob with volume
+function adjustKnobVolume(val) {
+    $('#volume').val(val);
 }
 
 // scrolling
@@ -508,12 +483,6 @@ function customScroll(list, destination, speed) {
             var scrolloffset = '-=' + Math.abs(scrollcalc - scrolltop) + 'px';
         }
     }
-    // debug
-    // console.log('-------------------------------------------');
-    // console.log('customScroll parameters = ' + list + ', ' + destination + ', ' + speed);
-    // console.log('scrolltop = ', scrolltop);
-    // console.log('scrollcalc = ', scrollcalc);
-    // console.log('scrolloffset = ', scrolloffset);
     if (scrollcalc > 0) {
         $.scrollTo( scrolloffset , speed );
     } else {
@@ -535,14 +504,14 @@ function randomScrollDB() {
 
 //Social Sharing
 $('a.tweet').click(function(e){
-var urlTwitter = 'https://twitter.com/home?status=%E2%99%AB%20%23NowPlaying+' + GUI.currentartist.replace(/\s+/g, '+') + '+-+' + GUI.currentsong.replace(/\s+/g, '+') + '+with+%40Volumio+http%3A%2F%2Fvolumio.org%2F+';
-$('a.tweet').attr('href', urlTwitter);
+    var urlTwitter = 'https://twitter.com/home?status=%E2%99%AB%20%23NowPlaying+' + GUI.currentartist.replace(/\s+/g, '+') + '+-+' + GUI.currentsong.replace(/\s+/g, '+') + '+with+%40Volumio+http%3A%2F%2Fvolumio.org%2F+';
+    $('a.tweet').attr('href', urlTwitter);
 });
 $('a.facebook').click(function(e){
-var urlFacebook = 'https://www.facebook.com/sharer.php?u=http%3A%2F%2Fvolumio.org%2F&display=popup';
-$('a.facebook').attr('href', urlFacebook);
+    var urlFacebook = 'https://www.facebook.com/sharer.php?u=http%3A%2F%2Fvolumio.org%2F&display=popup';
+    $('a.facebook').attr('href', urlFacebook);
 });
 $('a.googleplus').click(function(e){
-var urlGooglePlus = 'https://plus.google.com/share?url=http%3A%2F%2Fvolumio.org%2F';;
-$('a.googleplus').attr('href', urlGooglePlus);
+    var urlGooglePlus = 'https://plus.google.com/share?url=http%3A%2F%2Fvolumio.org%2F';;
+    $('a.googleplus').attr('href', urlGooglePlus);
 });
