@@ -476,20 +476,18 @@ function cfgdb_connect($dbpath) {
 
 function cfgdb_read($table,$dbh,$param,$id) {
 	if(!isset($param)) {
-	$querystr = 'SELECT * from '.$table;
+	   $querystr = 'SELECT * from '.$table;
 	} else if (isset($id)) {
-	$querystr = "SELECT * from ".$table." WHERE id='".$id."'";
+	   $querystr = "SELECT * from ".$table." WHERE id='".$id."'";
 	} else if ($param == 'mpdconf'){
-	$querystr = "SELECT param,value_player FROM cfg_mpd WHERE value_player!=''";
+	   $querystr = "SELECT param,value_player FROM cfg_mpd WHERE value_player!=''";
 	} else if ($param == 'mpdconfdefault') {
-	$querystr = "SELECT param,value_default FROM cfg_mpd WHERE value_default!=''";
+        $querystr = "SELECT param,value_default FROM cfg_mpd WHERE value_default!=''";
 	} else {
-	$querystr = 'SELECT value from '.$table.' WHERE param="'.$param.'"';
+        $querystr = 'SELECT value from '.$table.' WHERE param="'.$param.'"';
 	}
-//debug
-error_log(">>>>> cfgdb_read(".$table.",dbh,".$param.",".$id.") >>>>> \n".$querystr, 0);
-$result = sdbquery($querystr,$dbh);
-return $result;
+    $result = sdbquery($querystr,$dbh);
+    return $result;
 }
 
 function cfgdb_update($table,$dbh,$key,$value) {
