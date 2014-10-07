@@ -164,4 +164,19 @@ jQuery(document).ready(function($){ 'use strict';
             $(this).hide();
         });
     }
+
+    var $toggledisplaylib1 = $("#toggledisplaylib1");
+    var $toggledisplaylib2 = $("#toggledisplaylib2");
+    var $displaylibastabblock = $("#displaylibastabblock");
+    if ($toggledisplaylib1.size() > 0 && $toggledisplaylib2.size() > 0 && $displaylibastabblock.size() > 0) {
+        if ($toggledisplaylib1.attr("checked") === undefined) {
+            $displaylibastabblock.hide("slide");
+        }
+        $toggledisplaylib1.click(function() {
+            $displaylibastabblock.show("slide");
+        });
+        $toggledisplaylib2.click(function() {
+            $displaylibastabblock.hide("slide");
+        });
+    }
 });

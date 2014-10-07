@@ -100,7 +100,7 @@ function _loadDirForLib($sock, $flat, $dir) {
 		$iItem = 0;
 		$skip = true;
 		for ($iLine = 0; $iLine < count($lines); $iLine++) {
-			list($element, $value) = explode(": ", $lines[$iLine]);
+			list($element, $value) = explode(": ", $lines[$iLine], 2);
 			if ($element == "file") {
 				$skip = false;
 				$iItem = count($flat);
@@ -284,8 +284,8 @@ if (phpVer() == '5.3') {
 }
 
 function sysCmd($syscmd) {
-exec($syscmd." 2>&1", $output);
-return $output;
+    exec($syscmd." 2>&1", $output);
+    return $output;
 }
 
 // format Output for "playlist"
@@ -294,36 +294,29 @@ function _parseFileListResponse($resp) {
 			return NULL;
 		} else {
 			$plistArray = array();
+			$dirArray = array();
+			$plCounter = -1;
+			$dirCounter = 0;
 			$plistLine = strtok($resp,"\n");
 			$plistFile = "";
-			$plCounter = -1;
 			while ( $plistLine ) {
-				list ( $element, $value ) = explode(": ",$plistLine);
+				list ( $element, $value ) = explode(": ",$plistLine,2);
 				if ( $element == "file" OR $element == "playlist") {
 					$plCounter++;
 					$plistFile = $value;
 					$plistArray[$plCounter]["file"] = $plistFile;
 					$plistArray[$plCounter]["fileext"] = parseFileStr($plistFile,'.');
 				} else if ( $element == "directory") {
-					$plCounter++;
-					// record directory index for further processing
-					$dirCounter++;
-					$plistFile = $value;
-					$plistArray[$plCounter]["directory"] = $plistFile;
+					$dirArray[$dirCounter++]["directory"] = $value;
 				} else {
 					$plistArray[$plCounter][$element] = $value;
 					$plistArray[$plCounter]["Time2"] = songTime($plistArray[$plCounter]["Time"]);
 				}
 
 				$plistLine = strtok("\n");
-			} 
-				// reverse MPD list output
-				if (isset($dirCounter) && isset($plistArray[0]["file"]) ) {
-				$dir = array_splice($plistArray, -$dirCounter);
-				$plistArray = $dir + $plistArray;
-				}
+			}
 		}
-		return $plistArray;
+		return array_merge($dirArray, $plistArray);
 	}
 
 // format Output for "status"
@@ -336,7 +329,7 @@ function _parseStatusResponse($resp) {
 			$plistFile = "";
 			$plCounter = -1;
 			while ( $plistLine ) {
-				list ( $element, $value ) = explode(": ",$plistLine);
+				list ( $element, $value ) = explode(": ",$plistLine,2);
 				$plistArray[$element] = $value;
 				$plistLine = strtok("\n");
 			} 
@@ -476,20 +469,18 @@ function cfgdb_connect($dbpath) {
 
 function cfgdb_read($table,$dbh,$param,$id) {
 	if(!isset($param)) {
-	$querystr = 'SELECT * from '.$table;
+	   $querystr = 'SELECT * from '.$table;
 	} else if (isset($id)) {
-	$querystr = "SELECT * from ".$table." WHERE id='".$id."'";
+	   $querystr = "SELECT * from ".$table." WHERE id='".$id."'";
 	} else if ($param == 'mpdconf'){
-	$querystr = "SELECT param,value_player FROM cfg_mpd WHERE value_player!=''";
+	   $querystr = "SELECT param,value_player FROM cfg_mpd WHERE value_player!=''";
 	} else if ($param == 'mpdconfdefault') {
-	$querystr = "SELECT param,value_default FROM cfg_mpd WHERE value_default!=''";
+        $querystr = "SELECT param,value_default FROM cfg_mpd WHERE value_default!=''";
 	} else {
-	$querystr = 'SELECT value from '.$table.' WHERE param="'.$param.'"';
+        $querystr = 'SELECT value from '.$table.' WHERE param="'.$param.'"';
 	}
-//debug
-error_log(">>>>> cfgdb_read(".$table.",dbh,".$param.",".$id.") >>>>> \n".$querystr, 0);
-$result = sdbquery($querystr,$dbh);
-return $result;
+    $result = sdbquery($querystr,$dbh);
+    return $result;
 }
 
 function cfgdb_update($table,$dbh,$key,$value) {
