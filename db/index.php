@@ -42,10 +42,29 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 				
 				case 'filepath':
 					if (isset($_POST['path']) && $_POST['path'] != '') {
-					echo json_encode(searchDB($mpd,'filepath',$_POST['path']));
+						if ($spop && strcmp(substr($_POST['path'],0,7),"SPOTIFY") == 0) {
+							$arraySpopSearchResults = querySpopDB($spop, 'filepath', $_POST['path']);
+							echo json_encode($arraySpopSearchResults);
+
+						} else {
+							$arrayMpdSearchResults = searchDB($mpd,'filepath',$_POST['path']);
+							echo json_encode($arrayMpdSearchResults);
+
+						}
+
 					} else {
-					echo json_encode(searchDB($mpd,'filepath'));
+						$arraySearchResults = searchDB($mpd,'filepath');
+
+						if ($spop) {
+							$arraySpopSearchResults = querySpopDB($spop, 'filepath');
+							$arraySearchResults = array_merge($arraySearchResults, $arraySpopSearchResults);
+
+						}
+
+						echo json_encode($arraySearchResults);
+
 					}
+
 				break;
 
 				case 'playlist':

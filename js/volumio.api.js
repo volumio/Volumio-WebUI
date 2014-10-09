@@ -153,6 +153,32 @@ function getPlaylist(json){
     });
 }
 
+function convertNumericPathToDisplayPath(path) {
+// Convert paths defined by numeric indices (such as spop playlists) to readable text form
+// Treats all elements of the path (other than the root) as numerical indices
+	var arrayPathParts = path.split("/");
+	var nPathParts = arrayPathParts.length;
+	var sReturnString = "";
+	var sParentPath = arrayPathParts[0];
+	var nDirectoryIndex = 0;
+
+	var i = 1;
+	while (i < nPathParts) {
+		nDirectoryIndex = arrayPathParts[i];
+
+		$.post('db/?cmd=filepath', { 'path': sParentPath }, function(arrayParentQueryResponse) {
+			sReturnString = concat(sReturnString, "/", arrayParentQueryResponse[nDirectoryIndex].DisplayName);
+
+		}, 'json');
+
+		sParentPath = concat(sParentPath, "/",  nDirectoryIndex);
+
+		i++;
+	}
+
+	return sReturnString;
+}
+
 function parsePath(str) {
 	var cutpos=str.lastIndexOf("/");
 	//-- verify this switch! (Orion)
@@ -222,8 +248,18 @@ function parseResponse(inputArr,respType,i,inpath) {
 					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-hdd-o icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
 				} else if (inputArr[i].directory == 'RAMPLAY') {
 					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spinner icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';	
+				} else if (inputArr[i].directory == 'SPOTIFY') {
+					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spotify icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';	
 				}	
-				content += inputArr[i].directory.replace(inpath + '/', '');
+
+				if (inputArr[i].DisplayName) {
+					content += inputArr[i].DisplayName;
+
+				} else {
+					content += inputArr[i].directory.replace(inpath + '/', '');
+
+				}
+
 				content += '</div></li>';
 			}
 		break;

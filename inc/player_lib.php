@@ -27,9 +27,31 @@
  *
  */
  
-// Predefined MPD Response messages
+// Predefined daemon Response messages
 define("MPD_RESPONSE_ERR", "ACK");
 define("MPD_RESPONSE_OK",  "OK");
+
+// Spotify daemon communication functions
+function openSpopSocket($host, $portSpop) {
+	$sock = stream_socket_client('tcp://'.$host.':'.$portSpop.'', $errorno, $errorstr, 30 );
+	
+	// First response is typically "spop [version]"
+	$response = readSpopResponse($sock);
+
+	return $sock;
+}
+
+function sendSpopCommand($sock, $cmd) {
+	$cmd = $cmd."\n";
+	fputs($sock, $cmd);
+
+}
+
+function readSpopResponse($sock) {
+	$output = fgets($sock);
+
+	return $output;
+}
 
 // v2
 function openMpdSocket($host, $port) {
@@ -205,6 +227,17 @@ function echoTemplate($template) {
 echo $template;
 }
 
+// Perform Spotify database query/search
+function querySpopDB($sock, $queryType, $queryString) {
+
+	if(strcmp($queryType, "filepath") == 0) {
+		return _getSpopListing($sock, $queryString);
+
+	}
+
+	return array();
+}
+
 function searchDB($sock,$querytype,$query) {
 	switch ($querytype) {
 	case "filepath":
@@ -286,6 +319,95 @@ if (phpVer() == '5.3') {
 function sysCmd($syscmd) {
 exec($syscmd." 2>&1", $output);
 return $output;
+}
+function _parseSpopResponse($resp) {
+	return json_decode($resp, true);
+
+}
+
+// Make an array describing the requested level of the Spop database
+function _getSpopListing($sock, $queryString) {
+	$arrayReturn = array();
+
+	if (strcmp($queryString, "") == 0) {
+		$arrayRootItem = array();
+		$arrayRootItem["directory"] = "SPOTIFY";
+		$arrayRootItem["Last-Modified"] = "";
+		$arrayRootItem["Time2"] = "";
+		$arrayRoot = array(0 => $arrayRootItem);
+		$arrayReturn = $arrayRoot;
+
+	} else if (strncmp($queryString, "SPOTIFY", 7) == 0) {
+		sendSpopCommand($sock,"ls");
+		$arrayResponse = _parseSpopResponse(readSpopResponse($sock));
+		$arrayQueryStringParts = explode("/", $queryString);
+		$nQueryStringParts = count($arrayQueryStringParts);
+		$sCurrentDirectory = "SPOTIFY";
+		$sCurrentDisplayPath = "SPOTIFY";
+
+		$i = 1;
+		while ($i < $nQueryStringParts) {
+			$sCurrentDirectory = $sCurrentDirectory . "/" . $arrayQueryStringParts[$i];
+
+			if (strcmp($arrayResponse["playlists"][$arrayQueryStringParts[$i]]["type"], "playlist") == 0) { 
+			// This is a playlist, navigate into it and stop
+				sendSpopCommand($sock,"ls " . $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"]);
+				$arrayResponse = _parseSpopResponse(readSpopResponse($sock));
+				break;
+
+			} else {
+			// Index further into the directory listing
+				$arrayResponse = $arrayResponse["playlists"][$arrayQueryStringParts[$i]];
+
+			}
+
+			$i++;
+		}
+
+		$i = 0;
+		if (isset($arrayResponse["tracks"])) { 
+		// This is a tracklist within a playlist
+			$nItems = sizeof($arrayResponse["tracks"]);
+			while ($i < $nItems) {
+				$arrayCurrentEntry = array();
+				$arrayCurrentEntry["file"] = (string)$arrayResponse["tracks"][$i]["uri"];
+				$arrayCurrentEntry["Title"] = $arrayResponse["tracks"][$i]["title"];
+				$arrayCurrentEntry["Artist"] = $arrayResponse["tracks"][$i]["artist"];
+				$arrayCurrentEntry["Album"] = $arrayResponse["tracks"][$i]["album"];
+				$arrayCurrentEntry["Last-Modified"] = "";
+				$arrayCurrentEntry["Time2"] = "";
+				
+				array_push($arrayReturn, $arrayCurrentEntry);
+
+				$i++;
+			}
+
+		} else if (isset($arrayResponse["playlists"])) {
+		// This is a folder listing
+			$nItems = sizeof($arrayResponse["playlists"]);
+			while ($i < $nItems) {
+				$arrayCurrentEntry = array();
+				$arrayCurrentEntry["directory"] = $sCurrentDirectory . "/" . $i;
+
+				if (strcmp($arrayResponse["playlists"][$i]["type"], "playlist") == 0 && $arrayResponse["playlists"][$i]["index"] == 0) {
+					$arrayCurrentEntry["DisplayName"] = "Starred";
+				} else {
+					$arrayCurrentEntry["DisplayName"] = $arrayResponse["playlists"][$i]["name"];
+				}
+
+				$arrayCurrentEntry["Last-Modified"] = "";
+				$arrayCurrentEntry["Time2"] = "";
+					
+				array_push($arrayReturn, $arrayCurrentEntry);
+
+				$i++;
+			}
+
+		}
+
+	}
+
+	return $arrayReturn;
 }
 
 // format Output for "playlist"
