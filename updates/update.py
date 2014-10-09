@@ -3,7 +3,7 @@
 import os.path
 import subprocess
 import sqlite3
-from update_modules import mapUpdates
+import json
 
 # Constants
 DB_FILE = "/var/www/db/player.db"
@@ -77,10 +77,13 @@ def flagInstalled(dbCursor, name, version):
     dbCursor.execute("REPLACE INTO updates VALUES(?,?)", (name,version,))
 
 def checkForUpdates():
-    global DB_FILE, mapUpdates
+    global DB_FILE
+    modules = open('modules.json')
+    jsonModules = json.load(modules)
     db = sqlite3.connect(DB_FILE)
     cursor = db.cursor()
-    for name, version in mapUpdates.iteritems():
+    for name in jsonModules:
+        version = jsonModules[name]
         installedVersion = getVersionForModule(cursor, name)
         print "Module %s: latest version is %d, current version is %d" % (name, version, installedVersion)
         if installedVersion < version:
@@ -89,6 +92,7 @@ def checkForUpdates():
             flagInstalled(cursor, name, version)
             db.commit()
     db.close()
+    modules.close()
 
 checkDbSetup()
 checkForUpdates()
