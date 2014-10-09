@@ -35,13 +35,13 @@ library = {
     },
     containerArtist: undefined,
     containerAlbums: undefined,
-    containerSongs: undefined
+    containerSongs: undefined,
+    viewSize: ""
 };
 
 function setLibOptions(isEnabled, displayAsTab, shouldLoad) {
-    // The library will be enabled not only if setting enables it, but also if screen resolution is sufficiant
-    // arbitrary detection: width must be >= 800, height must be >= 600
-    library.isEnabled = isEnabled && window.screen.width >= 800 && window.screen.height >= 600;
+    // The library will be enabled according to settings
+    library.isEnabled = isEnabled;
     library.displayAsTab = displayAsTab;
     library.shouldLoad = library.isEnabled && shouldLoad;
 }
@@ -51,6 +51,7 @@ function loadLibraryIfNeeded() {
         // Load it once only
         library.shouldLoad = false;
         // Load MPD content
+        decideViewLayout();
         $("#lib-loader").show();
         $.post('db/?cmd=loadlib', {}, function(data) {
             $("#lib-loader").hide();
@@ -223,12 +224,27 @@ function filterLib(forceShowAll) {
     } else {
         // Sort lists
         library.allGenres.sort();
-        library.allGenres = ["All genres"].concat(library.allGenres);
+        library.allGenres = removeDuplicate(["All genres"].concat(library.allGenres),
+                                            function(a, b) { return a === b; });
         library.allArtists.sort();
-        library.allArtists = ["All artists"].concat(library.allArtists);
+        library.allArtists = removeDuplicate(["All artists"].concat(library.allArtists),
+                                            function(a, b) { return a === b; });
         library.allAlbums.sort(function(a, b) { return a.album.toLowerCase() > b.album.toLowerCase() ? 1 : -1; });
-        library.allAlbums = [{"album": "All albums", "artist": ""}].concat(library.allAlbums);
+        library.allAlbums = removeDuplicate([{"album": "All albums", "artist": ""}].concat(library.allAlbums),
+                                            function(a, b) { return a.album === b.album && a.artist === b.artist; });
     }
+}
+
+// Assumes input array is sorted => method operates in o(n)
+function removeDuplicate(arr, fequals) {
+    // Initialize with first
+    var nodup = [arr[0]];
+    for (var i = 1; i < arr.length; i++) {
+        if (!fequals(arr[i], nodup[nodup.length-1])) {
+            nodup.push(arr[i]);
+        }
+    }
+    return nodup;
 }
 
 function checkFilters(filters, collection, func) {
@@ -307,7 +323,7 @@ var renderAlbums = function() {
 var getSongHtml = function(from, to) {
     var html = "";
     for (var i = from; i <= to; i++) {
-        html += '<li id="lib-song-' + (i + 1) + '" class="clearfix"><div class="lib-entry">' + library.allSongs[i].display
+        html += '<li id="lib-song-' + (i + 1) + '" class="clearfix" title="' + library.allSongs[i].file + '"><div class="lib-entry">' + library.allSongs[i].display
             + ' <span> (' + library.allSongs[i].artist + ', ' + library.allSongs[i].album
             + ')<div class="lib-play"><a title="Play" href="#notarget" class="btn"><i class="fa fa-play"></i></a></div>'
             + '<div class="lib-add"><a title="Enqueue" href="#notarget" class="btn"><i class="fa fa-plus"></i></a></div></div></li>';
@@ -358,6 +374,102 @@ function clickedLibItem(event, container, domElt, libItem, currentFilter, render
     filterLib();
     // Render
     renderFunc();
+}
+
+function decideViewLayout() {
+    var viewSize = ($(window).width() < 640) ? "small" : "large";
+    if (viewSize !== library.viewSize) {
+        library.viewSize = viewSize;
+        if (viewSize === "large") {
+            showLargeView();
+        } else {
+            showSmallView();
+        }
+    }
+}
+
+// Enable the full-sized view
+function showLargeView() {
+    library.viewSize = "large";
+    $("#lib-tabs").hide();
+    $("#lib-genre").css({
+        "position": "absolute",
+        "overflow": "auto",
+        "width": "25%",
+        "height": "25%",
+        "border-bottom": "3px solid #212D39",
+        "border-right": "3px solid #212D39",
+        "z-index": "12"
+    }).removeClass("tab-pane");
+    $("#lib-artist").css({
+        "position": "absolute",
+        "overflow": "auto",
+        "top": "25%",
+        "width": "25%",
+        "height": "75%",
+        "margin-top": "3px",
+        "border-right": "3px solid #212D39",
+        "z-index": "12"
+    }).removeClass("tab-pane");
+    $("#lib-album").css({
+        "position": "absolute",
+        "overflow": "auto",
+        "left": "25%",
+        "width": "25%",
+        "height": "100%",
+        "border-right": "3px solid #212D39",
+        "z-index": "11"
+    }).removeClass("tab-pane");
+    $("#lib-file").css({
+        "position": "absolute",
+        "overflow": "auto",
+        "left": "50%",
+        "width": "50%",
+        "height": "100%",
+        "z-index": "10"
+    }).removeClass("tab-pane");
+}
+
+// Enable the tabs-styled view
+function showSmallView() {
+    library.viewSize = "small";
+    $("#lib-tabs").show();
+    $("#lib-genre").css({
+        "position": "relative",
+        "top": "0px",
+        "left": "0px",
+        "width": "100%",
+        "height": "auto",
+        "border-bottom": "0px",
+        "border-right": "0px"
+    }).addClass("tab-pane");
+    $("#lib-artist").css({
+        "position": "relative",
+        "top": "0px",
+        "left": "0px",
+        "width": "100%",
+        "height": "auto",
+        "border-bottom": "0px",
+        "border-right": "0px"
+    }).addClass("tab-pane");
+    $("#lib-album").css({
+        "position": "relative",
+        "top": "0px",
+        "left": "0px",
+        "width": "100%",
+        "height": "auto",
+        "border-bottom": "0px",
+        "border-right": "0px"
+    }).addClass("tab-pane");
+    $("#lib-file").css({
+        "position": "relative",
+        "top": "0px",
+        "left": "0px",
+        "width": "100%",
+        "height": "auto",
+        "border-bottom": "0px",
+        "border-right": "0px"
+    }).addClass("tab-pane");
 }
 
 // On ready, register callbacks
@@ -427,5 +539,10 @@ jQuery(document).ready(function($) {
     //click on ADD ALL
     $('.lib-addall').click(function(e) {
         getDB('addall', library.allSongs);
+    });
+
+    // Resize event
+    $(window).resize(function() {
+        decideViewLayout();
     });
 });

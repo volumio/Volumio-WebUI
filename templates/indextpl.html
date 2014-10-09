@@ -124,21 +124,29 @@
 		<div class="container txtmid">
 			<div id="lib-loader"><div id="loaderbg"></div><div id="loadercontent"><i class="fa fa-refresh icon-spin"></i>loading...</div></div>
 			<div id="lib-content">
-				<div id="lib-genre">
+                <ul id="lib-tabs" class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#lib-genre" role="tab" data-toggle="tab">Genres</a></li>
+                    <li><a href="#lib-artist" role="tab" data-toggle="tab">Artists</a></li>
+                    <li><a href="#lib-album" role="tab" data-toggle="tab">Albums</a></li>
+                    <li><a href="#lib-file" role="tab" data-toggle="tab">Songs</a></li>
+                </ul>
+                <div class="tab-content">
+				<div id="lib-genre" class="tab-pane active">
 					<ul id="genresList"></ul>
 				</div>
-				<div id="lib-artist">
+				<div id="lib-artist" class="tab-pane">
 					<ul id="artistsList"></ul>
 				</div>
-				<div id="lib-album">
+				<div id="lib-album" class="tab-pane">
 					<ul id="albumsList"></ul>
 				</div>
-				<div id="lib-file">
+				<div id="lib-file" class="tab-pane">
 					<ul id="songsList"></ul>
 					<div class="lib-showall"><a title="WARNING: depending on the number of songs to display, showing all songs may result in slowing down or freezing your navigation." href="#notarget" class="btn">Show all songs</a></div>
 					<div class="lib-playall"><a title="Play all" href="#notarget" class="btn"><i class="fa fa-play"></i></a></div>
 					<div class="lib-addall"><a title="Enqueue all" href="#notarget" class="btn"><i class="fa fa-plus"></i></a></div>
 				</div>
+                </div>
 			</div>
 		</div>
 	</div>

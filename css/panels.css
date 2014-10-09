@@ -930,6 +930,7 @@ body { background: #cf0; } */
 }
 
 #lib-genre {
+    /*WARNING: overriden in js (volumio.library.js)*/
     position: absolute;
 	overflow: auto;
 	width: 25%;
@@ -939,6 +940,7 @@ body { background: #cf0; } */
 	z-index: 12;
 }
 #lib-artist {
+    /*WARNING: overriden in js (volumio.library.js)*/
     position: absolute;
 	overflow: auto;
     top: 25%;
@@ -949,6 +951,7 @@ body { background: #cf0; } */
 	z-index: 12;
 }
 #lib-album {
+    /*WARNING: overriden in js (volumio.library.js)*/
     position: absolute;
 	overflow: auto;
     left: 25%;
@@ -958,6 +961,7 @@ body { background: #cf0; } */
     z-index: 11;
 }
 #lib-file {
+    /*WARNING: overriden in js (volumio.library.js)*/
     position: absolute;
 	overflow: auto;
     left: 50%;
@@ -1107,4 +1111,22 @@ body { background: #cf0; } */
 
 .control-group.subgroup {
     margin-left: 100px;
+}
+
+#lib-tabs li.active a {
+	background: #4BBE87;
+}
+#lib-tabs a {
+	background: #7A848E;
+	text-decoration: none;
+	color: #fff;
+    padding: 5px;
+}
+#lib-tabs a:hover, #aaa a:focus {
+	text-decoration: none;
+	outline: none;
+	color: #fff;
+}
+#lib-content .tab-content {
+    height: 100%;
 }
