@@ -37,7 +37,6 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
         echo 'Error Connecting to MPD daemon ';
 		
 		}  else {
-				
 				switch ($_GET['cmd']) {
 				
 				case 'filepath':
@@ -56,8 +55,8 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 						$arraySearchResults = searchDB($mpd,'filepath');
 
 						if ($spop) {
-							$arraySpopSearchResults = querySpopDB($spop, 'filepath');
-							$arraySearchResults = array_merge($arraySearchResults, $arraySpopSearchResults);
+							$arraySpopSearchResults = querySpopDB($spop, 'filepath', '');
+							$arraySearchResults = array_merge($arraySpopSearchResults, $arraySearchResults);
 
 						}
 
@@ -65,83 +64,98 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 
 					}
 
-				break;
+					break;
 
 				case 'playlist':
-				echo json_encode(getPlayQueue($mpd));
-				break;
+					echo json_encode(getPlayQueue($mpd));
+					break;
 
 				case 'add':
 					if (isset($_POST['path']) && $_POST['path'] != '') {
-					echo json_encode(addQueue($mpd,$_POST['path']));
+						echo json_encode(addQueue($mpd,$_POST['path']));
 					}
-				break;
+					break;
 				
 				case 'addplay':
 					if (isset($_POST['path']) && $_POST['path'] != '') {
-					$status = _parseStatusResponse(MpdStatus($mpd));
-					$pos = $status['playlistlength'] ;
-					addQueue($mpd,$_POST['path']);
-					sendMpdCommand($mpd,'play '.$pos);
-					echo json_encode(readMpdResponse($mpd));
+						$status = _parseStatusResponse(MpdStatus($mpd));
+						$pos = $status['playlistlength'] ;
+						addQueue($mpd,$_POST['path']);
+						sendMpdCommand($mpd,'play '.$pos);
+						echo json_encode(readMpdResponse($mpd));
 					}
-				break;
+					break;
 
 				case 'addreplaceplay':
 					if (isset($_POST['path']) && $_POST['path'] != '') {
-					sendMpdCommand($mpd,'clear');
-					addQueue($mpd,$_POST['path']);
-					sendMpdCommand($mpd,'play');
-					echo json_encode(readMpdResponse($mpd));
+						sendMpdCommand($mpd,'clear');
+						addQueue($mpd,$_POST['path']);
+						sendMpdCommand($mpd,'play');
+						echo json_encode(readMpdResponse($mpd));
 					}
-				break;
+					break;
 				
 				case 'update':
 					if (isset($_POST['path']) && $_POST['path'] != '') {
-					sendMpdCommand($mpd,"update \"".html_entity_decode($_POST['path'])."\"");
-					echo json_encode(readMpdResponse($mpd));
+						sendMpdCommand($mpd,"update \"".html_entity_decode($_POST['path'])."\"");
+						echo json_encode(readMpdResponse($mpd));
 					}
-				break;
+					break;
 				
 				case 'trackremove':
 					if (isset($_GET['songid']) && $_GET['songid'] != '') {
-					echo json_encode(remTrackQueue($mpd,$_GET['songid']));
+						echo json_encode(remTrackQueue($mpd,$_GET['songid']));
 					}
-				break;
+					break;
 
-                                case 'savepl':
-                                        if (isset($_GET['plname']) && $_GET['plname'] != '') {
-                                        sendMpdCommand($mpd,"rm \"".html_entity_decode($_GET['plname'])."\"");
-                                        sendMpdCommand($mpd,"save \"".html_entity_decode($_GET['plname'])."\"");
-                                        echo json_encode(readMpdResponse($mpd));
-                                        }
-                                break;
+				case 'savepl':
+					if (isset($_GET['plname']) && $_GET['plname'] != '') {
+						sendMpdCommand($mpd,"rm \"".html_entity_decode($_GET['plname'])."\"");
+						sendMpdCommand($mpd,"save \"".html_entity_decode($_GET['plname'])."\"");
+						echo json_encode(readMpdResponse($mpd));
+					}
+					break;
 				
 				case 'search':
 					if (isset($_POST['query']) && $_POST['query'] != '' && isset($_GET['querytype']) && $_GET['querytype'] != '') {
-					echo json_encode(searchDB($mpd,$_GET['querytype'],$_POST['query']));
+						echo json_encode(searchDB($mpd,$_GET['querytype'],$_POST['query']));
 					}
-				break;
+					break;
 
-                                case 'loadlib':
+				case 'loadlib':
 					echo loadAllLib($mpd);
-                                	break;
+					break;
 
-                                case 'playall':
-                                        if (isset($_POST['path']) && $_POST['path'] != '') {
-                                        	echo json_encode(playAll($mpd,$_POST['path']));
-                                        }
-                                break;
+				case 'playall':
+					if (isset($_POST['path']) && $_POST['path'] != '') {
+						echo json_encode(playAll($mpd,$_POST['path']));
+					}
+					break;
 
-                                case 'addall':
-                                        if (isset($_POST['path']) && $_POST['path'] != '') {
-        	                                echo json_encode(enqueueAll($mpd,$_POST['path']));
-	                                }
-                                break;
+				case 'addall':
+					if (isset($_POST['path']) && $_POST['path'] != '') {
+						echo json_encode(enqueueAll($mpd,$_POST['path']));
+					}
+					break;
+
+				case 'spop-playuri':
+					if (isset($_POST['path']) && $_POST['path'] != '') {
+						sendMpdCommand($mpd,'stop');
+						sendSpopCommand($spop, "uplay " . $_POST['path']);
+						echo readSpopResponse($spop);
+					}
+					break;
+
+				case 'spop-stop':
+					sendSpopCommand($spop, "stop");
+					echo readSpopResponse($spop);
+					break;
+
 			}
 
 				
 		closeMpdSocket($mpd);
+		closeSpopSocket($spop);
 		}
 
 } else {

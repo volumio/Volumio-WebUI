@@ -41,6 +41,12 @@ function openSpopSocket($host, $portSpop) {
 	return $sock;
 }
 
+function closeSpopSocket($sock) {
+	sendSpopCommand($sock,"bye");
+	fclose($sock);
+
+}
+
 function sendSpopCommand($sock, $cmd) {
 	$cmd = $cmd."\n";
 	fputs($sock, $cmd);

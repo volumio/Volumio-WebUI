@@ -396,11 +396,19 @@ jQuery(document).ready(function($){ 'use strict';
 	            $("#pl-saveName").val(path);
             } else {
 	            $("#pl-saveName").val("");
-	    }
+			}
         }
         if ($(this).data('cmd') == 'update') {
             getDB('update', path);
             notify('update', path);
+        }
+        if ($(this).data('cmd') == 'spop-playuri') {
+			$.post('db/?cmd=spop-playuri', { 'path': path }, function(data) {}, 'json');
+
+        }
+        if ($(this).data('cmd') == 'spop-stop') {
+			$.post('db/?cmd=spop-stop', {}, function(data) {}, 'json');
+
         }
     });
 

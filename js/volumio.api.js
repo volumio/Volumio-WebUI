@@ -153,32 +153,6 @@ function getPlaylist(json){
     });
 }
 
-function convertNumericPathToDisplayPath(path) {
-// Convert paths defined by numeric indices (such as spop playlists) to readable text form
-// Treats all elements of the path (other than the root) as numerical indices
-	var arrayPathParts = path.split("/");
-	var nPathParts = arrayPathParts.length;
-	var sReturnString = "";
-	var sParentPath = arrayPathParts[0];
-	var nDirectoryIndex = 0;
-
-	var i = 1;
-	while (i < nPathParts) {
-		nDirectoryIndex = arrayPathParts[i];
-
-		$.post('db/?cmd=filepath', { 'path': sParentPath }, function(arrayParentQueryResponse) {
-			sReturnString = concat(sReturnString, "/", arrayParentQueryResponse[nDirectoryIndex].DisplayName);
-
-		}, 'json');
-
-		sParentPath = concat(sParentPath, "/",  nDirectoryIndex);
-
-		i++;
-	}
-
-	return sReturnString;
-}
-
 function parsePath(str) {
 	var cutpos=str.lastIndexOf("/");
 	//-- verify this switch! (Orion)
@@ -206,9 +180,26 @@ function parseResponse(inputArr,respType,i,inpath) {
 		case 'db':
 			if (inpath == '' && typeof inputArr[i].file != 'undefined') {
                 inpath = parsePath(inputArr[i].file)
+
 			}
+
 			if (typeof inputArr[i].file != 'undefined') {
-				if (typeof inputArr[i].Title != 'undefined') {
+			// This is some kind of file
+				if (inputArr[i].file.substring(0,8) == 'spotify:') {
+				// This is a spotify file
+					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
+					content += inputArr[i].file;
+					content += '"><div class="db-icon db-browse"><i class="fa fa-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-spotify"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-browse">';
+					content += inputArr[i].Title + ' <em class="songtime">' + timeConvert(inputArr[i].Time) + '</em>';
+					content += ' <span>';
+					content +=  inputArr[i].Artist;
+					content += ' - ';
+					content +=  inputArr[i].Album;
+					content += '</span></div></li>';
+					showtype = 'music'
+
+				} else if (typeof inputArr[i].Title != 'undefined') {
+				// This is a local file with a title (eg. a local file playable by MPD)
 					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 					content += inputArr[i].file;
 					content += '"><div class="db-icon db-song db-browse"><i class="fa fa-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-song db-browse">';
@@ -219,52 +210,88 @@ function parseResponse(inputArr,respType,i,inpath) {
 					content +=  inputArr[i].Album;
 					content += '</span></div></li>';
 					showtype = 'music'
+
 				} else {
+				// This is some other music format (eg. streams)
                     var dbItemClass = (inputArr[i].Time === undefined) ? "db-other" : "db-song";
 					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 					content += inputArr[i].file;
+
 					if (inpath == 'WEBRADIO') {
+					// This is a webradio stream
                         content += '"><div class="db-icon ' + dbItemClass + ' db-browse"><i class="fa fa-microphone sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry ' + dbItemClass + ' db-browse">';
                         showtype = 'radio'
+
 					} else {
+					// This is an unknown file type
                         content += '"><div class="db-icon ' + dbItemClass + ' db-browse"><i class="fa fa-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry ' + dbItemClass + ' db-browse">';
                         showtype = 'file'
+
 					}
+
+					// Strip the leading path and trailing '.pls', and display only the filename
 					content += inputArr[i].file.replace(inpath + '/', '').replace('.pls', '') + ' <em class="songtime">' + timeConvert(inputArr[i].Time) + '</em>';
 					content += '</div></li>';
 					
 				}
+
 			} else {
+			// This is a folder or openable playlist
 				content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
 				content += inputArr[i].directory;
 				showtype = 'file'
+
 				if (inpath != '') {
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-folder-open sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+					if (inpath.substring(0,7) == 'SPOTIFY') {
+					// This is a Spotify folder not at the root level
+						content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-folder-open sx"></i></div><div class="db-action"></div><div class="db-entry db-folder db-browse">';
+
+					} else {
+					// This is a generic folder not at the root level
+						content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-folder-open sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+
+					}
+
 				} else if (inputArr[i].directory == 'WEBRADIO') {
+				// This is the WEBRADIO root folder
 					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-microphone icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+
 				} else if (inputArr[i].directory == 'NAS') {
+				// This is the NAS root folder
 					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-code-fork icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+
 				} else if (inputArr[i].directory == 'USB') {
+				// This is the USB root folder
 					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-hdd-o icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+
 				} else if (inputArr[i].directory == 'RAMPLAY') {
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spinner icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';	
+				// This is the RAMPLAY root folder
+					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spinner icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+
 				} else if (inputArr[i].directory == 'SPOTIFY') {
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spotify icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';	
+				// This is the SPOTIFY root folder
+					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spotify icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
+
 				}	
 
 				if (inputArr[i].DisplayName) {
+				// If a DisplayName is available for this entry, use it
 					content += inputArr[i].DisplayName;
 
 				} else {
+				// Else strip the leading path and slash, and display the folder name
 					content += inputArr[i].directory.replace(inpath + '/', '');
 
 				}
 
 				content += '</div></li>';
+
 			}
+
 		break;
 		
 	}
+
 	return content;
 } // end parseResponse()
 
@@ -273,28 +300,37 @@ function getDB(cmd, path, browsemode, uplevel){
 		$.post('db/?cmd=filepath', { 'path': path }, function(data) {
 			populateDB(data, path, uplevel);
 		}, 'json');
+
 	} else if (cmd == 'add') {
 		$.post('db/?cmd=add', { 'path': path }, function(path) {
 		}, 'json');
+
 	} else if (cmd == 'addplay') {
 		$.post('db/?cmd=addplay', { 'path': path }, function(path) {
 		}, 'json');
+
 	} else if (cmd == 'addreplaceplay') {
 		$.post('db/?cmd=addreplaceplay', { 'path': path }, function(path) {
 		}, 'json');
+
 	} else if (cmd == 'update') {
 		$.post('db/?cmd=update', { 'path': path }, function(path) {
 		}, 'json');
+
 	} else if (cmd == 'search') {
 		var keyword = $('#db-search-keyword').val();
 		$.post('db/?querytype=' + browsemode + '&cmd=search', { 'query': keyword }, function(data) {
 			populateDB(data, path, uplevel, keyword);
 		}, 'json');
+
 	} else if (cmd == 'playall') {
-                $.post('db/?cmd=playall', { 'path': path }, function(data) {}, 'json');
-        } else if (cmd == 'addall') {
-                $.post('db/?cmd=addall', { 'path': path }, function(data) {}, 'json');
-        }
+			$.post('db/?cmd=playall', { 'path': path }, function(data) {}, 'json');
+
+	} else if (cmd == 'addall') {
+			$.post('db/?cmd=addall', { 'path': path }, function(data) {}, 'json');
+
+	}
+
 }
 
 function populateDB(data, path, uplevel, keyword){
