@@ -1387,9 +1387,17 @@ function wrk_sysEnvCheck($arch,$install) {
 
 
 function alsa_findHwMixerControl($device) {
+if (isset($_SESSION['i2s']) && $_SESSION['i2s'] == 'Hifiberryplus') {
+$hwmixerdev = 'Playback Digital';
+} elseif (isset($_SESSION['i2s']) && $_SESSION['i2s'] == 'Hifiberry') {
+$hwmixerdev = 'Playback Digital';
+} elseif (isset($_SESSION['i2s']) && $_SESSION['i2s'] == 'Iqaudio') {
+$hwmixerdev = 'Playback Digital';
+} else {
 $cmd = "amixer -c ".$device." |grep \"mixer control\"";
 $str = sysCmd($cmd);
 $hwmixerdev = substr(substr($str[0], 0, -(strlen($str[0]) - strrpos($str[0], "'"))), strpos($str[0], "'")+1);
+}
 return $hwmixerdev;
 }
 
