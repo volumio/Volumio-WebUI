@@ -163,87 +163,7 @@ if (isset($_POST['syscmd'])){
 	case 'restore':
 		
 		break;
-	case 'Hifiberry':
 	
-		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-snd_soc_bcm2708_i2s
-bcm2708_dmaengine
-snd_soc_pcm5102a
-snd_soc_hifiberry_dac';
-
-	file_put_contents($file, $text);
-	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
-		break;
-		
-	case 'HifiberryDigi':
-	
-		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-snd_soc_bcm2708_i2s
-bcm2708_dmaengine
-snd_soc_pcm5102a
-snd_soc_hifiberry_digi';
-
-
-	file_put_contents($file, $text);
-	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
-		break;
-	
-	case 'RpiDac':
-	
-		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-snd_soc_bcm2708_i2s
-bcm2708_dmaengine
-snd_soc_pcm5102a
-snd_soc_rpi_dac';
-
-	file_put_contents($file, $text);
-	$_SESSION['notify']['msg'] = 'I2S Driver Activated. You must reboot for changes to take effect';
-		break;
-		
-	case 'Iqaudio':
-	
-		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-snd_soc_bcm2708_i2s
-bcm2708_dmaengine
-snd_soc_pcm512x
-snd_soc_iqaudio_dac';
-
-	file_put_contents($file, $text);
-	$_SESSION['notify']['msg'] = 'IQAudio.com R-PI DAC Driver Activated. You must reboot for changes to take effect';
-		break;
-		
-	case 'Generic':
-	
-		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-snd_soc_bcm2708_i2s
-bcm2708_dmaengine
-snd_soc_pcm512x
-snd_soc_pcm512x
-snd_soc_hifiberry_dac
-snd_soc_rpi_dac';
-
-	file_put_contents($file, $text);
-	$_SESSION['notify']['msg'] = 'I2S Generic Driver Activated. You must reboot for changes to take effect';
-		break;
-	case 'i2soff':
-	
-		session_start();
-	$file = '/etc/modules';
-	$text = 'snd-bcm2835';
-
-	file_put_contents($file, $text);
-	$_SESSION['notify']['msg'] = 'I2S Driver Deactivated. You must reboot for changes to take effect';
-		break;
 	}
 
 }
@@ -384,6 +304,26 @@ if (isset($_POST['minidlna']) && $_POST['minidlna'] != $_SESSION['minidlna']){
 	playerSession('unlock');
 }
 
+if (isset($_POST['startupsound']) && $_POST['startupsound'] != $_SESSION['startupsound']){
+	// load worker queue 
+	// start / respawn session
+	session_start();
+	// save new value on SQLite datastore
+	if ($_POST['startupsound'] == 1 OR $_POST['startupsound'] == 0) {
+	playerSession('write',$db,'startupsound',$_POST['startupsound']);
+	}
+	// set UI notify
+	if ($_POST['startupsound'] == 1) {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'Startup Sound enabled';
+	} else {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'Startup Sound disabled';
+	}
+	// unlock session file
+	playerSession('unlock');
+}
+
 if (isset($_POST['hostname']) && $_POST['hostname'] != $_SESSION['hostname']){
 	// load worker queue 
 	// start / respawn session
@@ -414,11 +354,150 @@ if (isset($_POST['hostname']) && $_POST['hostname'] != $_SESSION['hostname']){
 	playerSession('unlock');
 }
 
+//i2s selector
+
+
+if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
+	switch ($_POST['i2s']) {
+
+	case 'Hifiberry':
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+bcm2708_dmaengine
+snd_soc_pcm5102a
+snd_soc_hifiberry_dac';
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'Hifiberry Driver Activated. You must reboot for changes to take effect';
+	$_SESSION['w_active'] = 1;
+	// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');
+		break;
+	
+	case 'Hifiberryplus':
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+bcm2708_dmaengine
+snd_soc_hifiberry_dacplus';
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'Hifiberry + Driver Activated. You must reboot for changes to take effect';
+	// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');	
+		break;
+		
+	case 'HifiberryDigi':
+			session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+bcm2708_dmaengine
+snd_soc_hifiberry_digi';
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'Hifiberry DIGI Driver Activated. You must reboot for changes to take effect';
+	// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');
+	break;
+	
+	case 'HifiberryAmp':
+			session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+bcm2708_dmaengine
+snd_soc_hifiberry_amp';
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'Hifiberry Amp Driver Activated. You must reboot for changes to take effect';
+	// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');
+	break;
+	
+	case 'RpiDac':
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+snd_soc_bcm2708_i2s
+bcm2708_dmaengine
+snd_soc_pcm5102a
+snd_soc_rpi_dac';
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'RPi-DAC Driver Activated. You must reboot for changes to take effect';
+		// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');
+		break;
+		
+	case 'Iqaudio':
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+snd_soc_bcm2708_i2s
+bcm2708_dmaengine
+snd_soc_pcm512x
+snd_soc_iqaudio_dac';
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'IQaudIO Pi-DAC Driver Activated. You must reboot for changes to take effect';
+	// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');	
+		break;
+		
+	case 'Generic':
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd_soc_bcm2708
+snd_soc_bcm2708_i2s
+bcm2708_dmaengine
+snd_soc_pcm512x
+snd_soc_pcm512x
+snd_soc_hifiberry_dac
+snd_soc_rpi_dac';
+
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'Generic Driver Activated. You must reboot for changes to take effect';
+	// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');	
+		break;
+	
+	case 'i2soff':
+		session_start();
+	$file = '/etc/modules';
+	$text = 'snd-bcm2835';
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'I2S Driver Deactivated. You must reboot for changes to take effect';
+	// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');	
+		break;
+}
+}
+
+
+
 // configure html select elements
 $_system_select['orionprofile'] .= "<option value=\"default\" ".(($_SESSION['orionprofile'] == 'default') ? "selected" : "").">default</option>\n";
 $_system_select['orionprofile'] .= "<option value=\"ACX\" ".(($_SESSION['orionprofile'] == 'ACX') ? "selected" : "").">ACX</option>\n";
 $_system_select['orionprofile'] .= "<option value=\"Buscia\" ".(($_SESSION['orionprofile'] == 'Buscia') ? "selected" : "").">Buscia</option>\n";
 $_system_select['orionprofile'] .= "<option value=\"Mike\" ".(($_SESSION['orionprofile'] == 'Mike') ? "selected" : "").">Mike</option>\n";
+$_i2s['i2s'] .= "<option value=\"i2soff\" ".(($_SESSION['i2s'] == 'i2soff') ? "selected" : "").">None</option>\n";
+$_i2s['i2s'] .= "<option value=\"Hifiberry\" ".(($_SESSION['i2s'] == 'Hifiberry') ? "selected" : "").">Hifiberry</option>\n";
+$_i2s['i2s'] .= "<option value=\"Hifiberryplus\" ".(($_SESSION['i2s'] == 'Hifiberryplus') ? "selected" : "").">Hifiberry +</option>\n";
+$_i2s['i2s'] .= "<option value=\"HifiberryDigi\" ".(($_SESSION['i2s'] == 'HifiberryDigi') ? "selected" : "").">Hifiberry Digi</option>\n";
+$_i2s['i2s'] .= "<option value=\"HifiberryAmp\" ".(($_SESSION['i2s'] == 'HifiberryAmp') ? "selected" : "").">Hifiberry Amp</option>\n";
+$_i2s['i2s'] .= "<option value=\"Iqaudio\" ".(($_SESSION['i2s'] == 'Iqaudio') ? "selected" : "").">IQaudIO Pi-DAC</option>\n";
+$_i2s['i2s'] .= "<option value=\"RpiDac\" ".(($_SESSION['i2s'] == 'RpiDac') ? "selected" : "").">RPi-DAC</option>\n";
+$_i2s['i2s'] .= "<option value=\"Generic\" ".(($_SESSION['i2s'] == 'Generic') ? "selected" : "").">Generic</option>\n";
 $_system_select['orionprofile'] .= "<option value=\"Orion\" ".(($_SESSION['orionprofile'] == 'Orion') ? "selected" : "").">Orion</option>\n";
 $_system_select['cmediafix1'] .= "<input type=\"radio\" name=\"cmediafix\" id=\"togglecmedia1\" value=\"1\" ".(($_SESSION['cmediafix'] == 1) ? "checked=\"checked\"" : "").">\n";
 $_system_select['cmediafix0'] .= "<input type=\"radio\" name=\"cmediafix\" id=\"togglecmedia2\" value=\"0\" ".(($_SESSION['cmediafix'] == 0) ? "checked=\"checked\"" : "").">\n";
@@ -430,6 +509,8 @@ $_system_select['upnpmpdcli1'] .= "<input type=\"radio\" name=\"upnpmpdcli\" id=
 $_system_select['upnpmpdcli0'] .= "<input type=\"radio\" name=\"upnpmpdcli\" id=\"toggleupnpmpdcli2\" value=\"0\" ".(($_SESSION['upnpmpdcli'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_system_select['minidlna1'] .= "<input type=\"radio\" name=\"minidlna\" id=\"toggleminidlna1\" value=\"1\" ".(($_SESSION['minidlna'] == 1) ? "checked=\"checked\"" : "").">\n";
 $_system_select['minidlna0'] .= "<input type=\"radio\" name=\"minidlna\" id=\"toggleminidlna2\" value=\"0\" ".(($_SESSION['minidlna'] == 0) ? "checked=\"checked\"" : "").">\n";
+$_system_select['startupsound1'] .= "<input type=\"radio\" name=\"startupsound\" id=\"togglestartupsound1\" value=\"1\" ".(($_SESSION['startupsound'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['startupsound0'] .= "<input type=\"radio\" name=\"startupsound\" id=\"togglestartupsound2\" value=\"0\" ".(($_SESSION['startupsound'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_hostname = $_SESSION['hostname'];
 // set template
 $tpl = "settings.html";

@@ -1,3 +1,5 @@
 {
-    "library-jotak":2
+    "library-jotak":2,
+	"i2s-selector":1,
+	"startupsound-selector":1
 }
