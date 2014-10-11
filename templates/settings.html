@@ -89,6 +89,25 @@ $_system_select[minidlna0]
 			</div>
 		</fieldset>
 	</form>
+	<div $_i2s >
+	<form class="form-horizontal" method="post">
+		<fieldset>
+			<legend>I2S driver</legend>
+			<p>Activate i2s driver for Raspberry PI compatible i2s DACs</p>
+			<div class="control-group">
+				<label class="control-label">I2S DAC</label>
+				<div class="controls">
+					<select class="input-large" name="i2s">		
+$_i2s[i2s]
+					</select>
+				</div>
+			</div>				
+<div class="form-actions">
+				<button class="btn btn-primary btn-large" value="apply" name="apply" type="submit">Apply</button>
+			</div>
+		</fieldset>
+	</form>
+	</div>
 	<form class="form-horizontal" method="post">
 		<fieldset>
 			<legend>Sound quality tweaks</legend>
@@ -113,7 +132,7 @@ $_system_select[orionprofile]
 				<button class="btn btn-primary btn-large" value="save" name="save" type="submit">Apply settings</button>
 			</div>
 		</fieldset>
-	</form>
+	</form>			
 	<form class="form-horizontal" method="post">
 		<fieldset>
 			<legend>System commands</legend>
@@ -149,48 +168,6 @@ $_system_select[orionprofile]
 				</div>
 			</div>
 		</fieldset>
-		
-<div $_i2s >
-	</form>
-	<form class="form-horizontal" method="post">
-		<fieldset>
-			<legend>Activate I2S driver</legend>
-			<p>Activate i2s driver for Raspberry PI compatible i2s DACs</p>
-			<div class="control-group">
-				<label class="control-label">Activate I2S Driver </label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="Hifiberry" id="Hifiberry">
-				</div>
-				</div>
-				<div class="control-group">
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="HifiberryDigi" id="HifiberryDigi">
-				</div>
-				</div>
-				<div class="control-group">
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="RpiDac" id="RpiDac">
-				</div>
-				</div>
-				<div class="control-group">
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="Iqaudio" id="Iqaudio">
-				</div>
-				</div>
-				<div class="control-group">
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="Generic" id="Generic">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">Deactivate I2S Driver</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="i2soff" id="i2soff">
-				</div>
-			</div>
-	</div>		
-		</fieldset>
-	</form>
 	<form class="form-horizontal" method="post">
 		<fieldset>
 			<legend>Compatibility fixes</legend>
