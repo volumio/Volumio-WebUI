@@ -56,7 +56,7 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 
 						if ($spop) {
 							$arraySpopSearchResults = querySpopDB($spop, 'filepath', '');
-							$arraySearchResults = array_merge($arraySpopSearchResults, $arraySearchResults);
+							$arraySearchResults = array_merge($arraySearchResults, $arraySpopSearchResults);
 
 						}
 
@@ -138,7 +138,7 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 					}
 					break;
 
-				case 'spop-playuri':
+				case 'spop-playtrackuri':
 					if (isset($_POST['path']) && $_POST['path'] != '') {
 						sendMpdCommand($mpd,'stop');
 						sendSpopCommand($spop, "uplay " . $_POST['path']);
@@ -149,6 +149,15 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 				case 'spop-stop':
 					sendSpopCommand($spop, "stop");
 					echo readSpopResponse($spop);
+					break;
+
+				case 'spop-playplaylistindex':
+					if (isset($_POST['path']) && $_POST['path'] != '') {
+						$sSpopPlaylistIndex = end(explode("@", $_POST['path']));
+						sendMpdCommand($mpd,'stop');
+						sendSpopCommand($spop, "play " . $sSpopPlaylistIndex);
+						echo readSpopResponse($spop);
+					}
 					break;
 
 			}

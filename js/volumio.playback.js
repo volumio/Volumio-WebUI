@@ -402,8 +402,12 @@ jQuery(document).ready(function($){ 'use strict';
             getDB('update', path);
             notify('update', path);
         }
-        if ($(this).data('cmd') == 'spop-playuri') {
-			$.post('db/?cmd=spop-playuri', { 'path': path }, function(data) {}, 'json');
+        if ($(this).data('cmd') == 'spop-playtrackuri') {
+			$.post('db/?cmd=spop-playtrackuri', { 'path': path }, function(data) {}, 'json');
+
+        }
+        if ($(this).data('cmd') == 'spop-playplaylistindex') {
+			$.post('db/?cmd=spop-playplaylistindex', { 'path': path }, function(data) {}, 'json');
 
         }
         if ($(this).data('cmd') == 'spop-stop') {
