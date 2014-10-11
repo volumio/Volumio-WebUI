@@ -101,13 +101,37 @@ $_system_select[minidlna0]
 $_i2s[i2s]
 					</select>
 				</div>
-			</div>				
-<div class="form-actions">
+			</div>		
+			<div class="form-actions">
 				<button class="btn btn-primary btn-large" value="apply" name="apply" type="submit">Apply</button>
 			</div>
 		</fieldset>
 	</form>
 	</div>
+<form class="form-horizontal" method="post">
+		<fieldset>
+			<legend>Miscellaneous</legend>
+			<p>Various & useful system settings</p>
+			<div class="control-group">
+				<label class="control-label">Startup Sound</label>
+				<div class="controls">
+					<div class="toggle">
+						<label class="toggle-radio" for="togglestartupsound2" >ON</label>
+						
+$_system_select[startupsound1]
+
+						<label class="toggle-radio" for="togglestartupsound1">OFF</label>
+
+$_system_select[startupsound0]				
+						
+					</div>
+				</div>
+			</div>
+			<div class="form-actions">
+				<button class="btn btn-primary btn-large" value="apply" name="apply" type="submit">Apply</button>
+			</div>
+		</fieldset>
+	</form>
 	<form class="form-horizontal" method="post">
 		<fieldset>
 			<legend>Sound quality tweaks</legend>

@@ -304,6 +304,26 @@ if (isset($_POST['minidlna']) && $_POST['minidlna'] != $_SESSION['minidlna']){
 	playerSession('unlock');
 }
 
+if (isset($_POST['startupsound']) && $_POST['startupsound'] != $_SESSION['startupsound']){
+	// load worker queue 
+	// start / respawn session
+	session_start();
+	// save new value on SQLite datastore
+	if ($_POST['startupsound'] == 1 OR $_POST['startupsound'] == 0) {
+	playerSession('write',$db,'startupsound',$_POST['startupsound']);
+	}
+	// set UI notify
+	if ($_POST['startupsound'] == 1) {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'Startup Sound enabled';
+	} else {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'Startup Sound disabled';
+	}
+	// unlock session file
+	playerSession('unlock');
+}
+
 if (isset($_POST['hostname']) && $_POST['hostname'] != $_SESSION['hostname']){
 	// load worker queue 
 	// start / respawn session
@@ -489,6 +509,8 @@ $_system_select['upnpmpdcli1'] .= "<input type=\"radio\" name=\"upnpmpdcli\" id=
 $_system_select['upnpmpdcli0'] .= "<input type=\"radio\" name=\"upnpmpdcli\" id=\"toggleupnpmpdcli2\" value=\"0\" ".(($_SESSION['upnpmpdcli'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_system_select['minidlna1'] .= "<input type=\"radio\" name=\"minidlna\" id=\"toggleminidlna1\" value=\"1\" ".(($_SESSION['minidlna'] == 1) ? "checked=\"checked\"" : "").">\n";
 $_system_select['minidlna0'] .= "<input type=\"radio\" name=\"minidlna\" id=\"toggleminidlna2\" value=\"0\" ".(($_SESSION['minidlna'] == 0) ? "checked=\"checked\"" : "").">\n";
+$_system_select['startupsound1'] .= "<input type=\"radio\" name=\"startupsound\" id=\"togglestartupsound1\" value=\"1\" ".(($_SESSION['startupsound'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['startupsound0'] .= "<input type=\"radio\" name=\"startupsound\" id=\"togglestartupsound2\" value=\"0\" ".(($_SESSION['startupsound'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_hostname = $_SESSION['hostname'];
 // set template
 $tpl = "settings.html";
