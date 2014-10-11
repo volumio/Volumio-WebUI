@@ -355,18 +355,23 @@ function _getSpopListing($sock, $queryString) {
 		$i = 1;
 		while ($i < $nQueryStringParts) {
 			$sCurrentDirectory = $sCurrentDirectory . "/" . $arrayQueryStringParts[$i];
+			if (isset($arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"]) && $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"] == 0) {
+				$sCurrentDisplayPath = $sCurrentDisplayPath . "/" . "Starred";
+
+			} else {
+				$sCurrentDisplayPath = $sCurrentDisplayPath . "/" . $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["name"];
+
+			}
 
 			if (strcmp($arrayResponse["playlists"][$arrayQueryStringParts[$i]]["type"], "playlist") == 0) { 
 			// This is a playlist, navigate into it and stop
 				sendSpopCommand($sock,"ls " . $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"]);
 				$arrayResponse = _parseSpopResponse(readSpopResponse($sock));
-				$sCurrentDisplayPath = $sCurrentDisplayPath . "/" .  $arrayResponse["name"];
 				break;
 
 			} else {
 			// Index further into the directory listing
 				$arrayResponse = $arrayResponse["playlists"][$arrayQueryStringParts[$i]];
-				$sCurrentDisplayPath = $sCurrentDisplayPath . "/" . $arrayResponse["name"];
 
 			}
 
