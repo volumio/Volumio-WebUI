@@ -27,9 +27,37 @@
  *
  */
  
-// Predefined MPD Response messages
+// Predefined daemon Response messages
 define("MPD_RESPONSE_ERR", "ACK");
 define("MPD_RESPONSE_OK",  "OK");
+
+// Spotify daemon communication functions
+function openSpopSocket($host, $portSpop) {
+	$sock = stream_socket_client('tcp://'.$host.':'.$portSpop.'', $errorno, $errorstr, 30 );
+	
+	// First response is typically "spop [version]"
+	$response = readSpopResponse($sock);
+
+	return $sock;
+}
+
+function closeSpopSocket($sock) {
+	sendSpopCommand($sock,"bye");
+	fclose($sock);
+
+}
+
+function sendSpopCommand($sock, $cmd) {
+	$cmd = $cmd."\n";
+	fputs($sock, $cmd);
+
+}
+
+function readSpopResponse($sock) {
+	$output = fgets($sock);
+
+	return $output;
+}
 
 // v2
 function openMpdSocket($host, $port) {
@@ -205,6 +233,17 @@ function echoTemplate($template) {
 echo $template;
 }
 
+// Perform Spotify database query/search
+function querySpopDB($sock, $queryType, $queryString) {
+
+	if(strcmp($queryType, "filepath") == 0) {
+		return _getSpopListing($sock, $queryString);
+
+	}
+
+	return array();
+}
+
 function searchDB($sock,$querytype,$query) {
 	switch ($querytype) {
 	case "filepath":
@@ -225,10 +264,10 @@ function searchDB($sock,$querytype,$query) {
 	
 	}
 	
-//$response =  htmlentities(readMpdResponse($sock),ENT_XML1,'UTF-8');
-//$response = htmlspecialchars(readMpdResponse($sock));
-$response = readMpdResponse($sock);
-return _parseFileListResponse($response);
+	//$response =  htmlentities(readMpdResponse($sock),ENT_XML1,'UTF-8');
+	//$response = htmlspecialchars(readMpdResponse($sock));
+	$response = readMpdResponse($sock);
+	return _parseFileListResponse($response);
 }
 
 function remTrackQueue($sock,$songpos) {
@@ -287,37 +326,159 @@ function sysCmd($syscmd) {
     exec($syscmd." 2>&1", $output);
     return $output;
 }
+function _parseSpopResponse($resp) {
+	return json_decode($resp, true);
+
+}
+
+// Make an array describing the requested level of the Spop database
+function _getSpopListing($sock, $queryString) {
+	$arrayReturn = array();
+
+	if (strcmp($queryString, "") == 0) {
+	// The SPOTIFY root item is requested
+		$arrayRootItem = array();
+		$arrayRootItem["directory"] = "SPOTIFY";
+		$arrayRootItem["Type"] = "SpopDirectory";
+		$arrayRoot = array(0 => $arrayRootItem);
+		$arrayReturn = $arrayRoot;
+
+	} else if (strncmp($queryString, "SPOTIFY", 7) == 0) {
+	// Looking into the SPOTIFY folder
+		sendSpopCommand($sock,"ls");
+		$arrayResponse = _parseSpopResponse(readSpopResponse($sock));
+		$arrayQueryStringParts = preg_split( "(@|/)", $queryString);
+		$nQueryStringParts = count($arrayQueryStringParts);
+		$sCurrentDirectory = "SPOTIFY";
+		$sCurrentDisplayPath = "SPOTIFY";
+
+		$i = 1;
+		while ($i < $nQueryStringParts) {
+			$sCurrentDirectory = $sCurrentDirectory . "/" . $arrayQueryStringParts[$i];
+			if (isset($arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"]) && $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"] == 0) {
+				$sCurrentDisplayPath = $sCurrentDisplayPath . "/" . "Starred";
+
+			} else {
+				$sCurrentDisplayPath = $sCurrentDisplayPath . "/" . $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["name"];
+
+			}
+
+			if (strcmp($arrayResponse["playlists"][$arrayQueryStringParts[$i]]["type"], "playlist") == 0) { 
+			// This is a playlist, navigate into it and stop
+				sendSpopCommand($sock,"ls " . $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"]);
+				$arrayResponse = _parseSpopResponse(readSpopResponse($sock));
+				break;
+
+			} else {
+			// Index further into the directory listing
+				$arrayResponse = $arrayResponse["playlists"][$arrayQueryStringParts[$i]];
+
+			}
+
+			$i++;
+		}
+
+		$arrayCurrentEntry = array();
+		$arrayCurrentEntry["DisplayPath"] = $sCurrentDisplayPath;
+		array_push($arrayReturn, $arrayCurrentEntry);
+
+		$i = 0;
+		if (isset($arrayResponse["tracks"])) { 
+		// This is a tracklist within a playlist
+			$nItems = sizeof($arrayResponse["tracks"]);
+			while ($i < $nItems) {
+				$arrayCurrentEntry = array();
+				$arrayCurrentEntry["Type"] = "SpopTrack";
+				$arrayCurrentEntry["SpopTrackUri"] = (string)$arrayResponse["tracks"][$i]["uri"];
+				$arrayCurrentEntry["Title"] = $arrayResponse["tracks"][$i]["title"];
+				$arrayCurrentEntry["Artist"] = $arrayResponse["tracks"][$i]["artist"];
+				$arrayCurrentEntry["Album"] = $arrayResponse["tracks"][$i]["album"];
+				
+				array_push($arrayReturn, $arrayCurrentEntry);
+
+				$i++;
+			}
+
+		} else if (isset($arrayResponse["playlists"])) {
+		// This is a browsable listing
+			$nItems = sizeof($arrayResponse["playlists"]);
+			while ($i < $nItems) {
+				$arrayCurrentEntry = array();
+				$arrayCurrentEntry["Type"] = "SpopDirectory";
+				$sItemDisplayName = $arrayResponse["playlists"][$i]["name"];
+
+				if (strcmp($arrayResponse["playlists"][$i]["type"], "playlist") == 0) {
+				// This is a browsable playlist
+					$arrayCurrentEntry["SpopPlaylistIndex"] = $arrayResponse["playlists"][$i]["index"];
+					$sItemDirectory = $sCurrentDirectory . "/" . $i . "@" . $arrayResponse["playlists"][$i]["index"];
+
+					if ($arrayResponse["playlists"][$i]["index"] == 0) {
+						$sItemDisplayName = "Starred";
+
+					}
+
+				} else {
+				// This is a Spotify folder
+					$sItemDirectory = $sCurrentDirectory . "/" . $i;
+
+				}
+
+				$arrayCurrentEntry["directory"] = $sItemDirectory;
+				$arrayCurrentEntry["DisplayName"] = $sItemDisplayName;
+				array_push($arrayReturn, $arrayCurrentEntry);
+
+				$i++;
+			}
+
+		}
+
+	}
+
+	return $arrayReturn;
+}
 
 // format Output for "playlist"
 function _parseFileListResponse($resp) {
-		if ( is_null($resp) ) {
-			return NULL;
-		} else {
-			$plistArray = array();
-			$dirArray = array();
-			$plCounter = -1;
-			$dirCounter = 0;
-			$plistLine = strtok($resp,"\n");
-			$plistFile = "";
-			while ( $plistLine ) {
-				list ( $element, $value ) = explode(": ",$plistLine,2);
-				if ( $element == "file" OR $element == "playlist") {
-					$plCounter++;
-					$plistFile = $value;
-					$plistArray[$plCounter]["file"] = $plistFile;
-					$plistArray[$plCounter]["fileext"] = parseFileStr($plistFile,'.');
-				} else if ( $element == "directory") {
-					$dirArray[$dirCounter++]["directory"] = $value;
-				} else {
-					$plistArray[$plCounter][$element] = $value;
-					$plistArray[$plCounter]["Time2"] = songTime($plistArray[$plCounter]["Time"]);
-				}
+	if ( is_null($resp) ) {
+		return NULL;
 
-				$plistLine = strtok("\n");
+	} else {
+		$plistArray = array();
+		$dirArray = array();
+		$plCounter = -1;
+		$dirCounter = 0;
+		$plistLine = strtok($resp,"\n");
+		$plistFile = "";
+
+		while ( $plistLine ) {
+			list ( $element, $value ) = explode(": ",$plistLine,2);
+
+			if ( $element == "file" OR $element == "playlist") {
+				$plCounter++;
+				$plistFile = $value;
+				$plistArray[$plCounter]["file"] = $plistFile;
+				$plistArray[$plCounter]["fileext"] = parseFileStr($plistFile,'.');
+				$plistArray[$plCounter]["Type"] = "MpdFile";
+
+			} else if ( $element == "directory") {
+				$dirCounter++;
+				$dirArray[$dirCounter]["directory"] = $value;
+				$dirArray[$dirCounter]["Type"] = "MpdDirectory";
+
+			} else {
+				$plistArray[$plCounter][$element] = $value;
+				$plistArray[$plCounter]["Time2"] = songTime($plistArray[$plCounter]["Time"]);
+
 			}
+
+			$plistLine = strtok("\n");
+
 		}
-		return array_merge($dirArray, $plistArray);
+
 	}
+
+	return array_merge($dirArray, $plistArray);
+}
 
 // format Output for "status"
 function _parseStatusResponse($resp) {
