@@ -151,7 +151,7 @@ function _organizeJsonLib($flat) {
 	$lib = array();
 	foreach ($flat as $songData) {
 		$genre = $songData["Genre"] ? $songData["Genre"] : "Unknown";
-		$artist = $songData["Artist"] ? $songData["Artist"] : "Unknown";
+		$artist = $songData["AlbumArtist"] ? $songData["AlbumArtist"] : ($songData["Artist"] ? $songData["Artist"] : "Unknown");
 		$album = $songData["Album"] ? $songData["Album"] : "Unknown";
 
 		if (!$lib[$genre]) {
