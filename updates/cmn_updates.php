@@ -20,7 +20,7 @@
  *  Authors:
  *  - v1: Joel Takvorian
  * 
- *  file:                    check_updates.php
+ *  file:                    cmn_updates.php
  *  version:                 1
  */
 
