@@ -354,9 +354,41 @@ if (isset($_POST['hostname']) && $_POST['hostname'] != $_SESSION['hostname']){
 	playerSession('unlock');
 }
 
+
+//Library Display
+if (isset($_POST['displaylib']) && $_POST['displaylib'] != $_SESSION['displaylib']){
+	// load worker queue 
+	// start / respawn session
+	session_start();
+	// save new value on SQLite datastore
+	if ($_POST['displaylib'] == 1 OR $_POST['displaylib'] == 0) {
+	playerSession('write',$db,'displaylib',$_POST['displaylib']);
+	}
+	// set UI notify
+	if ($_POST['displaylib'] == 1) {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'Library view enabled';
+	} else {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'Library view disabled';
+	}
+	// unlock session file
+	playerSession('unlock');
+}
+
+if (isset($_POST['displaylibastab']) && $_POST['displaylibastab'] != $_SESSION['displaylibastab']){
+	// load worker queue 
+	// start / respawn session
+	session_start();
+	// save new value on SQLite datastore
+	if ($_POST['displaylibastab'] == 1 OR $_POST['displaylibastab'] == 0) {
+	playerSession('write',$db,'displaylibastab',$_POST['displaylibastab']);
+	}
+	// unlock session file
+	playerSession('unlock');
+}
+
 //i2s selector
-
-
 if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 	switch ($_POST['i2s']) {
 
@@ -511,6 +543,10 @@ $_system_select['minidlna1'] .= "<input type=\"radio\" name=\"minidlna\" id=\"to
 $_system_select['minidlna0'] .= "<input type=\"radio\" name=\"minidlna\" id=\"toggleminidlna2\" value=\"0\" ".(($_SESSION['minidlna'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_system_select['startupsound1'] .= "<input type=\"radio\" name=\"startupsound\" id=\"togglestartupsound1\" value=\"1\" ".(($_SESSION['startupsound'] == 1) ? "checked=\"checked\"" : "").">\n";
 $_system_select['startupsound0'] .= "<input type=\"radio\" name=\"startupsound\" id=\"togglestartupsound2\" value=\"0\" ".(($_SESSION['startupsound'] == 0) ? "checked=\"checked\"" : "").">\n";
+$_system_select['displaylib1'] .= "<input type=\"radio\" name=\"displaylib\" id=\"toggledisplaylib1\" value=\"1\" ".(($_SESSION['displaylib'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['displaylib0'] .= "<input type=\"radio\" name=\"displaylib\" id=\"toggledisplaylib2\" value=\"0\" ".(($_SESSION['displaylib'] == 0) ? "checked=\"checked\"" : "").">\n";
+$_system_select['displaylibastab1'] .= "<input type=\"radio\" name=\"displaylibastab\" id=\"toggledisplaylibastab1\" value=\"1\" ".(($_SESSION['displaylibastab'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['displaylibastab0'] .= "<input type=\"radio\" name=\"displaylibastab\" id=\"toggledisplaylibastab2\" value=\"0\" ".(($_SESSION['displaylibastab'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_hostname = $_SESSION['hostname'];
 // set template
 $tpl = "settings.html";

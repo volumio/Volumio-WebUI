@@ -127,6 +127,39 @@ $_system_select[startupsound0]
 					</div>
 				</div>
 			</div>
+			<div class="control-group">
+				<label class="control-label">Library view</label>
+				<div class="controls">
+					<div class="toggle">
+						<label class="toggle-radio" for="toggledisplaylib2" >ON</label>
+						
+$_system_select[displaylib1]
+
+						<label class="toggle-radio" for="toggledisplaylib1">OFF</label>
+
+$_system_select[displaylib0]				
+						
+					</div>
+					<span class="help-block">The library view will be displayed only when this setting is enabled AND, because of its layout, if the screen resolution allows it (bigger than 800x600).
+					WARNING: activating the library panel may have an impact on the client-side performances.</span>
+				</div>
+			</div>
+			<div id="displaylibastabblock" class="control-group subgroup">
+				<label class="control-label">Show as tab</label>
+				<div class="controls">
+					<div class="toggle">
+						<label class="toggle-radio" for="toggledisplaylibastab2" >ON</label>
+						
+$_system_select[displaylibastab1]
+
+						<label class="toggle-radio" for="toggledisplaylibastab1">OFF</label>
+
+$_system_select[displaylibastab0]				
+						
+					</div>
+					<span class="help-block">If turned off, the library will be accessible from the "Browse" view.</span>
+				</div>
+			</div>
 			<div class="form-actions">
 				<button class="btn btn-primary btn-large" value="apply" name="apply" type="submit">Apply</button>
 			</div>
@@ -157,41 +190,6 @@ $_system_select[orionprofile]
 			</div>
 		</fieldset>
 	</form>			
-	<form class="form-horizontal" method="post">
-		<fieldset>
-			<legend>System commands</legend>
-			<p>Just some handy system commands, without the hassle of logging into SSH.</p>
-			<div class="control-group">
-				<label class="control-label">System reboot</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="reboot" id="syscmd-reboot">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">System poweroff</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="poweroff" id="syscmd-poweroff">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">Restart MPD service</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="mpdrestart" id="syscmd-mpdrestart">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">Update MPD database</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="updatempdDB" id="syscmd-updatempddb">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">Clear Play Queue</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="clearqueue" id="syscmd-clearqueue">
-				</div>
-			</div>
-		</fieldset>
 	<form class="form-horizontal" method="post">
 		<fieldset>
 			<legend>Compatibility fixes</legend>
