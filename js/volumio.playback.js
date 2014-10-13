@@ -17,48 +17,31 @@
  *  along with TsunAMP; see the file COPYING.  If not, see
  *  <http://www.gnu.org/licenses/>.
  *
- *
- *	 UI-design/JS code by: 	Andrea Coiutti (aka ACX)
- *  PHP/JS code by:			    Simone De Gregori (aka Orion)
+ *  Authors:
+ *  - v1, 1.1: Andrea Coiutti (aka ACX)
+ *  - v1, 1.1: Simone De Gregori (aka Orion)
+ *  - v2: Michelangelo Guarise
+ *  - v2: Joel Takvorian
  * 
- *  file:							scripts-playback.js
- *  version:						1.1
- *
+ *  file:                    volumio.playback.js
+ *  version:                 2
  */
- 
-// Global GUI Array
-// ----------------------------------------------------------------------------------------------------
-var GUI = {
-    json: 0,
-    cmd: 'status',
-    playlist: null,
-    currentsong: null,
-    currentknob: null,
-    state: '',
-    currentpath: '',
-    halt: 0,
-    volume: null,
-    currentDBpos: new Array(0,0,0,0,0,0,0,0,0,0,0),
-    DBentry: new Array('', '', ''),
-    visibility: 'visible',
-	DBupdate: 0
-};
 
 jQuery(document).ready(function($){ 'use strict';
 
     // INITIALIZATION
     // ----------------------------------------------------------------------------------------------------
     // first connection with MPD daemon
-    backendRequest(GUI.state);
+    backendRequest();
 
     // first GUI update
     updateGUI(GUI.json);
     getDB('filepath', GUI.currentpath, 'file');
     $.pnotify.defaults.history = false;
 
-	// hide "connecting" layer
+    // hide "connecting" layer
     if (GUI.state != 'disconnected') {
-    $('#loader').hide();
+        $('#loader').hide();
     }
 
     // BUTTONS
@@ -66,15 +49,15 @@ jQuery(document).ready(function($){ 'use strict';
     // playback
     $("#play").mouseenter(function() {
         if (GUI.state == "play") {
-            $("#play i").removeClass("icon-play").addClass("icon-pause");
+            $("#play i").removeClass("fa fa-play").addClass("fa fa-pause");
         } else if (GUI.state == "pause") {
-            $("#play i").removeClass("icon-pause").addClass("icon-play");
+            $("#play i").removeClass("fa fa-pause").addClass("fa fa-play");
         }
     }).mouseleave(function() {
         if (GUI.state == "play") {
-            $("#play i").removeClass("icon-pause").addClass("icon-play");
+            $("#play i").removeClass("fa fa-pause").addClass("fa fa-play");
         } else if (GUI.state == "pause") {
-            $("#play i").removeClass("icon-play").addClass("icon-pause");
+            $("#play i").removeClass("fa fa-play").addClass("fa fa-pause");
         }
     });
 
@@ -200,15 +183,40 @@ jQuery(document).ready(function($){ 'use strict';
     });
 
     // volume knob
-    $('.volumeknob').knob({
-        change : function (value) {
-            setvol(value);
+    var volumeKnob = $('#volume');
+    volumeKnob[0].isSliding = function() {
+        return volumeKnob[0].knobEvents.isSliding;
+    }
+    volumeKnob[0].setSliding = function(sliding) {
+        volumeKnob[0].knobEvents.isSliding = sliding;
+    }
+    volumeKnob[0].knobEvents = {
+        isSliding: false,
+        // on release => set volume
+    	release: function (value) {
+    	    if (this.hTimeout != null) {
+                clearTimeout(this.hTimeout);
+                this.hTimeout = null;
+    	    }
+    	    volumeKnob[0].setSliding(false);
+            adjustKnobVolume(value);
+    	    setVolume(value);
         },
-        release : function (value) {
-            setvol(value);
+    	hTimeout: null,
+    	// on change => set volume only after a given timeout, to avoid flooding with volume requests
+    	change: function (value) {
+            volumeKnob[0].setSliding(true);
+            var that = this;
+            if (this.hTimeout == null) {
+                this.hTimeout = setTimeout(function(){
+                    clearTimeout(that.hTimeout);
+                    that.hTimeout = null;
+                    setVolume(value);
+                }, 200);
+            }
         },
         cancel : function () {
-            //console.log('cancel : ', this);
+            volumeKnob[0].setSliding(false);
         },
         draw : function () {
             // "tron" case
@@ -252,7 +260,8 @@ jQuery(document).ready(function($){ 'use strict';
                 return false;
             }
         }
-    });
+    };
+    volumeKnob.knob(volumeKnob[0].knobEvents);
 
     // "pulse" effect knob
     /*
@@ -387,11 +396,23 @@ jQuery(document).ready(function($){ 'use strict';
 	            $("#pl-saveName").val(path);
             } else {
 	            $("#pl-saveName").val("");
-	    }
+			}
         }
         if ($(this).data('cmd') == 'update') {
             getDB('update', path);
             notify('update', path);
+        }
+        if ($(this).data('cmd') == 'spop-playtrackuri') {
+			$.post('db/?cmd=spop-playtrackuri', { 'path': path }, function(data) {}, 'json');
+
+        }
+        if ($(this).data('cmd') == 'spop-playplaylistindex') {
+			$.post('db/?cmd=spop-playplaylistindex', { 'path': path }, function(data) {}, 'json');
+
+        }
+        if ($(this).data('cmd') == 'spop-stop') {
+			$.post('db/?cmd=spop-stop', {}, function(data) {}, 'json');
+
         }
     });
 
@@ -466,7 +487,7 @@ jQuery(document).ready(function($){ 'use strict';
         var numberItems = count;
         var s = (count == 1) ? '' : 's';
         if (filter != '') {
-            $('#pl-filter-results').html('<i class="icon-search sx"></i> ' + (+count) + ' result' + s + ' for "<em class="keyword">' + filter + '</em>"');
+            $('#pl-filter-results').html('<i class="fa fa-search sx"></i> ' + (+count) + ' result' + s + ' for "<em class="keyword">' + filter + '</em>"');
         } else {
             $('#pl-filter-results').html('');
         }
@@ -522,3 +543,4 @@ jQuery(document).ready(function($){ 'use strict';
         }
     }
 })();
+

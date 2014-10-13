@@ -9,9 +9,9 @@
 			<span id="playlist-position">&nbsp;</span>
 			<span id="format-bitrate"></span>
 			<div class="social">                       
-				<a class="tweet" id="twbutton" title="Share On Twitter" href="http://volumio.org" target="_blank"><i class="icon-twitter"></i></a>
-				<a class="facebook" id="fbbutton"title="Share On Facebook" href="#" target="_blank"><i class="icon-facebook"></i></a>
-				<a class="googleplus" id="gbutton"title="Share On Google+" href="http://volumio.org" target="_blank"><i class="icon-google-plus"></i></a>	
+				<a class="tweet" id="twbutton" title="Share On Twitter" href="http://volumio.org" target="_blank"><i class="fa fa-twitter"></i></a>
+				<a class="facebook" id="fbbutton"title="Share On Facebook" href="#" target="_blank"><i class="fa fa-facebook"></i></a>
+				<a class="googleplus" id="gbutton"title="Share On Google+" href="http://volumio.org" target="_blank"><i class="fa fa-google-plus"></i></a>	
 				</div>
 			<div class="row-fluid">
 			
@@ -25,27 +25,24 @@
 					</div>
 					<div class="btn-toolbar">
 						<div class="btn-group">
-							<a id="repeat" class="btn btn-cmd btn-toggle" href="#notarget" title="Repeat"><i class="icon-repeat"></i></a>
-							<a id="random" class="btn btn-cmd btn-toggle" href="#notarget" title="Random"><i class="icon-random"></i></a>
-							<a id="single" class="btn btn-cmd btn-toggle" href="#notarget" title="Single"><i class="icon-refresh"></i></a>
-							<a id="consume" class="btn btn-cmd btn-toggle" href="#notarget" title="Consume Mode"><i class="icon-trash"></i></a>			
+							<a id="repeat" class="btn btn-cmd btn-toggle" href="#notarget" title="Repeat"><i class="fa fa-repeat"></i></a>
+							<a id="random" class="btn btn-cmd btn-toggle" href="#notarget" title="Random"><i class="fa fa-random"></i></a>
+							<a id="single" class="btn btn-cmd btn-toggle" href="#notarget" title="Single"><i class="fa fa-refresh"></i></a>
+							<a id="consume" class="btn btn-cmd btn-toggle" href="#notarget" title="Consume Mode"><i class="fa fa-trash"></i></a>			
 						</div>
 					</div>
 				</div>
-				<div class="span4">
-				
-  </div> 
-				
-				
+				<div class="span4"></div> 
+
 				<div class="span4 volume">
 					<input class="volumeknob" id="volume" data-width="211" data-cursor="true" data-bgColor="#34495E" data-fgColor="#4BBE87" data-thickness=".25" data-angleArc="250" data-angleOffset="-125" data-skin="tron" value="66">	
 					<div class="btn-toolbar floatright">
 						<div class="btn-group">
-							<a id="volumedn" class="btn btn-cmd btn-volume" href="#notarget"><i class="icon-volume-down"></i></a>
-							<a id="volumemute" class="btn btn-cmd btn-volume" href="#notarget"><i class="icon-volume-off"></i> <i class="icon-exclamation"></i></a>
-							<!--<a id="ramplay" class="btn btn-cmd btn-toggle" title="Ramplay" href="#notarget"><i class="icon-copy"></i></a> -->
-							<a id="volumeup" class="btn btn-cmd btn-volume" href="#notarget"><i class="icon-volume-up"></i></a>
-							<!--<a id="dbupdate" class="btn btn-cmd" href="#notarget" title="Updating Music DB..."><i class="icon-refresh"></i></a>-->
+							<a id="volumedn" class="btn btn-cmd btn-volume" href="#notarget"><i class="fa fa-volume-down"></i></a>
+							<a id="volumemute" class="btn btn-cmd btn-volume" href="#notarget"><i class="fa fa-volume-off"></i> <i class="fa fa-exclamation"></i></a>
+							<!--<a id="ramplay" class="btn btn-cmd btn-toggle" title="Ramplay" href="#notarget"><i class="fa fa-copy"></i></a> -->
+							<a id="volumeup" class="btn btn-cmd btn-volume" href="#notarget"><i class="fa fa-volume-up"></i></a>
+							<!--<a id="dbupdate" class="btn btn-cmd" href="#notarget" title="Updating Music DB..."><i class="fa fa-refresh"></i></a>-->
 						</div>
 					</div>
 				</div>
@@ -59,11 +56,15 @@
 			<form id="db-search" action="javascript:getDB('search', '', 'file');">
 				<div class="input-append">
 					<input class="span2" id="db-search-keyword" type="text" value="" placeholder="search in DB...">
-					<button class="btn" type="submit"><i class="icon-search"></i></button>
+					<button class="btn" type="submit"><i class="fa fa-search"></i></button>
 				</div>
 			</form>
 			<div id="db-back">
-				<button class="btn"><i class="icon-arrow-left sx"></i> <em id="db-back-text">back</em></button>
+				<button class="btn"><i class="fa fa-arrow-left sx"></i> <em id="db-back-text">back</em></button>
+			
+			<span id="webradio-add">
+				<a href="#webradio-modal" data-toggle="modal" title="Add New WebRadio"><button class="btn"><i class="fa fa-plus"></i><em id="webradio-add-text"></em></button></a>
+			</span>
 			</div>
 		</div>
 		<div id="database">
@@ -73,14 +74,12 @@
 		</div>
 		<div class="btnlist btnlist-bottom">
 			<div id="db-controls">
-				<button id="db-debug-btn" class="btn hide"><i class="icon-random"></i></button>
-				<button class="btn db-firstPage"><i class="icon-double-angle-up"></i></button>
-				<button class="btn db-prevPage"><i class="icon-angle-up"></i></button>
-				<button class="btn db-nextPage"><i class="icon-angle-down"></i></button>
-				<button class="btn db-lastPage"><i class="icon-double-angle-down"></i></button>
+				<button id="db-debug-btn" class="btn hide"><i class="fa fa-random"></i></button>
+				<button class="btn pl-firstPage"><i class="fa fa-angle-double-up"></i></button>
+				<button class="btn pl-lastPage"><i class="fa fa-angle-double-down"></i></button>
 			</div>
 			<div id="db-currentpath">
-				<i class="icon-folder-open"></i> <span>NAS/</span>
+				<i class="fa fa-folder-open"></i> <span>NAS/</span>
 			</div>
 		</div>		
 	</div>
@@ -91,7 +90,7 @@
 			<form id="pl-search" method="post" onSubmit="return false;">
 				<div class="input-append">
 					<input id="pl-filter" class="ttip" type="text" value="" placeholder="search in playlist..." data-placement="bottom" data-toggle="tooltip" data-original-title="Type here to search on the fly">
-					<button class="btn"><i class="icon-search"></i></button>
+					<button class="btn"><i class="fa fa-search"></i></button>
 				</div>
 			</form>
 			<div id="pl-filter-results"></div>
@@ -107,34 +106,77 @@
 				<form id="pl-save" method="post" onSubmit="return false;">
                                 	<div class="input-append">
 						<input id="pl-saveName" class="ttip" type="text" value="" placeholder="Type playlist name" data-placement="bottom" data-toggle="tooltip">
-						<button id="pl-btnSave" class="btn"><i class="icon-save"></i></button>
+						<button id="pl-btnSave" class="btn"><i class="fa fa-floppy-o"></i></button>
 					</div>
 				</form>
-				<button id="pl-debug-btn" class="btn hide"><i class="icon-random"></i></button>
-				<button class="btn pl-firstPage"><i class="icon-double-angle-up"></i></button>
-				<button class="btn pl-lastPage"><i class="icon-double-angle-down"></i></button>
+				<button id="pl-debug-btn" class="btn hide"><i class="fa fa-random"></i></button>
+				<button class="btn pl-firstPage"><i class="fa fa-angle-double-up"></i></button>
+				<button class="btn pl-lastPage"><i class="fa fa-angle-double-down"></i></button>
 			</div>
-				<form id="clearqueue" method="post">	
-				<input class="btn" type="submit" name="syscmd" value="Clear Queue" id="syscmd-clearqueue">
-				</form>
+			<form id="clearqueue" method="post">	
+			<input class="btn" type="submit" name="syscmd" value="Clear Queue" id="syscmd-clearqueue">
+			</form>
+		</div>
+	</div>
+
+	<!-- -------------------- LIBRARY PANEL -------------------- -->
+	<div id="panel-lib" class="tab-pane">
+		<div class="container txtmid">
+			<div id="lib-loader"><div id="loaderbg"></div><div id="loadercontent"><i class="fa fa-refresh fa-spin"></i>loading...</div></div>
+			<div id="lib-content">
+                <ul id="lib-tabs" class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#lib-genre" role="tab" data-toggle="tab">Genres</a></li>
+                    <li><a href="#lib-artist" role="tab" data-toggle="tab">Artists</a></li>
+                    <li><a href="#lib-album" role="tab" data-toggle="tab">Albums</a></li>
+                    <li><a href="#lib-file" role="tab" data-toggle="tab">Songs</a></li>
+                </ul>
+                <div class="tab-content">
+				<div id="lib-genre" class="tab-pane active">
+					<ul id="genresList"></ul>
+				</div>
+				<div id="lib-artist" class="tab-pane">
+					<ul id="artistsList"></ul>
+				</div>
+				<div id="lib-album" class="tab-pane">
+					<ul id="albumsList"></ul>
+				</div>
+				<div id="lib-file" class="tab-pane">
+					<ul id="songsList"></ul>
+					<div class="lib-showall"><a title="WARNING: depending on the number of songs to display, showing all songs may result in slowing down or freezing your navigation." href="#notarget" class="btn">Show all songs</a></div>
+					<div class="lib-playall"><a title="Play all" href="#notarget" class="btn"><i class="fa fa-play"></i></a></div>
+					<div class="lib-addall"><a title="Enqueue all" href="#notarget" class="btn"><i class="fa fa-plus"></i></a></div>
+				</div>
+                </div>
 			</div>
 		</div>
 	</div>
-	
+
 </div>
 
 <div id="context-menus">
 	<div id="context-menu" class="context-menu">
 		<ul class="dropdown-menu" role="menu">
-			<li><a href="#notarget" data-cmd="add"><i class="icon-plus-sign sx"></i> Add</a></li>
-			<li><a href="#notarget" data-cmd="addplay"><i class="icon-play sx"></i> Add and play</a></li>
-			<li><a href="#notarget" data-cmd="addreplaceplay"><i class="icon-share sx"></i> Add, replace and play</a></li>
-			<li><a href="#notarget" data-cmd="update"><i class="icon-refresh sx"></i> Update this folder</a></li>
+			<li><a href="#notarget" data-cmd="add"><i class="fa fa-plus sx"></i> Add</a></li>
+			<li><a href="#notarget" data-cmd="addplay"><i class="fa fa-play sx"></i> Add and play</a></li>
+			<li><a href="#notarget" data-cmd="addreplaceplay"><i class="fa fa-share sx"></i> Add, replace and play</a></li>
+			<li><a href="#notarget" data-cmd="update"><i class="fa fa-refresh sx"></i> Update this folder</a></li>
 		</ul>
 	</div>
 	<div id="context-menu-root" class="context-menu">
 		<ul class="dropdown-menu" role="menu">
-			<li><a href="#notarget" data-cmd="update"><i class="icon-refresh sx"></i> Update this folder</a></li>
+			<li><a href="#notarget" data-cmd="update"><i class="fa fa-refresh sx"></i> Update this folder</a></li>
+		</ul>
+	</div>
+	<div id="context-menu-spotifytrack" class="context-menu">
+		<ul class="dropdown-menu" role="menu">
+			<li><a href="#notarget" data-cmd="spop-playtrackuri"><i class="fa fa-play sx"></i>Spotify Play</a></li>
+			<li><a href="#notarget" data-cmd="spop-stop"><i class="fa fa-stop sx"></i>Spotify Stop</a></li>
+		</ul>
+	</div>
+	<div id="context-menu-spotifyplaylist" class="context-menu">
+		<ul class="dropdown-menu" role="menu">
+			<li><a href="#notarget" data-cmd="spop-playplaylistindex"><i class="fa fa-play sx"></i>Spotify Play</a></li>
+			<li><a href="#notarget" data-cmd="spop-stop"><i class="fa fa-stop sx"></i>Spotify Stop</a></li>
 		</ul>
 	</div>
 </div>

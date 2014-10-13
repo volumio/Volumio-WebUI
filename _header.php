@@ -74,35 +74,37 @@
 
 <div id="menu-top" class="ui-header ui-bar-f ui-header-fixed slidedown" data-position="fixed" data-role="header" role="banner">
 	<div class="dropdown">
-		<a class="dropdown-toggle" id="menu-settings" role="button" data-toggle="dropdown" data-target="#" href="<?php echo $sezione ?>.php">MENU <i class="icon-th-list dx"></i></a>
+		<a class="dropdown-toggle" id="menu-settings" role="button" data-toggle="dropdown" data-target="#" href="<?php echo $sezione ?>.php">MENU <i class="fa fa-th-list dx"></i></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="menu-settings">
-			<li class="<?php ami('index'); ?>"><a href="index.php"><i class="icon-play sx"></i> Main</a></li>
-			<li class="<?php ami('sources'); ?>"><a href="sources.php"><i class="icon-folder-open sx"></i> Library</a></li>
-			<li class="<?php ami('mpd-config'); ?>"><a href="mpd-config.php"><i class="icon-cogs sx"></i> Playback</a></li>
-			<li class="<?php ami('net-config'); ?>"><a href="net-config.php"><i class="icon-sitemap sx"></i> Network</a></li>
-			<li class="<?php ami('settings'); ?>"><a href="settings.php"><i class="icon-wrench sx"></i> System</a></li>
-			<li class="<?php ami('credits'); ?>"><a href="credits.php"><i class="icon-trophy sx"></i> Credits</a></li>
-			<li><a href="#poweroff-modal" data-toggle="modal"><i class="icon-power-off sx"></i> Turn off</a></li>
+			<li class="<?php ami('index'); ?>"><a href="index.php"><i class="fa fa-play sx"></i> Main</a></li>
+			<li class="<?php ami('sources'); ?>"><a href="sources.php"><i class="fa fa-folder-open sx"></i> Library</a></li>
+			<li class="<?php ami('mpd-config'); ?>"><a href="mpd-config.php"><i class="fa fa-cogs sx"></i> Playback</a></li>
+			<li class="<?php ami('net-config'); ?>"><a href="net-config.php"><i class="fa fa-sitemap sx"></i> Network</a></li>
+			<li class="<?php ami('settings'); ?>"><a href="settings.php"><i class="fa fa-wrench sx"></i> System</a></li>
+			<li class="<?php ami('credits'); ?>"><a href="credits.php"><i class="fa fa-trophy sx"></i> Credits</a></li>
+			<li><a href="#poweroff-modal" data-toggle="modal"><i class="fa fa-power-off sx"></i> Turn off</a></li>
 		</ul>
 	</div>
 	<div class="playback-controls">	
-		<button id="previous" class="btn btn-cmd" title="Previous"><i class="icon-step-backward"></i></button>
-		<button id="stop" class="btn btn-cmd" title="Stop"><i class="icon-stop"></i></button>
-		<button id="play" class="btn btn-cmd" title="Play/Pause"><i class="icon-play"></i></button>
-		<button id="next" class="btn btn-cmd" title="Next"><i class="icon-step-forward"></i></button>
+		<button id="previous" class="btn btn-cmd" title="Previous"><i class="fa fa-step-backward"></i></button>
+		<button id="stop" class="btn btn-cmd" title="Stop"><i class="fa fa-stop"></i></button>
+		<button id="play" class="btn btn-cmd" title="Play/Pause"><i class="fa fa-play"></i></button>
+		<button id="next" class="btn btn-cmd" title="Next"><i class="fa fa-step-forward"></i></button>
 	</div>
 	<a class="home" href="index.php"><img src="images/logo.png" class="logo" alt="RaspyFi"></a>
 </div>
 <div id="menu-bottom" class="ui-footer ui-bar-f ui-footer-fixed slidedown" data-position="fixed" data-role="footer"  role="banner">
 	<ul>
 		<?php if ($sezione == 'index') { ?>
-		<li id="open-panel-sx"><a href="#panel-sx" class="open-panel-sx" data-toggle="tab"><i class="icon-music sx"></i> Browse</a></li>
-		<li id="open-playback" class="active"><a href="#playback" class="close-panels" data-toggle="tab"><i class="icon-play sx"></i> Playback</a></li>
-		<li id="open-panel-dx"><a href="#panel-dx" class="open-panel-dx" data-toggle="tab"><i class="icon-list sx"></i> Playlist</a></li>
+		<li id="open-panel-sx"><a href="#panel-sx" class="open-panel-sx" data-toggle="tab"><i class="fa fa-music sx"></i> Browse</a></li>
+		<li id="open-panel-lib"><a href="#panel-lib" class="open-panel-lib" data-toggle="tab"><i class="fa fa-columns sx"></i> Library</a></li>
+		<li id="open-playback" class="active"><a href="#playback" class="close-panels" data-toggle="tab"><i class="fa fa-play sx"></i> Playback</a></li>
+		<li id="open-panel-dx"><a href="#panel-dx" class="open-panel-dx" data-toggle="tab"><i class="fa fa-list sx"></i> Playlist</a></li>
 		<?php } else { ?>
-		<li id="open-panel-sx"><a href="index.php#panel-sx" class="open-panel-sx"><i class="icon-music sx"></i> Browse</a></li>
-		<li id="open-playback"><a href="index.php#playback" class="close-panels"><i class="icon-play sx"></i> Playback</a></li>
-		<li id="open-panel-dx"><a href="index.php#panel-dx" class="open-panel-dx"><i class="icon-list sx"></i> Playlist</a></li>
+		<li id="open-panel-sx"><a href="index.php#panel-sx" class="open-panel-sx"><i class="fa fa-music sx"></i> Browse</a></li>
+		<li id="open-panel-lib"><a href="index.php#panel-lib" class="open-panel-lib"><i class="fa fa-columns sx"></i> Library</a></li>
+		<li id="open-playback"><a href="index.php#playback" class="close-panels"><i class="fa fa-play sx"></i> Playback</a></li>
+		<li id="open-panel-dx"><a href="index.php#panel-dx" class="open-panel-dx"><i class="fa fa-list sx"></i> Playlist</a></li>
 		<?php } ?>
 	</ul>
 </div>

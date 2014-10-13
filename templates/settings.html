@@ -89,6 +89,82 @@ $_system_select[minidlna0]
 			</div>
 		</fieldset>
 	</form>
+	<div $_i2s >
+	<form class="form-horizontal" method="post">
+		<fieldset>
+			<legend>I2S driver</legend>
+			<p>Activate i2s driver for Raspberry PI compatible i2s DACs</p>
+			<div class="control-group">
+				<label class="control-label">I2S DAC</label>
+				<div class="controls">
+					<select class="input-large" name="i2s">		
+$_i2s[i2s]
+					</select>
+				</div>
+			</div>		
+			<div class="form-actions">
+				<button class="btn btn-primary btn-large" value="apply" name="apply" type="submit">Apply</button>
+			</div>
+		</fieldset>
+	</form>
+	</div>
+<form class="form-horizontal" method="post">
+		<fieldset>
+			<legend>Miscellaneous</legend>
+			<p>Various & useful system settings</p>
+			<div class="control-group">
+				<label class="control-label">Startup Sound</label>
+				<div class="controls">
+					<div class="toggle">
+						<label class="toggle-radio" for="togglestartupsound2" >ON</label>
+						
+$_system_select[startupsound1]
+
+						<label class="toggle-radio" for="togglestartupsound1">OFF</label>
+
+$_system_select[startupsound0]				
+						
+					</div>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Library view</label>
+				<div class="controls">
+					<div class="toggle">
+						<label class="toggle-radio" for="toggledisplaylib2" >ON</label>
+						
+$_system_select[displaylib1]
+
+						<label class="toggle-radio" for="toggledisplaylib1">OFF</label>
+
+$_system_select[displaylib0]				
+						
+					</div>
+					<span class="help-block">The library view will be displayed only when this setting is enabled AND, because of its layout, if the screen resolution allows it (bigger than 800x600).
+					WARNING: activating the library panel may have an impact on the client-side performances.</span>
+				</div>
+			</div>
+			<div id="displaylibastabblock" class="control-group subgroup">
+				<label class="control-label">Show as tab</label>
+				<div class="controls">
+					<div class="toggle">
+						<label class="toggle-radio" for="toggledisplaylibastab2" >ON</label>
+						
+$_system_select[displaylibastab1]
+
+						<label class="toggle-radio" for="toggledisplaylibastab1">OFF</label>
+
+$_system_select[displaylibastab0]				
+						
+					</div>
+					<span class="help-block">If turned off, the library will be accessible from the "Browse" view.</span>
+				</div>
+			</div>
+			<div class="form-actions">
+				<button class="btn btn-primary btn-large" value="apply" name="apply" type="submit">Apply</button>
+			</div>
+		</fieldset>
+	</form>
 	<form class="form-horizontal" method="post">
 		<fieldset>
 			<legend>Sound quality tweaks</legend>
@@ -113,84 +189,7 @@ $_system_select[orionprofile]
 				<button class="btn btn-primary btn-large" value="save" name="save" type="submit">Apply settings</button>
 			</div>
 		</fieldset>
-	</form>
-	<form class="form-horizontal" method="post">
-		<fieldset>
-			<legend>System commands</legend>
-			<p>Just some handy system commands, without the hassle of logging into SSH.</p>
-			<div class="control-group">
-				<label class="control-label">System reboot</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="reboot" id="syscmd-reboot">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">System poweroff</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="poweroff" id="syscmd-poweroff">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">Restart MPD service</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="mpdrestart" id="syscmd-mpdrestart">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">Update MPD database</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="updatempdDB" id="syscmd-updatempddb">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">Clear Play Queue</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="clearqueue" id="syscmd-clearqueue">
-				</div>
-			</div>
-		</fieldset>
-		
-<div $_i2s >
-	</form>
-	<form class="form-horizontal" method="post">
-		<fieldset>
-			<legend>Activate I2S driver</legend>
-			<p>Activate i2s driver for Raspberry PI compatible i2s DACs</p>
-			<div class="control-group">
-				<label class="control-label">Activate I2S Driver </label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="Hifiberry" id="Hifiberry">
-				</div>
-				</div>
-				<div class="control-group">
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="HifiberryDigi" id="HifiberryDigi">
-				</div>
-				</div>
-				<div class="control-group">
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="RpiDac" id="RpiDac">
-				</div>
-				</div>
-				<div class="control-group">
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="Iqaudio" id="Iqaudio">
-				</div>
-				</div>
-				<div class="control-group">
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="Generic" id="Generic">
-				</div>
-			</div>
-			<div class="control-group">
-				<label class="control-label">Deactivate I2S Driver</label>
-				<div class="controls">
-					<input class="btn" type="submit" name="syscmd" value="i2soff" id="i2soff">
-				</div>
-			</div>
-	</div>		
-		</fieldset>
-	</form>
+	</form>			
 	<form class="form-horizontal" method="post">
 		<fieldset>
 			<legend>Compatibility fixes</legend>

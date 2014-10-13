@@ -308,7 +308,7 @@ if (isset($_SESSION['shairport']) && $_SESSION['shairport'] == 1) {
 	playerSession('open',$db);
 	$hostname = $_SESSION['hostname'];	
 	$tempfile = '/tmp/.restart_mpd'; // if this file exists, start playing mpd after shairport stopped
-	$cmd = '/usr/local/bin/shairport -a "'.$hostname.'" -w -B "(/usr/bin/mpc | grep -q playing && touch \''.$tempfile.'\'); /usr/bin/mpc stop" -E "test -f \''.$tempfile.'\' && /usr/bin/mpc play && rm -f \''.$tempfile.'\'" -o alsa -- -d default:'.$device.' > /dev/null 2>&1 &';
+	$cmd = '/usr/local/bin/shairport -a "'.$hostname.'" -w -B "(/usr/bin/mpc | grep -q playing && touch \''.$tempfile.'\'); /usr/bin/mpc stop" -E "test -f \''.$tempfile.'\' && /usr/bin/mpc play && rm -f \''.$tempfile.'\'" -o alsa -- -d plughw:'.$device.' > /dev/null 2>&1 &';
 	sysCmd($cmd);
 } 
 
@@ -325,9 +325,10 @@ if (isset($_SESSION['upnpmpdcli']) && $_SESSION['upnpmpdcli'] == 1) {
 } 
 
 //Startup Sound
+if (isset($_SESSION['startupsound']) && $_SESSION['startupsound'] == 1) {
 $cmd = 'mpg123 -a hw:'.$device.' /var/www/inc/Sounds/startup.mp3 > /dev/null 2>&1 &';
 sysCmd($cmd);
-
+} 
 // --- NORMAL STARTUP --- //
 
 // --- WORKER MAIN LOOP --- //

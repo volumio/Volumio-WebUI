@@ -23,8 +23,6 @@ html, body {
 	overflow: hidden;
 }
 
-
-
 /* Common use
 -------------------------------------------------------------- */
 
@@ -288,7 +286,7 @@ html, body {
 	outline: none;
 	color: #fff;
 }
-#open-playback a {
+#menu-bottom .odd {
 	background: #273B4F;
 }
 
@@ -335,7 +333,7 @@ a.btn-cmd {
 	position: relative;
 	height: 49px;
 	margin: 0;
-	background: ##525C66;
+	background: #525C66;
 	border-bottom: 1px solid #fff;
 	color: #ddd;
 	cursor: pointer;
@@ -371,8 +369,9 @@ a.btn-cmd {
 	margin-right: 70px; /* era: right: 70px; */
 	height: 39px;
 	padding: 5px 10px;
+	white-space: nowrap;
 }
-.database .db-folder, .database .levelup {
+.database .db-folder, .database .db-other, .database .levelup {
 	line-height: 39px;
 }
 .database .db-icon {
@@ -574,6 +573,12 @@ a.btn-cmd {
     font-size: 18px;
     font-weight: bold;
 }
+#webradio-add {
+    margin: 0px 0 0px 0px;
+    float: right;
+}
+
+
 
 /* Pages */
 .pl-pages {
@@ -633,6 +638,9 @@ a.btn-cmd {
 	width: 100%;
 	height: 100%;
 	z-index: 99999;
+	display: none;
+}
+#lib-loader {
 	display: none;
 }
 #loaderbg {
@@ -889,7 +897,18 @@ body { background: #cf0; } */
 		display: none;
 	}
 }
-<<<<<<< HEAD
+@media (max-width: 320px) {
+    #menu-bottom li a {
+		font-size: 30px;
+	}
+    #menu-bottom .sx {
+        margin:0 auto;
+    }
+}
+
+#menu-bottom li#open-panel-lib {
+	display: none;
+}
 
 #lib-load {
 	color: #DDDDDD;
@@ -898,47 +917,57 @@ body { background: #cf0; } */
 	margin-left: -72px;
 	position: absolute;
 	top: 50%;
+	left: 50%;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 #lib-content {
 	display: none;
-        position: absolute;
-        top: 40px;
-        left: 0px;
-        right: 0px;
-        bottom: 40px;
+    position: absolute;
+    top: 40px;
+    left: 0px;
+    right: 0px;
+    bottom: 40px;
 }
 
 #lib-genre {
-        position: absolute;
+    /*WARNING: overriden in js (volumio.library.js)*/
+    position: absolute;
 	overflow: auto;
 	width: 25%;
 	height: 25%;
 	border-bottom: 3px solid #212D39;
+    border-right: 3px solid #212D39;
+	z-index: 12;
 }
 #lib-artist {
-        position: absolute;
+    /*WARNING: overriden in js (volumio.library.js)*/
+    position: absolute;
 	overflow: auto;
-        top: 25%;
-        width: 25%;
-        height: 75%;
+    top: 25%;
+    width: 25%;
+    height: 75%;
 	margin-top: 3px;
+    border-right: 3px solid #212D39;
+	z-index: 12;
 }
 #lib-album {
-        position: absolute;
+    /*WARNING: overriden in js (volumio.library.js)*/
+    position: absolute;
 	overflow: auto;
-        left: 25%;
+    left: 25%;
 	width: 25%;
 	height: 100%;
+    border-right: 3px solid #212D39;
+    z-index: 11;
 }
 #lib-file {
-        position: absolute;
+    /*WARNING: overriden in js (volumio.library.js)*/
+    position: absolute;
 	overflow: auto;
-        left: 50%;
+    left: 50%;
 	width: 50%;
 	height: 100%;
+    z-index: 10;
 }
 
 #lib-content ul {
@@ -948,20 +977,87 @@ body { background: #cf0; } */
 #lib-content li {
 	display: block;
 	position: relative;
-	height: 22px;
 	margin: 0;
 	border-bottom: 1px solid #111D29;
-	color: #ddd;
 	cursor: pointer;
+	color: #ddd;
 	font-size: 13px;
 	text-align: left;
 	font-weight: bold;
+}
+
+#lib-content li div:hover {
+	background-color: #7A848E;
+}
+
+#lib-content #lib-file li {
+    cursor: default;
+}
+
+#lib-content #lib-file li div:hover {
+	background-color: transparent;
+}
+
+#lib-content li div.active {
+    background-color: #4BBE87;
 }
 
 #lib-content span {
 	color: #14192E;
 	font-size: 12px;
 	font-weight: normal;
+}
+
+.lib-entry {
+	margin-left: 4px;
+}
+
+.lib-entry .btn {
+	font-size: 10px;
+	height: 80%;
+	line-height: 16px;
+	margin-top: -5px;
+	padding: 1px 3px;
+}
+
+.lib-entry .btn:hover {
+	background-color: #1ABC9C;
+}
+
+.lib-play {
+	position: absolute;
+	top: 2px;
+	right: 20px;
+	height: 80%;
+}
+
+.lib-add {
+	position: absolute;
+	top: 2px;
+	right: 1px;
+	height: 80%;
+}
+
+.lib-showall {
+	display: none;
+}
+
+.lib-playall, .lib-addall {
+	position: fixed;
+	bottom: 42px;
+	opacity: 0.5;
+}
+
+.lib-playall:hover, .lib-addall:hover {
+	opacity: 1;
+}
+
+.lib-playall {
+	right: 92px;
+}
+
+.lib-addall {
+	right: 52px;
 }
 
 /* Social Sharing Buttons */
@@ -1000,10 +1096,37 @@ body { background: #cf0; } */
 }
 
 
+.db-plugin li.active a {
+	background: #4BBE87;
+}
+.db-plugin a {
+	text-decoration: none;
+	color: #fff;
+}
+.db-plugin a:hover, .db-plugin a:focus {
+	text-decoration: none;
+	outline: none;
+	color: #fff;
+}
 
-=======
->>>>>>> parent of 31382c7... Load and display library (WIP)
-=======
->>>>>>> parent of 31382c7... Load and display library (WIP)
-=======
->>>>>>> parent of d788af1... New panel: library
+.control-group.subgroup {
+    margin-left: 100px;
+}
+
+#lib-tabs li.active a {
+	background: #4BBE87;
+}
+#lib-tabs a {
+	background: #7A848E;
+	text-decoration: none;
+	color: #fff;
+    padding: 5px;
+}
+#lib-tabs a:hover, #aaa a:focus {
+	text-decoration: none;
+	outline: none;
+	color: #fff;
+}
+#lib-content .tab-content {
+    height: 100%;
+}

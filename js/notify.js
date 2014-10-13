@@ -5,7 +5,7 @@ function notify(command, msg) {
 			$.pnotify({
 				title: 'Added to playlist',
 				text: msg,
-				icon: 'icon-ok',
+				icon: 'fa fa-ok',
 				opacity: .9
 			});
 		break;
@@ -14,7 +14,7 @@ function notify(command, msg) {
 			$.pnotify({
 				title: 'Playlist cleared<br> Added to playlist',
 				text: msg,
-				icon: 'icon-remove',
+				icon: 'fa fa-remove',
 				opacity: .9
 			});
 		break;
@@ -23,7 +23,7 @@ function notify(command, msg) {
 			$.pnotify({
 				title: 'Update path: ',
 				text: msg,
-				icon: 'icon-remove',
+				icon: 'fa fa-remove',
 				opacity: .9
 			});
 		break;
@@ -32,7 +32,7 @@ function notify(command, msg) {
 			$.pnotify({
 				title: 'Removed from playlist',
 				text: msg,
-				icon: 'icon-remove',
+				icon: 'fa fa-remove',
 				opacity: .9
 			});
 		break;
@@ -41,7 +41,7 @@ function notify(command, msg) {
                         $.pnotify({
                                 title: 'Playlist has been saved',
                                 text: msg,
-                                icon: 'icon-remove',
+                                icon: 'fa fa-remove',
                                 opacity: .9
                         });
                 break;
@@ -50,7 +50,7 @@ function notify(command, msg) {
                         $.pnotify({
                                 title: 'Give a name for saving playlist',
                                 text: msg,
-                                icon: 'icon-remove',
+                                icon: 'fa fa-remove',
                                 opacity: .9
                         });
                 break;
