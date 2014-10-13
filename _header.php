@@ -45,6 +45,7 @@
     <link href="css/bootstrap-select.css" rel="stylesheet">
 	<link href="css/bootstrap-fileupload.css" rel="stylesheet">
     <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/jquery-ui.min.css" rel="stylesheet">
 	<!--[if lte IE 7]>
 		<link href="css/font-awesome-ie7.min.css" rel="stylesheet">
 	<![endif]-->

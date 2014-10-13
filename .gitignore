@@ -1,3 +1,9 @@
+favorites/
+libtags.json
+libcache.json
+
+node_modules
+
 #################
 ## DB
 #################

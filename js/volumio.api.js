@@ -29,82 +29,73 @@
 
  // Global GUI object
  GUI = {
-    MpdState: 0,
-	SpopState: 0,
+    mpd: {
+        state: "",
+        elapsed: "0",
+        time: "0",
+        playlist: ""
+    },
+	spop: {
+        state: ""
+    },
+    current: {
+        artist: "",
+        album: "",
+        title: ""
+    },
+    state: "",
     cmd: 'status',
     playlist: null,
-    currentsong: null,
     currentknob: null,
-    state: '',
     currentpath: '',
-    halt: 0,
     volume: null,
     currentDBpos: new Array(0,0,0,0,0,0,0,0,0,0,0),
-    DBentry: new Array('', '', '', '', '', ''), // path, x, y, title, artist, album
-    visibility: 'visible',
-    DBupdate: 0
+    menuClicked: {
+        path: '',
+        title: '',
+        artist: '',
+        album: ''
+    },
+    visibility: 'visible'
 };
+
+bootstrapContext = {
+    left: '',
+    top: ''
+};
+
 
 // FUNZIONI
 // ----------------------------------------------------------------------------------------------------
 
-function sendCmd(inputcmd) {
-    $.ajax({
-        type : 'GET',
-        url : 'command/?cmd=' + inputcmd,
-        async : true,
-        cache : false,
-        success : function(data) {
-            GUI.halt = 1;
-        },
-    });
+function onMpdRefreshed(state) {
+    GUI.mpd = state;
 }
 
-function sendPLCmd(inputcmd) {
-    $.ajax({
-        type : 'GET',
-        url : 'db/?cmd=' + inputcmd,
-        async : true,
-        cache : false,
-        success : function(data) {
-            GUI.halt = 1;
-        },
-    });
-}
-
-function backendRequest() {
-    $.ajax({
-        type : 'GET',
-        url : '_player_engine.php?state=' + GUI.MpdState['state'],
-        async : true,
-        cache : false,
-        success : function(data) {
-			GUI.MpdState = eval('(' + data + ')');
-            renderUI();
-            backendRequest();
-        },
-        error : function() {
-            setTimeout(function() {
-                GUI.state = 'disconnected';
-                $('#loader').show();
-                $('#countdown-display').countdown('pause');
-                window.clearInterval(GUI.currentKnob);
-                backendRequest();
-            }, 5000);
-        }
-    });
+function onCurrentRefreshed(current) {
+    var previousSong = GUI.current.title;
+    GUI.current = current.song || {
+        artist: "",
+        album: "",
+        title: ""
+    };
+    renderUI(previousSong);
 }
 
 function backendRequestSpop() {
     $.ajax({
         type : 'GET',
-        url : '_player_engine_spop.php?state=' + GUI.SpopState['state'],
+        url : '_player_engine_spop.php?state=' + GUI.spop.state,
         async : true,
         cache : false,
         success : function(data) {
 			if (data != '') {
-				GUI.SpopState = eval('(' + data + ')');
-				renderUI();
+				GUI.spop = eval('(' + data + ')');
+                var previousSong = GUI.current.title;
+                GUI.current.artist = GUI.spop.artist;
+                GUI.current.album = GUI.spop.album;
+                GUI.current.title = GUI.spop.title;
+				renderUI(previousSong);
 	            backendRequestSpop();
 			} else {
 				setTimeout(function() {
@@ -120,40 +111,33 @@ function backendRequestSpop() {
     });
 }
 
-function renderUI() {
-	if (GUI.SpopState['state'] == 'play' || GUI.SpopState['state'] == 'pause') {
-	// If Spop is playing, temporarily redirect button control and title display to Spop
-	    GUI.state = GUI.SpopState['state'];
+function renderUI(previousSong) {
+	if (GUI.spop.state === 'play' || GUI.spop.state === 'pause') {
+        // If Spop is playing, temporarily redirect button control and title display to Spop
+        GUI.state = GUI.spop.state;
 
 		// Combine the Spop state array with the Mpd state array - any state variable defined by Spop will overwrite the corresponding Mpd state variable
-		var objectCombinedState = $.extend({}, GUI.MpdState, GUI.SpopState);
-	    updateGUI(objectCombinedState);
+		var objectCombinedState = $.extend({}, GUI.mpd, GUI.spop);
+	    updateGUI(objectCombinedState, previousSong);
 		refreshTimer(parseInt(objectCombinedState['elapsed']), parseInt(objectCombinedState['time']), objectCombinedState['state']);
 		refreshKnob(objectCombinedState);
 
 	} else {
-	// Else UI should be connected to MPD status
-	    GUI.state = GUI.MpdState['state'];
-	    updateGUI(GUI.MpdState);
-		refreshTimer(parseInt(GUI.MpdState['elapsed']), parseInt(GUI.MpdState['time']), GUI.MpdState['state']);
-		refreshKnob(GUI.MpdState);
-
+        // Else UI should be connected to MPD status
+	    GUI.state = GUI.mpd.state;
+	    updateGUI(GUI.mpd, previousSong);
+		refreshTimer(parseInt(GUI.mpd.elapsed), parseInt(GUI.mpd.time), GUI.mpd.state);
+		refreshKnob(GUI.mpd);
 	}
 
-    if (GUI.state != 'disconnected') {
+    if (GUI.state !== 'disconnected') {
         $('#loader').hide();
-
     }
 
-
-    if (GUI.MpdState['playlist'] != GUI.playlist) {
-        getPlaylist(GUI.MpdState);
-        GUI.playlist = GUI.MpdState['playlist'];
-
+    if (GUI.mpd.playlist !== GUI.playlist) {
+        getPlaylist(GUI.mpd);
+        GUI.playlist = GUI.mpd.playlist;
     }
-
-    GUI.halt = 0;
-
 }
 
 function getPlaylist(json){
@@ -183,7 +167,7 @@ function getPlaylist(json){
                     content += '</span></div></li>';
                     output = output + content;
                 } else {
-                    songpath = parsePath(data[i].file);
+                    songpath = retrieveParentPath(data[i].file);
                     content += '<div class="pl-entry">';
                     content += data[i].file.replace(songpath + '/', '') + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
                     content += ' <span>';
@@ -198,284 +182,31 @@ function getPlaylist(json){
     });
 }
 
-function parsePath(str) {
+function retrieveParentPath(str) {
 	var cutpos=str.lastIndexOf("/");
 	//-- verify this switch! (Orion)
-	if (cutpos !=-1) {
-        var songpath = str.slice(0,cutpos);
-	}  else {
-        songpath = '';
+    var parentPath = "";
+	if (cutpos != -1) {
+        parentPath = str.slice(0, cutpos);
 	}
-	return songpath;
-}
-
-function pluginListItem(id, text, faicon, onclick) {
-    return '<li id="#' + id + '" class="db-plugin" onclick="'
-        + onclick + '"><div class="db-icon db-other"><i class="fa '
-        + faicon + ' icon-root sx"></i></div><div class="db-entry db-other">'
-        + text + '</div></li>';
-}
-
-function parseResponse(inputArr,respType,i,inpath) {		
-	var content = "";
-
-	switch (respType) {
-		case 'playlist':		
-			// code placeholder
-		break;
-
-		case 'db':
-			if (inputArr[i].Type == 'MpdFile') {
-			// This is a MPD playable file
-				if (typeof inputArr[i].Title != 'undefined') {
-				// This is a local file with a title
-					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
-					content += inputArr[i].file;
-					content += '"><div class="db-icon db-song db-browse"><i class="fa fa-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-song db-browse">';
-					content += inputArr[i].Title + ' <em class="songtime">' + timeConvert(inputArr[i].Time) + '</em>';
-					content += ' <span>';
-					content +=  inputArr[i].Artist;
-					content += ' - ';
-					content +=  inputArr[i].Album;
-					content += '</span></div></li>';
-					showtype = 'music'
-
-				} else {
-				// This is some other format (eg. streams)
-                    var dbItemClass = (inputArr[i].Time === undefined) ? "db-other" : "db-song";
-					content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
-					content += inputArr[i].file;
-
-					if (inpath == 'WEBRADIO') {
-					// This is a webradio stream
-                        content += '"><div class="db-icon ' + dbItemClass + ' db-browse"><i class="fa fa-microphone sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry ' + dbItemClass + ' db-browse">';
-                        showtype = 'radio'
-
-					} else {
-					// This is an unknown file type
-                        content += '"><div class="db-icon ' + dbItemClass + ' db-browse"><i class="fa fa-music sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry ' + dbItemClass + ' db-browse">';
-                        showtype = 'file'
-
-					}
-
-					// Strip the leading path and trailing '.pls', and display only the filename
-					content += inputArr[i].file.replace(inpath + '/', '').replace('.pls', '') + ' <em class="songtime">' + timeConvert(inputArr[i].Time) + '</em>';
-					content += '</div></li>';
-					
-				}
-
-			} else if (inputArr[i].Type == 'MpdDirectory') {
-			// This is a MPD folder
-				content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
-				content += inputArr[i].directory;
-				showtype = 'file';
-
-				if (inpath != '') {
-				// This is a generic folder not at the root level
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-folder-open sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-				} else if (inputArr[i].directory == 'WEBRADIO') {
-				// This is the WEBRADIO root folder
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-microphone icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-				} else if (inputArr[i].directory == 'NAS') {
-				// This is the NAS root folder
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-code-fork icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-				} else if (inputArr[i].directory == 'USB') {
-				// This is the USB root folder
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-hdd-o icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-				} else if (inputArr[i].directory == 'RAMPLAY') {
-				// This is the RAMPLAY root folder
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spinner icon-root sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-root"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-				}
- 
-				if (inputArr[i].DisplayName) {
-				// If a DisplayName is available for this entry, use it
-					content += inputArr[i].DisplayName;
-
-				} else {
-				// Else strip the leading path and slash, and display the folder name
-					content += inputArr[i].directory.replace(inpath + '/', '');
-
-				}
-
-				content += '</div></li>';
-
-			} else if (inputArr[i].Type == 'SpopTrack') {
-			// This is a Spotify file
-				content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
-				content += inputArr[i].SpopTrackUri;
-				content += '" data-artist="';
-				content += inputArr[i].Artist;
-				content += '" data-album="';
-				content += inputArr[i].Album;
-				content += '" data-title="';
-				content += inputArr[i].Title;
-content += '"><div class="db-icon db-browse"><i class="fa fa-spotify sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-spotifytrack"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-browse">';
-				content += inputArr[i].Title + ' <em class="songtime">' + timeConvert(inputArr[i].Time) + '</em>';
-				content += ' <span>';
-				content +=  inputArr[i].Artist;
-				content += ' - ';
-				content +=  inputArr[i].Album;
-				content += '</span></div></li>';
-				showtype = 'music';
-
-			} else if (inputArr[i].Type == 'SpopDirectory') {
-			// This is a Spotify folder or playlist
-				content = '<li id="db-' + (i + 1) + '" class="clearfix" data-path="';
-				content += inputArr[i].directory;
-				showtype = 'file';
-
-				if (inpath != '') {
-				// This is a Spotify folder not at the root level
-					if (typeof inputArr[i].SpopPlaylistIndex != 'undefined') {
-					// This is a browsable Spotify playlist
-						content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-list-ol sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-spotifyplaylist"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">';
-
-					} else {
-					// This is a generic Spotify folder
-						content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-folder-open sx"></i></div><div class="db-entry db-folder db-browse">';
-
-					}
-
-				} else if (inputArr[i].directory == 'SPOTIFY') {
-				// This is the SPOTIFY root folder
-					content += '"><div class="db-icon db-folder db-browse"><i class="fa fa-spotify icon-root sx"></i></div><div class="db-entry db-folder db-browse">';
-
-				}
-
-				if (inputArr[i].DisplayName) {
-				// If a DisplayName is available for this entry, use it
-					content += inputArr[i].DisplayName;
-
-				} else {
-				// Else strip the leading path and slash, and display the folder name
-					content += inputArr[i].directory.replace(inpath + '/', '');
-
-				}
-
-				content += '</div></li>';
-
-			}	
-
-		break;
-		
-	}
-
-	return content;
-} // end parseResponse()
-
-function getDB(cmd, path, browsemode, uplevel){
-	if (cmd == 'filepath') {
-		$.post('db/?cmd=filepath', { 'path': path }, function(data) {
-			populateDB(data, path, uplevel);
-		}, 'json');
-
-	} else if (cmd == 'add') {
-		$.post('db/?cmd=add', { 'path': path }, function(path) {
-		}, 'json');
-
-	} else if (cmd == 'addplay') {
-		$.post('db/?cmd=addplay', { 'path': path }, function(path) {
-		}, 'json');
-
-	} else if (cmd == 'addreplaceplay') {
-		$.post('db/?cmd=addreplaceplay', { 'path': path }, function(path) {
-		}, 'json');
-
-	} else if (cmd == 'update') {
-		$.post('db/?cmd=update', { 'path': path }, function(path) {
-		}, 'json');
-
-	} else if (cmd == 'search') {
-		var keyword = $('#db-search-keyword').val();
-		$.post('db/?querytype=' + browsemode + '&cmd=search', { 'query': keyword }, function(data) {
-			populateDB(data, path, uplevel, keyword);
-		}, 'json');
-
-	} else if (cmd == 'playall') {
-			$.post('db/?cmd=playall', { 'path': path }, function(data) {}, 'json');
-
-	} else if (cmd == 'addall') {
-			$.post('db/?cmd=addall', { 'path': path }, function(data) {}, 'json');
-
-	}
-
-}
-
-function populateDB(data, path, uplevel, keyword){
-	if (path) GUI.currentpath = path;
-	var DBlist = $('ul.database');
-	DBlist.html('');
-
-	if (keyword) {
-		var results = (data.length) ? data.length : '0';
-		var s = (data.length == 1) ? '' : 's';
-		var text = "" + results + ' result' + s + ' for "<em class="keyword">' + keyword + '</em>"';
-		$("#db-back").attr("title", "Close search results and go back to the DB");
-		$("#db-back-text").html(text);
-		$("#db-back").show();
-
-	} else if (path != '') {
-		$("#db-back").attr("title", "");
-		$("#db-back-text").html("back");
-		$("#db-back").show();
-
-	} else {
-        $("#db-back").hide();
-
-        if (library && library.isEnabled && !library.displayAsTab) {
-            DBlist.append(pluginListItem("db-plug-lib", "LIBRARY", "fa-columns", "showLibraryView()"));
-
-        }
-
-    }
-
-	var i = 0;
-	for (i = 0; i < data.length; i++){
-	 	DBlist.append(parseResponse(data,'db',i,path));
-
-	}
-
-	if (typeof data[0].DisplayPath != 'undefined') {
-		$('#db-currentpath span').html(data[0].DisplayPath);
-
-	} else {
-		$('#db-currentpath span').html(path);
-
-	}
-
-	if (uplevel) {
-		$('#db-' + GUI.currentDBpos[GUI.currentDBpos[10]]).addClass('active');
-		customScroll('db', GUI.currentDBpos[GUI.currentDBpos[10]]);
-	} else {
-		customScroll('db', 0, 0);
-	}
-	if (showtype == 'radio') {
-        $("#webradio-add").show();
-	} else {
-        $("#webradio-add").hide();
-	}
+	return parentPath;
 }
 
 // update interface
-function updateGUI(objectInputState){
+function updateGUI(stateObj, previousSong){
     // check MPD status
-    if (objectInputState['state'] == 'play') {
+    if (stateObj.state === 'play') {
         $('#play').addClass('btn-primary');
         $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
         $('#stop').removeClass('btn-primary');
 
-    } else if (objectInputState['state'] == 'pause') {
+    } else if (stateObj.state === 'pause') {
         $('#playlist-position').html('Not playing');
         $('#play').addClass('btn-primary');
         $('#play i').removeClass('fa fa-play').addClass('fa fa-pause');
         $('#stop').removeClass('btn-primary');
 
-    } else if (objectInputState['state'] == 'stop') {
+    } else if (stateObj.state === 'stop') {
         $('#play').removeClass('btn-primary');
         $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
         $('#stop').addClass('btn-primary');
@@ -485,84 +216,73 @@ function updateGUI(objectInputState){
         $('#time').val(0).trigger('change');
         $('#format-bitrate').html('&nbsp;');
         $('.playlist li').removeClass('active');
-
     }
 
-	$('#elapsed').html(timeConvert(objectInputState['elapsed']));
-	$('#total').html(timeConvert(objectInputState['time']));
-	//$('#time').val(objectInputState['song_percent']).trigger('change');
+    $('#elapsed').html(timeConvert(stateObj.elapsed));
+	$('#total').html(timeConvert(stateObj.time));
 
-	var fileinfo = (objectInputState['audio_channels'] && objectInputState['audio_sample_depth'] && objectInputState['audio_sample_rate']) ? (objectInputState['audio_channels'] + ' - ' + objectInputState['audio_sample_depth'] + ' bit - ' + objectInputState['audio_sample_rate'] +' kHz ') : '&nbsp;';
+	var fileinfo = (stateObj.audioChannels && stateObj.audioSampleDepth && stateObj.audioSampleRate) ? (stateObj.audioChannels + ' - ' + stateObj.audioSampleDepth + ' bit - ' + stateObj.audioSampleRate +' kHz ') : '&nbsp;';
 	$('#format-bitrate').html(fileinfo);
 
-	$('#playlist-position').html('Playlist position ' + (parseInt(objectInputState['song']) + 1) +'/'+objectInputState['playlistlength']);
+	$('#playlist-position').html('Playlist position ' + (parseInt(stateObj.song) + 1) +'/'+stateObj.playlistlength);
 	$('.playlist li').removeClass('active');
-	var current = parseInt(objectInputState['song']) + 1;
+	var current = parseInt(stateObj.song) + 1;
 	if (!isNaN(current)) {
 		$('.playlist li:nth-child(' + current + ')').addClass('active');
-
 	}
 
-	// show UpdateDB icon
-	// console.log('dbupdate = ', GUI.MpdState['updating_db']);
-	if (typeof GUI.MpdState['updating_db'] != 'undefined') {
+    // show UpdateDB icon
+	if (typeof GUI.mpd.updating_db != 'undefined') {
 		$('.open-panel-sx').html('<i class="fa fa-refresh fa-spin"></i> Updating');
 	} else {
 		$('.open-panel-sx').html('<i class="fa fa-music sx"></i> Browse');
 	}
 
     // check song update
-    if (GUI.currentsong != objectInputState['currentsong']) {
+    if (previousSong !== GUI.current.title) {
         countdownRestart(0);
         if ($('#panel-dx').hasClass('active')) {
-            var current = parseInt(objectInputState['song']);
+            var current = parseInt(stateObj.song);
             customScroll('pl', current);
         }
     }
-    // common actions
 
+    // common actions
     // Don't update the knob if it's currently being changed
     var volume = $('#volume');
     if (volume[0] && (volume[0].knobEvents === undefined || !volume[0].knobEvents.isSliding)) {
-        volume.val((objectInputState['volume'] == '-1') ? 100 : objectInputState['volume']).trigger('change');
+        volume.val((stateObj.volume == '-1') ? 100 : stateObj.volume).trigger('change');
     }
-    $('#currentartist').html(objectInputState['currentartist']);
-    $('#currentsong').html(objectInputState['currentsong']);
-    $('#currentalbum').html(objectInputState['currentalbum']);
-    if (objectInputState['repeat'] == 1) {
+    $('#currentartist').html(GUI.current.artist);
+    $('#currentsong').html(GUI.current.title);
+    $('#currentalbum').html(GUI.current.album);
+    if (stateObj.repeat) {
         $('#repeat').addClass('btn-primary');
     } else {
         $('#repeat').removeClass('btn-primary');
     }
-    if (objectInputState['random'] == 1) {
+    if (stateObj.random) {
         $('#random').addClass('btn-primary');
     } else {
         $('#random').removeClass('btn-primary');
     }
-    if (objectInputState['consume'] == 1) {
+    if (stateObj.consume) {
         $('#consume').addClass('btn-primary');
     } else {
         $('#consume').removeClass('btn-primary');
     }
-    if (objectInputState['single'] == 1) {
+    if (stateObj.single) {
         $('#single').addClass('btn-primary');
     } else {
         $('#single').removeClass('btn-primary');
     }
 
-    GUI.halt = 0;
-    GUI.currentsong = objectInputState['currentsong'];
-	GUI.currentartist = objectInputState['currentartist'];
-
 	//Change Name according to Now Playing
-	if (GUI.currentartist != null && GUI.currentsong != null) {
-		document.title = objectInputState['currentsong'] + ' - ' + objectInputState['currentartist'] + ' - ' + 'Volumio';
-
+	if (GUI.current.artist != null && GUI.current.title != null) {
+        document.title = GUI.current.title + ' - ' + GUI.current.artist + ' - ' + 'Volumio';
 	} else {
-            document.title = 'Volumio - Audiophile Music Player';
-
+        document.title = 'Volumio - Audiophile Music Player';
     }
-
 }
 
 // update countdown
@@ -584,7 +304,7 @@ function refreshTimer(startFrom, stopTo, state){
 // update right knob
 function refreshKnob(json){
     window.clearInterval(GUI.currentKnob)
-    var initTime = json['song_percent'];
+    var initTime = 100 * json['elapsed'] / json['time'];
     var delta = json['time'] / 1000;
     $('#time').val(initTime*10).trigger('change');
     if (GUI.state == 'play') {
@@ -623,9 +343,8 @@ function countdownRestart(startFrom) {
 // set volume with knob
 function setVolume(val) {
     GUI.volume = val;
-    GUI.halt = 1;
     $('#volumemute').removeClass('btn-primary');
-    sendCmd('setvol ' + val);
+    mpdVolume(val);
 }
 
 // adjust knob with volume
@@ -672,7 +391,7 @@ function randomScrollDB() {
 
 //Social Sharing
 $('a.tweet').click(function(e){
-    var urlTwitter = 'https://twitter.com/home?status=%E2%99%AB%20%23NowPlaying+' + GUI.currentartist.replace(/\s+/g, '+') + '+-+' + GUI.currentsong.replace(/\s+/g, '+') + '+with+%40Volumio+http%3A%2F%2Fvolumio.org%2F+';
+    var urlTwitter = 'https://twitter.com/home?status=%E2%99%AB%20%23NowPlaying+' + GUI.current.artist.replace(/\s+/g, '+') + '+-+' + GUI.current.title.replace(/\s+/g, '+') + '+with+%40Volumio+http%3A%2F%2Fvolumio.org%2F+';
     $('a.tweet').attr('href', urlTwitter);
 });
 $('a.facebook').click(function(e){

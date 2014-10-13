@@ -53,7 +53,7 @@
 	<!-- -------------------- DATABASE PANEL -------------------- -->
 	<div id="panel-sx" class="tab-pane">
 		<div class="btnlist btnlist-top">
-			<form id="db-search" action="javascript:getDB('search', '', 'file');">
+			<form id="db-search" action="javascript:searchFile();">
 				<div class="input-append">
 					<input class="span2" id="db-search-keyword" type="text" value="" placeholder="Search">
 					<button class="btn" type="submit"><i class="fa fa-search"></i></button>
@@ -121,8 +121,26 @@
 
 	<!-- -------------------- LIBRARY PANEL -------------------- -->
 	<div id="panel-lib" class="tab-pane">
-		<div class="container txtmid">
-			<div id="lib-loader"><div id="loaderbg"></div><div id="loadercontent"><i class="fa fa-refresh fa-spin"></i>loading...</div></div>
+		<div class="container">
+            <div class="btnlist" id="lib-toolbar">
+                <span class="rel">
+                    <input class="span2" id="lib-search" type="text" value="" placeholder="Search..." title="Search in artists, albums or songs">
+                    <button id="lib-search-help" class="btn" title="Help on search"><i class="fa fa-question"></i></button>
+                    <button id="lib-clear-search" class="btn" title="Clear search"><i class="fa fa-remove"></i></button>
+                </span>
+                <button id="lib-refresh" class="btn" title="Force reload"><i class="fa fa-refresh"></i></button>
+                <button id="lib-playall" class="btn" title="Play all"><i class="fa fa-play"></i></button>
+                <button id="lib-addall" class="btn" title="Enqueue all"><i class="fa fa-plus"></i></button>
+                <span id="lib-status-text"></span>
+                <span class="rel floatdx">
+                    <div id="lib-favorites" class="dropdown btn" title="Load favorite filters">
+                        <a class="dropdown-toggle" title="Favorites" role="button" data-toggle="dropdown" data-target="#" href="#notarget"><i class="fa fa-star"></i></a>
+                        <ul class="dropdown-menu" role="menu"></ul>
+                    </div>
+                    <input class="span2" id="lib-favorites-name" type="text" value="" placeholder="Enter a name for saving" title="Enter a name to save current filters as a favorite">
+                    <button id="lib-favorites-save" class="btn" title="Save current filters to favorites"><i class="fa fa-save"></i></button>
+                </span>
+            </div>
 			<div id="lib-content">
                 <ul id="lib-tabs" class="nav nav-tabs" role="tablist">
                     <li class="active"><a href="#lib-genre" role="tab" data-toggle="tab">Genres</a></li>
@@ -142,13 +160,43 @@
 				</div>
 				<div id="lib-file" class="tab-pane">
 					<ul id="songsList"></ul>
-					<div class="lib-showall"><a title="WARNING: depending on the number of songs to display, showing all songs may result in slowing down or freezing your navigation." href="#notarget" class="btn">Show all songs</a></div>
-					<div class="lib-playall"><a title="Play all" href="#notarget" class="btn"><i class="fa fa-play"></i></a></div>
-					<div class="lib-addall"><a title="Enqueue all" href="#notarget" class="btn"><i class="fa fa-plus"></i></a></div>
 				</div>
                 </div>
 			</div>
-		</div>
+            <div id="lib-search-help-dlg" title="Help on search">
+                <p>You can perform several kind of searches by typing text. All methods are case-insensitive.
+                </p>
+                <ul>
+                    <li>Full-text search for any term, in genres, artists, albums or songs. E.g: <b>Highway hell</b> will return both items that contain "highway" or "hell". For instance, you'd get ACDC's "Highway to Hell", but also Deep Purple's "Highway Star" and No Doubt's "Hella Good".</li><br>
+                    <li>Search for exact terms in genres, artists, albums or songs by using double-quotes. E.g: <b>"Highway to hell"</b> (notice the double-quotes) will return only songs with this exact name.</li><br>
+                    <li>You can restrict filters with advanced patterns, by typing <b>{&lt;word&gt;&lt;op&gt;&lt;value&gt;}</b> where &lt;word&gt; is one of:
+                        <ul>
+                            <li>genre: takes the following operators (&lt;op&gt;):
+                                <ul>
+                                    <li>= or == for testing equality</li>
+                                    <li>!= for testing unequality</li>
+                                    <li>~ for testing inclusion (test if the string is contained in)</li>
+                                </ul>
+                            </li>
+                            <li>artist: same operators as genre</li>
+                            <li>album: same operators as genre</li>
+                            <li>song: same operators as genre</li>
+                            <li>rate: for filtering on song's rating. Note that unrated songs are considered as 0-rated
+                                <ul>
+                                    <li>= or == for testing strict equality</li>
+                                    <li>!= for testing unequality</li>
+                                    <li>&gt; or &gt;= for strict or non-strict superiority</li>
+                                    <li>&lt; or &lt;= for strict or non-strict inferiority</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        For instance, if you search for <b>{rate>=4}{genre~rock}</b>, you would get all rock/poprock/rock alt... songs rated 4 at least.
+                </ul>
+
+                You can write any combination of those 3 search methods.<br/><br/>
+                By the way, did you know that you can select multiple items from the library by control-clicking? Yeah, you just need to have a keyboard with "ctrl" key...
+            </div>
+        </div>
 	</div>
 
 </div>
@@ -158,7 +206,7 @@
 		<ul class="dropdown-menu" role="menu">
 			<li><a href="#notarget" data-cmd="add"><i class="fa fa-plus sx"></i> Add</a></li>
 			<li><a href="#notarget" data-cmd="addplay"><i class="fa fa-play sx"></i> Add and play</a></li>
-			<li><a href="#notarget" data-cmd="addreplaceplay"><i class="fa fa-share sx"></i> Add, replace and play</a></li>
+			<li><a href="#notarget" data-cmd="addreplaceplay"><i class="fa fa-share sx"></i> Replace and play</a></li>
 			<li><a href="#notarget" data-cmd="update"><i class="fa fa-refresh sx"></i> Update this folder</a></li>
 		</ul>
 	</div>

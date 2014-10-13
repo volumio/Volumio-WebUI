@@ -1,0 +1,28 @@
+{
+    "name": "volumio-server",
+    "version": "0.1.0",
+    "description": "HTTP server running on nodejs, used for Volumio, the audiophile music player.",
+    "homepage": "https://www.volumio.org/",
+    "author": "Volumio.org",
+    "license": {
+        "type": "GPL",
+        "url": "https://github.com/volumio/Volumio-WebUI/blob/master/LICENSE"
+    },
+    "main": "server.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/volumio/Volumio-WebUI/"
+    },
+    "bugs": {
+        "url": "https://github.com/volumio/Volumio-WebUI/issues"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    },
+    "dependencies": {
+        "express": ">=4.9.0",
+        "q": ">=1.0.0",
+        "socket.io": "~1.2.0",
+        "mipod": ">=0.1.3"
+    }
+}

@@ -147,8 +147,8 @@
 			var menuWidth = $menu.find('.dropdown-menu').outerWidth(),
 				tp = {"position":"fixed"},
 				X, Y;
-			X = {"left": GUI.DBentry[1] - menuWidth + 15};
-			Y = {"top": GUI.DBentry[2] - $(window).scrollTop()};
+			X = {"left": bootstrapContext.left - menuWidth + 15};
+			Y = {"top": bootstrapContext.top - $(window).scrollTop()};
 
 			return $.extend(tp, Y, X);
 		}
@@ -187,8 +187,8 @@
 		// ACXMOD: contextmenu -> click
 		.on('click.context.data-api', '[data-toggle=context]', function(e) {
 				var pos = $(this).offset();
-				GUI.DBentry[1] = pos.left;
-				GUI.DBentry[2] = pos.top;
+				bootstrapContext.left = pos.left;
+				bootstrapContext.top = pos.top;
 				$(this).contextmenu('show',e);				
 				e.preventDefault();
 		});
