@@ -325,7 +325,7 @@ if (isset($_SESSION['upnpmpdcli']) && $_SESSION['upnpmpdcli'] == 1) {
 
 // SPOP Daemon for Spotify Plaback
 if (isset($_SESSION['spotify']) && $_SESSION['spotify'] == 1) {
-	$cmd = 'spopd > /dev/null 2>&1 &';
+	$cmd = ' spopd -c /etc/spopd.conf > /dev/null 2>&1 &';
 	sysCmd($cmd);
 } 
 
