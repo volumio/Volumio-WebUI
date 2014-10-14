@@ -578,7 +578,7 @@ if (isset($_POST['spotify']) && $_POST['spotify'] != $_SESSION['spotify']){
 	$content .= "high_bitrate = false"."\n";
 	}
 	file_put_contents($spopconf, $content);
-	$cmd = 'spopd > /dev/null 2>&1 &';
+	$cmd = 'spopd -c /etc/spopd.conf > /dev/null 2>&1 &';
 	// set UI notify
 	$_SESSION['w_queue'] = "spotify";
 	$_SESSION['w_queueargs'] = $_POST['spotify'];
