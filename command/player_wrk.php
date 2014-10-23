@@ -323,6 +323,12 @@ if (isset($_SESSION['upnpmpdcli']) && $_SESSION['upnpmpdcli'] == 1) {
 	sysCmd($cmd);
 } 
 
+// SPOP Daemon for Spotify Plaback
+if (isset($_SESSION['spotify']) && $_SESSION['spotify'] == 1) {
+	$cmd = ' spopd -c /etc/spopd.conf > /dev/null 2>&1 &';
+	sysCmd($cmd);
+} 
+
 //Startup Sound
 if (isset($_SESSION['startupsound']) && $_SESSION['startupsound'] == 1) {
 $cmd = 'mpg123 -a hw:'.$device.' /var/www/inc/Sounds/startup.mp3 > /dev/null 2>&1 &';

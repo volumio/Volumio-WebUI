@@ -514,7 +514,84 @@ snd_soc_rpi_dac';
 		break;
 }
 }
+//Spotify configuration File for Spop Daemon
 
+if (isset($_POST['spotusername']) && $_POST['spotusername'] != $_SESSION['spotusername']){
+	session_start();
+	playerSession('write',$db,'spotusername',$_POST['spotusername']);
+	$_SESSION['w_queue'] = "spotusername";
+		$_SESSION['w_queueargs'] = $_POST['spotusername'];
+		$_SESSION['w_active'] = 1;
+		} else {
+		$_SESSION['notify']['title'] = 'Job Failed';
+		$_SESSION['notify']['msg'] = 'background worker is busy.';
+	playerSession('unlock');
+}
+
+if (isset($_POST['spotpassword']) && $_POST['spotpassword'] != $_SESSION['spotpassword']){
+	session_start();
+	playerSession('write',$db,'spotpassword',$_POST['spotpassword']);
+	$_SESSION['w_queue'] = "spotpassword";
+		$_SESSION['w_queueargs'] = $_POST['spotpassword'];
+		$_SESSION['w_active'] = 1;
+		} else {
+		$_SESSION['notify']['title'] = 'Job Failed';
+		$_SESSION['notify']['msg'] = 'background worker is busy.';
+	playerSession('unlock');
+}
+
+if (isset($_POST['spotifybitrate']) && $_POST['spotifybitrate'] != $_SESSION['spotifybitrate']){
+	session_start();
+	if ($_POST['spotifybitrate'] == 1 OR $_POST['spotifybitrate'] == 0) {
+	playerSession('write',$db,'spotifybitrate',$_POST['spotifybitrate']);
+	}
+	playerSession('unlock');
+}
+
+if (isset($_POST['spotify']) && $_POST['spotify'] != $_SESSION['spotify']){
+	session_start();
+	if ($_POST['spotify'] == 1 OR $_POST['spotify'] == 0) {
+	playerSession('write',$db,'spotify',$_POST['spotify']);
+	}
+	$dbh = cfgdb_connect($db);
+	$query_cfg = "SELECT param,value_player FROM cfg_mpd WHERE value_player!=''";
+	$mpdcfg = sdbquery($query_cfg,$dbh);
+	$dbh = null;
+	foreach ($mpdcfg as $cfg) {
+		if ($cfg['param'] == 'audio_output_format' && $cfg['value_player'] == 'disabled'){
+		$output .= '';
+		} else if ($cfg['param'] == 'device') {
+		$device = $cfg['value_player'];
+		var_export($device);
+		}  else {
+		$output .= $cfg['param']." \t\"".$cfg['value_player']."\"\n";
+		}
+		}
+	$spopconf = '/etc/spopd.conf';
+	//$content .= "\t\t device \t\"hw:".$spotusername.",0\"\n";
+	$content .= "[spop]"."\n";
+	$content .= "spotify_username = ".$_SESSION['spotusername']."\n";
+	$content .= "spotify_password = ".$_SESSION['spotpassword']."\n"; 
+	$content .= "audio_output = ao"."\n"; 
+	$content .= "output_name =  hw:".$device.""."\n";
+	if ($_POST['spotifybitrate'] == 0) {
+	$content .= "high_bitrate = false"."\n";
+	}
+	file_put_contents($spopconf, $content);
+	$cmd = 'spopd -c /etc/spopd.conf > /dev/null 2>&1 &';
+	// set UI notify
+	$_SESSION['w_queue'] = "spotify";
+	$_SESSION['w_queueargs'] = $_POST['spotify'];
+	if ($_POST['spotify'] == 1) {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'Spotify Service enabled';
+	} else {
+	$_SESSION['notify']['title'] = '';
+	$_SESSION['notify']['msg'] = 'Spotify Service disabled';
+	}
+	// unlock session file
+	playerSession('unlock');
+}
 
 
 // configure html select elements
@@ -547,7 +624,13 @@ $_system_select['displaylib1'] .= "<input type=\"radio\" name=\"displaylib\" id=
 $_system_select['displaylib0'] .= "<input type=\"radio\" name=\"displaylib\" id=\"toggledisplaylib2\" value=\"0\" ".(($_SESSION['displaylib'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_system_select['displaylibastab1'] .= "<input type=\"radio\" name=\"displaylibastab\" id=\"toggledisplaylibastab1\" value=\"1\" ".(($_SESSION['displaylibastab'] == 1) ? "checked=\"checked\"" : "").">\n";
 $_system_select['displaylibastab0'] .= "<input type=\"radio\" name=\"displaylibastab\" id=\"toggledisplaylibastab2\" value=\"0\" ".(($_SESSION['displaylibastab'] == 0) ? "checked=\"checked\"" : "").">\n";
+$_system_select['spotify1'] .= "<input type=\"radio\" name=\"spotify\" id=\"togglespotify1\" value=\"1\" ".(($_SESSION['spotify'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['spotify0'] .= "<input type=\"radio\" name=\"spotify\" id=\"togglespotify2\" value=\"0\" ".(($_SESSION['spotify'] == 0) ? "checked=\"checked\"" : "").">\n";
+$_system_select['spotifybitrate1'] .= "<input type=\"radio\" name=\"spotifybitrate\" id=\"togglespotifybitrate1\" value=\"1\" ".(($_SESSION['spotifybitrate'] == 1) ? "checked=\"checked\"" : "").">\n";
+$_system_select['spotifybitrate0'] .= "<input type=\"radio\" name=\"spotifybitrate\" id=\"togglespotifybitrate2\" value=\"0\" ".(($_SESSION['spotifybitrate'] == 0) ? "checked=\"checked\"" : "").">\n";
 $_hostname = $_SESSION['hostname'];
+$_spotusername = $_SESSION['spotusername'];
+$_spotpassword = $_SESSION['spotpassword'];
 // set template
 $tpl = "settings.html";
 ?>

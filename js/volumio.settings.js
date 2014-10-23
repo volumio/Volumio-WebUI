@@ -179,4 +179,18 @@ jQuery(document).ready(function($){ 'use strict';
             $displaylibastabblock.hide("slide");
         });
     }
+	var $togglespotify1 = $("#togglespotify1");
+    var $togglespotify2 = $("#togglespotify2");
+    var $displayspotifyblock = $("#displayspotifyblock");
+    if ($togglespotify1.size() > 0 && $togglespotify2.size() > 0 && $displayspotifyblock.size() > 0) {
+        if ($togglespotify1.attr("checked") === undefined) {
+            $displayspotifyblock.hide("slide");
+        }
+        $togglespotify1.click(function() {
+            $displayspotifyblock.show("slide");
+        });
+        $togglespotify2.click(function() {
+            $displayspotifyblock.hide("slide");
+        });
+    }
 });
