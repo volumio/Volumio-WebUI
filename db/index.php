@@ -141,22 +141,15 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 				case 'spop-playtrackuri':
 					if (isset($_POST['path']) && $_POST['path'] != '') {
 						sendMpdCommand($mpd,'stop');
-						sendSpopCommand($spop, "uplay " . $_POST['path']);
-						echo readSpopResponse($spop);
+						echo sendSpopCommand($spop, "uplay " . $_POST['path']);
 					}
-					break;
-
-				case 'spop-stop':
-					sendSpopCommand($spop, "stop");
-					echo readSpopResponse($spop);
 					break;
 
 				case 'spop-playplaylistindex':
 					if (isset($_POST['path']) && $_POST['path'] != '') {
 						$sSpopPlaylistIndex = end(explode("@", $_POST['path']));
 						sendMpdCommand($mpd,'stop');
-						sendSpopCommand($spop, "play " . $sSpopPlaylistIndex);
-						echo readSpopResponse($spop);
+						echo sendSpopCommand($spop, "play " . $sSpopPlaylistIndex);
 					}
 					break;
 

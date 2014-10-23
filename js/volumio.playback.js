@@ -31,11 +31,12 @@ jQuery(document).ready(function($){ 'use strict';
 
     // INITIALIZATION
     // ----------------------------------------------------------------------------------------------------
-    // first connection with MPD daemon
+    // first connection with MPD and SPOP daemons
     backendRequest();
+	backendRequestSpop();
 
     // first GUI update
-    updateGUI(GUI.json);
+    updateGUI(GUI.MpdState);
     getDB('filepath', GUI.currentpath, 'file');
     $.pnotify.defaults.history = false;
 
@@ -168,8 +169,8 @@ jQuery(document).ready(function($){ 'use strict';
 				GUI.halt = 1;
 				// console.log('GUI.halt (Knobs2)= ', GUI.halt);
 				window.clearInterval(GUI.currentKnob);
-				var seekto = Math.floor((value * parseInt(GUI.json['time'])) / 1000);
-				sendCmd('seek ' + GUI.json['song'] + ' ' + seekto);
+				var seekto = Math.floor((value * parseInt(GUI.MpdState['time'])) / 1000);
+				sendCmd('seek ' + GUI.MpdState['song'] + ' ' + seekto);
 				//console.log('seekto = ', seekto);
 				$('#time').val(value);
 				$('#countdown-display').countdown('destroy');
@@ -266,8 +267,8 @@ jQuery(document).ready(function($){ 'use strict';
     // "pulse" effect knob
     /*
     setInterval(function() {
-        if (GUI.json['state'] == 'play') {
-            if (GUI.json['state'] == 'play') {
+        if (GUI.MpdState['state'] == 'play') {
+            if (GUI.MpdState['state'] == 'play') {
                 $('#timeflow').toggleClass('pulse');
                 setTimeout(function(){
                     $('#timeknob').toggleClass('pulse');
@@ -314,14 +315,14 @@ jQuery(document).ready(function($){ 'use strict';
 
     // click on playlist tab
     $('#open-panel-dx a').click(function(){
-        var current = parseInt(GUI.json['song']);
+        var current = parseInt(GUI.MpdState['song']);
         customScroll('pl', current, 200); // da eseguire sul tab ready!
     });
 
     // click on playback tab
     $('#open-playback a').click(function(){
         // fai qualcosa
-        // console.log('JSON = ', GUI.json);
+        // console.log('JSON = ', GUI.MpdState);
     });
 
 

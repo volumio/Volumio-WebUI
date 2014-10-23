@@ -27,70 +27,77 @@
  *
  */
  
-// common include
 include('inc/connection.php');
 playerSession('open',$db,'',''); 
-?>
 
-<?php
-// setup endless loop
-//set_time_limit(0);
-
-if ( !$mpd) {
+if (!$mpd) {
     	echo 'Error Connecting MPD Daemon';
+
 } else {
 		// fetch MPD status
 		$status = _parseStatusResponse(MpdStatus($mpd));
-		
+
 		// check for CMediaFix
 		if (isset($_SESSION['cmediafix']) && $_SESSION['cmediafix'] == 1) {
-		$_SESSION['lastbitdepth'] = $status['audio'];
+			$_SESSION['lastbitdepth'] = $status['audio'];
+
 		}
 		
 		// check for Ramplay
 		if (isset($_SESSION['ramplay']) && $_SESSION['ramplay'] == 1) {
 			// record "lastsongid" in PHP SESSION
 			$_SESSION['lastsongid'] = $status['songid'];
+
 			// controllo per cancellazione ramplay
 				// if (!rp_checkPLid($_SESSION['lastsongid'],$mpd)) {
 				// rp_deleteFile($_SESSION['lastsongid'],$mpd);
 				// }
 			// recupero id nextsong e metto in sessione
 			$_SESSION['nextsongid'] = $status['nextsongid']; 
+
 		}
-// register player STATE in SESSION
-$_SESSION['state'] = $status['state'];
-// Unlock SESSION file
-session_write_close(); 
-// -----  check and compare GUI state with Backend state  ----  //
-// idle LOOP
+
+		// register player STATE in SESSION
+		$_SESSION['state'] = $status['state'];
+
+		// Unlock SESSION file
+		session_write_close();
+
+		// -----  check and compare GUI state with Backend state  ----  //
 		if ($_GET['state'] == $status['state']) {
+		// If the playback state is the same as specified in the ajax call
+			// Wait until the status changes and then return new status
 			$status = monitorMpdState($mpd);
+
 		} 
-// idle LOOP
-// -----  check and compare GUI state with Backend state  ----  //
+		// -----  check and compare GUI state with Backend state  ----  //
 
-			$curTrack = getTrackInfo($mpd,$status['song']);
+		$curTrack = getTrackInfo($mpd,$status['song']);
 
-			if (isset($curTrack[0]['Title'])) {
+		if (isset($curTrack[0]['Title'])) {
 			$status['currentartist'] = $curTrack[0]['Artist'];
 			$status['currentsong'] = $curTrack[0]['Title'];
 			$status['currentalbum'] = $curTrack[0]['Album'];
 			$status['fileext'] = parseFileStr($curTrack[0]['file'],'.');
-			} else {
+
+		} else {
 			$path = parseFileStr($curTrack[0]['file'],'/');
 			$status['fileext'] = parseFileStr($curTrack[0]['file'],'.');
 			$status['currentartist'] = "";
 			$status['currentsong'] = $song;
 			$status['currentalbum'] = "path: ".$path;
-			}
-		
+
+		}
+
 		// CMediaFix
 		if (isset($_SESSION['cmediafix']) && $_SESSION['cmediafix'] == 1 && $status['state'] == 'play' ) {
 			$status['lastbitdepth'] = $_SESSION['lastbitdepth'];
-				if ($_SESSION['lastbitdepth'] != $status['audio']) {
-					sendMpdCommand($mpd,'cmediafix');
-				}
+
+			if ($_SESSION['lastbitdepth'] != $status['audio']) {
+				sendMpdCommand($mpd,'cmediafix');
+
+			}
+
 		}
 		
 		// Ramplay
@@ -103,15 +110,20 @@ session_write_close();
 
 			// copio il pezzo in /dev/shm
 			$path = rp_copyFile($status['nextsongid'],$mpd);
+
 			// lancio update mdp locazione ramplay
 			rp_updateFolder($mpd);
+
 			// lancio addandplay canzone
 			rp_addPlay($path,$mpd,$status['playlistlength']);
+
 		}
-		
-		
+
 		// JSON response for GUI
 		echo json_encode($status);
 		
-closeMpdSocket($mpd);	
+	closeMpdSocket($mpd);
+
 }
+
+?>
