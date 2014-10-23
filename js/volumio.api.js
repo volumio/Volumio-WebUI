@@ -29,7 +29,8 @@
 
  // Global GUI object
  GUI = {
-    json: 0,
+    MpdState: 0,
+	SpopState: 0,
     cmd: 'status',
     playlist: null,
     currentsong: null,
@@ -74,12 +75,12 @@ function sendPLCmd(inputcmd) {
 function backendRequest() {
     $.ajax({
         type : 'GET',
-        url : '_player_engine.php?state=' + GUI.state,
+        url : '_player_engine.php?state=' + GUI.MpdState['state'],
         async : true,
         cache : false,
         success : function(data) {
-            renderUI(data);
-            GUI.currentsong = GUI.json['currentsong'];
+			GUI.MpdState = eval('(' + data + ')');
+            renderUI();
             backendRequest();
         },
         error : function() {
@@ -94,21 +95,64 @@ function backendRequest() {
     });
 }
 
-function renderUI(data) {
-    // update global GUI array
-    GUI.json = eval('(' + data + ')');
-    GUI.state = GUI.json['state'];
-    updateGUI(GUI.json);
+function backendRequestSpop() {
+    $.ajax({
+        type : 'GET',
+        url : '_player_engine_spop.php?state=' + GUI.SpopState['state'],
+        async : true,
+        cache : false,
+        success : function(data) {
+			if (data != '') {
+				GUI.SpopState = eval('(' + data + ')');
+				renderUI();
+	            backendRequestSpop();
+			} else {
+				setTimeout(function() {
+					backendRequestSpop();
+				}, 5000);
+			}
+        },
+        error : function() {
+            setTimeout(function() {
+                backendRequestSpop();
+            }, 5000);
+        }
+    });
+}
+
+function renderUI() {
+	if (GUI.SpopState['state'] == 'play' || GUI.SpopState['state'] == 'pause') {
+	// If Spop is playing, temporarily redirect button control and title display to Spop
+	    GUI.state = GUI.SpopState['state'];
+
+		// Combine the Spop state array with the Mpd state array - any state variable defined by Spop will overwrite the corresponding Mpd state variable
+		// This is a temporary way to get a few UI elements to reflect Spop status (playback control buttons, song title) while the rest reflect Mpd status (seek, timer, volume, etc)
+		var objectCombinedState = $.extend({}, GUI.MpdState, GUI.SpopState);
+	    updateGUI(objectCombinedState);
+
+	} else {
+	// Else UI should be connected to MPD status
+	    GUI.state = GUI.MpdState['state'];
+	    updateGUI(GUI.MpdState);
+
+	}
+
     if (GUI.state != 'disconnected') {
         $('#loader').hide();
+
     }
-    refreshTimer(parseInt(GUI.json['elapsed']), parseInt(GUI.json['time']), GUI.json['state']);
-    refreshKnob(GUI.json);
-    if (GUI.json['playlist'] != GUI.playlist) {
-        getPlaylist(GUI.json);
-        GUI.playlist = GUI.json['playlist'];
+
+    refreshTimer(parseInt(GUI.MpdState['elapsed']), parseInt(GUI.MpdState['time']), GUI.MpdState['state']);
+    refreshKnob(GUI.MpdState);
+
+    if (GUI.MpdState['playlist'] != GUI.playlist) {
+        getPlaylist(GUI.MpdState);
+        GUI.playlist = GUI.MpdState['playlist'];
+
     }
+
     GUI.halt = 0;
+
 }
 
 function getPlaylist(json){
@@ -411,14 +455,14 @@ function populateDB(data, path, uplevel, keyword){
 }
 
 // update interface
-function updateGUI(json){
+function updateGUI(objectInputState){
     // check MPD status
-    refreshState(GUI.state);
+    refreshState(objectInputState['state']);
     // check song update
-    if (GUI.currentsong != json['currentsong']) {
+    if (GUI.currentsong != objectInputState['currentsong']) {
         countdownRestart(0);
         if ($('#panel-dx').hasClass('active')) {
-            var current = parseInt(json['song']);
+            var current = parseInt(objectInputState['song']);
             customScroll('pl', current);
         }
     }
@@ -427,38 +471,38 @@ function updateGUI(json){
     // Don't update the knob if it's currently being changed
     var volume = $('#volume');
     if (volume[0] && (volume[0].knobEvents === undefined || !volume[0].knobEvents.isSliding)) {
-        volume.val((json['volume'] == '-1') ? 100 : json['volume']).trigger('change');
+        volume.val((objectInputState['volume'] == '-1') ? 100 : objectInputState['volume']).trigger('change');
     }
-    $('#currentartist').html(json['currentartist']);
-    $('#currentsong').html(json['currentsong']);
-    $('#currentalbum').html(json['currentalbum']);
-    if (json['repeat'] == 1) {
+    $('#currentartist').html(objectInputState['currentartist']);
+    $('#currentsong').html(objectInputState['currentsong']);
+    $('#currentalbum').html(objectInputState['currentalbum']);
+    if (objectInputState['repeat'] == 1) {
         $('#repeat').addClass('btn-primary');
     } else {
         $('#repeat').removeClass('btn-primary');
     }
-    if (json['random'] == 1) {
+    if (objectInputState['random'] == 1) {
         $('#random').addClass('btn-primary');
     } else {
         $('#random').removeClass('btn-primary');
     }
-    if (json['consume'] == 1) {
+    if (objectInputState['consume'] == 1) {
         $('#consume').addClass('btn-primary');
     } else {
         $('#consume').removeClass('btn-primary');
     }
-    if (json['single'] == 1) {
+    if (objectInputState['single'] == 1) {
         $('#single').addClass('btn-primary');
     } else {
         $('#single').removeClass('btn-primary');
     }
 
     GUI.halt = 0;
-    GUI.currentsong = json['currentsong'];
-	GUI.currentartist = json['currentartist'];
+    GUI.currentsong = objectInputState['currentsong'];
+	GUI.currentartist = objectInputState['currentartist'];
 	//Change Name according to Now Playing
 	if (GUI.currentartist!=null && GUI.currentsong!=null) {
-	document.title = json['currentsong'] + ' - ' + json['currentartist'] + ' - ' + 'Volumio';
+	document.title = objectInputState['currentsong'] + ' - ' + objectInputState['currentartist'] + ' - ' + 'Volumio';
 	} else {
             document.title = 'Volumio - Audiophile Music Player';
         }
@@ -487,20 +531,25 @@ function refreshState(state) {
         $('.playlist li').removeClass('active');
     }
     if (state == 'play' || state == 'pause') {
-        $('#elapsed').html(timeConvert(GUI.json['elapsed']));
-        $('#total').html(timeConvert(GUI.json['time']));
+        $('#elapsed').html(timeConvert(GUI.MpdState['elapsed']));
+        $('#total').html(timeConvert(GUI.MpdState['time']));
         //$('#time').val(json['song_percent']).trigger('change');
-        $('#playlist-position').html('Playlist position ' + (parseInt(GUI.json['song']) + 1) +'/'+GUI.json['playlistlength']);
-        var fileinfo = (GUI.json['audio_channels'] && GUI.json['audio_sample_depth'] && GUI.json['audio_sample_rate']) ? (GUI.json['audio_channels'] + ' - ' + GUI.json['audio_sample_depth'] + ' bit - ' + GUI.json['audio_sample_rate'] +' kHz ') : '&nbsp;';
+        $('#playlist-position').html('Playlist position ' + (parseInt(GUI.MpdState['song']) + 1) +'/'+GUI.MpdState['playlistlength']);
+        var fileinfo = (GUI.MpdState['audio_channels'] && GUI.MpdState['audio_sample_depth'] && GUI.MpdState['audio_sample_rate']) ? (GUI.MpdState['audio_channels'] + ' - ' + GUI.MpdState['audio_sample_depth'] + ' bit - ' + GUI.MpdState['audio_sample_rate'] +' kHz ') : '&nbsp;';
         $('#format-bitrate').html(fileinfo);
         $('.playlist li').removeClass('active');
-        var current = parseInt(GUI.json['song']) + 1;
-        $('.playlist li:nth-child(' + current + ')').addClass('active');
+        var current = parseInt(GUI.MpdState['song']) + 1;
+
+		if (!isNaN(current)) {
+	        $('.playlist li:nth-child(' + current + ')').addClass('active');
+
+		}
+
     }
 	
 	// show UpdateDB icon
-	// console.log('dbupdate = ', GUI.json['updating_db']);
-	if (typeof GUI.json['updating_db'] != 'undefined') {
+	// console.log('dbupdate = ', GUI.MpdState['updating_db']);
+	if (typeof GUI.MpdState['updating_db'] != 'undefined') {
 		$('.open-panel-sx').html('<i class="fa fa-refresh fa-spin"></i> Updating');
 	} else {
 		$('.open-panel-sx').html('<i class="fa fa-music sx"></i> Browse');

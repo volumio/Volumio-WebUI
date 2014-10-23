@@ -37,16 +37,51 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
         echo 'Error Connecting to MPD daemon ';
 		
 		} else {
-		
-			sendMpdCommand($mpd,$_GET['cmd']);
-			closeMpdSocket($mpd);
+			$sRawCommand = $_GET['cmd'];
+			$sSpopCommand = NULL;
+
+			if ($spop) {
+			// If Spop daemon connected
+				$stringSpopState = getSpopState($spop,"CurrentState")['state'];
+
+				if (strcmp($stringSpopState, 'play') == 0 || strcmp($stringSpopState, 'pause') == 0) {
+				// If spotify playback mode
+					if (strcmp($sRawCommand, "previous") == 0) {
+						$sSpopCommand = "prev";
+
+					} else if (strcmp($sRawCommand, "pause") == 0) {
+						$sSpopCommand = "toggle";
+
+					} else if (strcmp($sRawCommand, "play") == 0 || strcmp($sRawCommand, "next") == 0) {
+						$sSpopCommand = $sRawCommand;
+
+					} else if (strcmp($sRawCommand, "stop") == 0) {
+						$sSpopCommand = $sRawCommand;
+					}
+
+				}
+
+			}
+
+			if (isset($sSpopCommand)) {
+			// If command is to be passed to spop
+				sendSpopCommand($spop,$sSpopCommand);
+				closeSpopSocket($spop);
+
+			} else {
+			// Else pass command to MPD
+				sendMpdCommand($mpd,$sRawCommand);
+				closeMpdSocket($mpd);
+
+			}
+
         }
 
 } else {
+	echo 'MPD COMMAND INTERFACE<br>';
+	echo 'INTERNAL USE ONLY<br>';
+	echo 'hosted on raspyfi.local:82';
 
-echo 'MPD COMMAND INTERFACE<br>';
-echo 'INTERNAL USE ONLY<br>';
-echo 'hosted on raspyfi.local:82';
 }
 ?>
 

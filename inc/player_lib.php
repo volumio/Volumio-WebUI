@@ -34,9 +34,12 @@ define("MPD_RESPONSE_OK",  "OK");
 // Spotify daemon communication functions
 function openSpopSocket($host, $portSpop) {
 	$sock = stream_socket_client('tcp://'.$host.':'.$portSpop.'', $errorno, $errorstr, 30 );
-	
-	// First response is typically "spop [version]"
-	$response = readSpopResponse($sock);
+
+	if ($sock) {
+		// First response is typically "spop [version]"
+		$response = fgets($sock);
+
+	}
 
 	return $sock;
 }
@@ -51,12 +54,19 @@ function sendSpopCommand($sock, $cmd) {
 	$cmd = $cmd."\n";
 	fputs($sock, $cmd);
 
-}
+	while(!feof($sock)) {
+		// fgets() may time out during the wait for response from commands like 'idle'.
+		// This loop will keep reading until a response is received, or until the socket closes.
+		$output = fgets($sock);
 
-function readSpopResponse($sock) {
-	$output = fgets($sock);
+		if ($output) {
+			break;
 
-	return $output;
+		}
+
+	}
+
+	return _parseSpopResponse($output);
 }
 
 // v2
@@ -198,18 +208,70 @@ function enqueueAll($sock, $json) {
 	chainMpdCommands($sock, $commands);
 }
 
-// v2
+// v2, Does not return until a change occurs.
 function sendMpdIdle($sock) {
 sendMpdCommand($sock,"idle"); 
 $response = readMpdResponse($sock);
 return true;
 }
 
+// Return state array for MPD. Does not return until a change occurs.
 function monitorMpdState($sock) {
 	if (sendMpdIdle($sock)) {
 	$status = _parseStatusResponse(MpdStatus($sock));
 	return $status;
 	}
+}
+
+// Return state array for spop daemon.
+function getSpopState($sock, $mode) {
+	$arrayReturn = array();
+
+	if (strcmp($mode, "CurrentState") == 0) {
+	// Return the current state array
+		$arrayResponse = sendSpopCommand($sock, "status");
+
+	} else if (strcmp($mode, "NextState") == 0) {
+	// Return a state array when a change has occured
+		$arrayResponse = sendSpopCommand($sock, "idle");
+
+	}
+
+	// Format the response to be understandable by Volumio
+	if (array_key_exists("status", $arrayResponse) == TRUE) {
+		if (strcmp($arrayResponse["status"], "stopped") == 0) {
+			$arrayReturn["state"] = "stop";
+
+		} else if (strcmp($arrayResponse["status"], "playing") == 0) {
+			$arrayReturn["state"] = "play";
+
+		} else if (strcmp($arrayResponse["status"], "paused") == 0) {
+			$arrayReturn["state"] = "pause";
+
+		} else {
+			$arrayReturn["state"] = $arrayResponse["status"];
+
+		}
+
+	}
+
+	if (array_key_exists("title", $arrayResponse) == TRUE) {
+		$arrayReturn["currentsong"] = $arrayResponse["title"];
+
+	}
+
+	if (array_key_exists("artist", $arrayResponse) == TRUE) {
+		$arrayReturn["currentartist"] = $arrayResponse["artist"];
+
+	}
+
+	if (array_key_exists("album", $arrayResponse) == TRUE) {
+		$arrayReturn["currentalbum"] = $arrayResponse["album"] . "<br />[Spotify Temporary Playback]</b>";
+
+	}
+
+	return $arrayReturn;
+
 }
 
 function getTrackInfo($sock,$songID) {
@@ -345,8 +407,7 @@ function _getSpopListing($sock, $queryString) {
 
 	} else if (strncmp($queryString, "SPOTIFY", 7) == 0) {
 	// Looking into the SPOTIFY folder
-		sendSpopCommand($sock,"ls");
-		$arrayResponse = _parseSpopResponse(readSpopResponse($sock));
+		$arrayResponse = sendSpopCommand($sock,"ls");
 		$arrayQueryStringParts = preg_split( "(@|/)", $queryString);
 		$nQueryStringParts = count($arrayQueryStringParts);
 		$sCurrentDirectory = "SPOTIFY";
@@ -365,8 +426,7 @@ function _getSpopListing($sock, $queryString) {
 
 			if (strcmp($arrayResponse["playlists"][$arrayQueryStringParts[$i]]["type"], "playlist") == 0) { 
 			// This is a playlist, navigate into it and stop
-				sendSpopCommand($sock,"ls " . $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"]);
-				$arrayResponse = _parseSpopResponse(readSpopResponse($sock));
+				$arrayResponse = sendSpopCommand($sock,"ls " . $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"]);
 				break;
 
 			} else {
@@ -482,55 +542,66 @@ function _parseFileListResponse($resp) {
 
 // format Output for "status"
 function _parseStatusResponse($resp) {
-		if ( is_null($resp) ) {
-			return NULL;
-		} else {
-			$plistArray = array();
-			$plistLine = strtok($resp,"\n");
-			$plistFile = "";
-			$plCounter = -1;
-			while ( $plistLine ) {
-				list ( $element, $value ) = explode(": ",$plistLine,2);
-				$plistArray[$element] = $value;
-				$plistLine = strtok("\n");
-			} 
-			// "elapsed time song_percent" added to output array
-			 $time = explode(":", $plistArray['time']);
-			 if ($time[0] != 0) {
-			 $percent = round(($time[0]*100)/$time[1]);	
-			 } else {
-			 	$percent = 0;
-			 }
-			 $plistArray["song_percent"] = $percent;
-			 $plistArray["elapsed"] = $time[0];
-			 $plistArray["time"] = $time[1];
+	if ( is_null($resp) ) {
+		return NULL;
 
-			 // "audio format" output
-			 	$audio_format = explode(":", $plistArray['audio']);
-				switch ($audio_format[0]) {
-					case '48000':
-					case '96000':
-					case '192000':
-					$plistArray['audio_sample_rate'] = rtrim(rtrim(number_format($audio_format[0]),0),',');
-					break;
-					
-					case '44100':
-					case '88200':
-					case '176400':
-					case '352800':
-					$plistArray['audio_sample_rate'] = rtrim(number_format($audio_format[0],0,',','.'),0);
-					break;
-				}
-			 // format "audio_sample_depth" string
-			 	$plistArray['audio_sample_depth'] = $audio_format[1];
-			 // format "audio_channels" string
-			 	if ($audio_format[2] == "2") $plistArray['audio_channels'] = "Stereo";
-			 	if ($audio_format[2] == "1") $plistArray['audio_channels'] = "Mono";
-			 	if ($audio_format[2] > 2) $plistArray['audio_channels'] = "Multichannel";
+	} else {
+		$plistArray = array();
+		$plistLine = strtok($resp,"\n");
+		$plistFile = "";
+		$plCounter = -1;
+
+		while ( $plistLine ) {
+			list ( $element, $value ) = explode(": ",$plistLine,2);
+			$plistArray[$element] = $value;
+			$plistLine = strtok("\n");
 
 		}
-		return $plistArray;
+
+		// "elapsed time song_percent" added to output array
+		$time = explode(":", $plistArray['time']);
+
+		if ($time[0] != 0) {
+			$percent = round(($time[0]*100)/$time[1]);
+
+		} else {
+			$percent = 0;
+
+		}
+
+		$plistArray["song_percent"] = $percent;
+		$plistArray["elapsed"] = $time[0];
+		$plistArray["time"] = $time[1];
+
+		// "audio format" output
+		$audio_format = explode(":", $plistArray['audio']);
+		switch ($audio_format[0]) {
+			case '48000':
+			case '96000':
+			case '192000':
+			$plistArray['audio_sample_rate'] = rtrim(rtrim(number_format($audio_format[0]),0),',');
+			break;
+
+			case '44100':
+			case '88200':
+			case '176400':
+			case '352800':
+			$plistArray['audio_sample_rate'] = rtrim(number_format($audio_format[0],0,',','.'),0);
+			break;
+		}
+
+		// format "audio_sample_depth" string
+			$plistArray['audio_sample_depth'] = $audio_format[1];
+
+		// format "audio_channels" string
+			if ($audio_format[2] == "2") $plistArray['audio_channels'] = "Stereo";
+			if ($audio_format[2] == "1") $plistArray['audio_channels'] = "Mono";
+			if ($audio_format[2] > 2) $plistArray['audio_channels'] = "Multichannel";
+
 	}
+
+	return $plistArray;
+}
 
 // get file extension
 function parseFileStr($strFile,$delimiter) {
