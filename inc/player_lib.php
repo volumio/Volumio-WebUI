@@ -45,31 +45,32 @@ function openSpopSocket($host, $portSpop) {
 }
 
 function closeSpopSocket($sock) {
-	if ($sock) {
-		sendSpopCommand($sock,"bye");
-		fclose($sock);
-
-	}
+	sendSpopCommand($sock,"bye");
+	fclose($sock);
 
 }
 
 function sendSpopCommand($sock, $cmd) {
-	$cmd = $cmd."\n";
-	fputs($sock, $cmd);
+	if ($sock) {
+		$cmd = $cmd."\n";
+		fputs($sock, $cmd);
 
-	while(!feof($sock)) {
-		// fgets() may time out during the wait for response from commands like 'idle'.
-		// This loop will keep reading until a response is received, or until the socket closes.
-		$output = fgets($sock);
+		while(!feof($sock)) {
+			// fgets() may time out during the wait for response from commands like 'idle'.
+			// This loop will keep reading until a response is received, or until the socket closes.
+			$output = fgets($sock);
 
-		if ($output) {
-			break;
+			if ($output) {
+				break;
+
+			}
 
 		}
 
+		return _parseSpopResponse($output);
+
 	}
 
-	return _parseSpopResponse($output);
 }
 
 // v2
