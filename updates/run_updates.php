@@ -51,7 +51,12 @@ function runFirstUpdateDb() {
     log_update("... Run DB initial script");
     runSQL("init-db-updates.sql");
 }
+?>
 
+        
+      
+          
+<?php 
 // Ensure DB file is present (else, create it from dump) and that it contains at least the "udpates" table (else, create it)
 function checkDbSetup() {
     global $dbh;
@@ -125,5 +130,4 @@ checkForUpdates();
 // close SQLite handle
 $dbh = null;
 ?>
-
 <br/><br/>Volumio has been updated. <a href='/index.php'>Click here to continue</a>.

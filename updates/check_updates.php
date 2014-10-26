@@ -74,12 +74,24 @@ if (!$isUpToDate) {
             document.getElementById("update-report").style = "display: block;";
         }
     </script>
-
-    The current version needs to apply some system or DB updates before being used. <a href='updates/run_updates.php'>Click here to proceed</a>, <a href='javascript:showReport()'>here to show report</a> or <a href='index.php?skip_updates=1'>here to ignore</a> (at your own risk)<br/><br/>
-
+	
+<div id="ModalStart" class="modal" tabindex="-1" role="dialog" aria-labelledby="update-modal" aria-hidden="true">
+		<div class="modal-header">
+		<h3 id="update-modal-label"> New Updates Available</h3>
+		</div>
+    <div class="modal-body">
+	New Updates found on your system. Please apply them, or ignore at your own risk.
+		  </div>
+		  <div class="modal-footer">
+			<div class="form-actions">
+			<a href="index.php?skip_updates=1" class="btn btn-primary btn-large" name="save">Ignore</a>
+			<a href="updates/run_updates.php" class="btn btn-large" data-dismiss="modal" aria-hidden="true">Update</a>
+			
+        </div>
+		</div>
+</div>
 <?
     echo $htmlReport;
     exit;
 }
-
 ?>

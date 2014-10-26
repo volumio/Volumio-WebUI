@@ -17,12 +17,31 @@
 	<div id="webradio-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="webradio-modal-label" aria-hidden="true">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h3 id="poweroff-modal-label">Add New WebRadio</h3>
+			<h3 id="webradio-modal-label">Add New WebRadio</h3>
 		</div>
 		<div class="modal-body">
 			<form action="settings.php" method="POST">	
 		<input name="radio-name" type="text" placeholder="WebRadio Name" />
 		<input name="radio-url" type="text" placeholder="WebRadio URL"/>
+		</form>
+		</div>
+		<div class="modal-footer">
+			<div class="form-actions">
+            <button class="btn btn-large" data-dismiss="modal" aria-hidden="true">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-large" name="save" value="save">Add</button>
+        </div>
+		</div>
+	</div>
+</form>
+<form class="form-horizontal" action="" method="post">
+	<div id="update-modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="update-modal-label" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3 id="update-modal-label">Add New WebRadio</h3>
+		</div>
+		<div class="modal-body">
+			<form action="updates/check_updates.php" method="POST">	
+		Cose varie da dire
 		</form>
 		</div>
 		<div class="modal-footer">

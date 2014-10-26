@@ -26,14 +26,11 @@
  * version:						1.0
  *
  */
+ 
+include('inc/connection.php');
+ 
 
 // common include
-include('inc/connection.php');
-
-// Check updates before everything else, since if state is outdated then other parts of the webui may crash
-if (!isset($_GET['skip_updates']) || $_GET['skip_updates'] != '1') {
-    include('updates/check_updates.php');
-}
 
 playerSession('open',$db,'','');
 playerSession('unlock',$db,'','');
@@ -49,7 +46,9 @@ $_section = $sezione;
 include('_header.php');
 
 ?>
-
+<?php if (!isset($_GET['skip_updates']) || $_GET['skip_updates'] != '1') { 
+include('updates/check_updates.php'); 
+ } ?>
 <!-- content --!>
 <?php
 eval("echoTemplate(\"".getTemplate("templates/$tpl")."\");");
