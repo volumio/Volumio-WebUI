@@ -302,8 +302,11 @@ echo $template;
 // Perform Spotify database query/search
 function querySpopDB($sock, $queryType, $queryString) {
 
-	if(strcmp($queryType, "filepath") == 0) {
+	if (strcmp($queryType, "filepath") == 0) {
 		return _getSpopListing($sock, $queryString);
+
+	} else if (strcmp($queryType, "file") == 0) {
+		return _searchSpopTracks($sock, $queryString);
 
 	}
 
@@ -395,6 +398,29 @@ function sysCmd($syscmd) {
 function _parseSpopResponse($resp) {
 	return json_decode($resp, true);
 
+}
+
+// Perform a Spotify search
+function _searchSpopTracks($sock, $queryString) {
+	$arrayReturn = array();
+	$arrayResponse = sendSpopCommand($sock,"search \"" . $queryString . "\"");
+
+	$i = 0;
+	$nItems = sizeof($arrayResponse["tracks"]);
+	while ($i < $nItems) {
+		$arrayCurrentEntry = array();
+		$arrayCurrentEntry["Type"] = "SpopTrack";
+		$arrayCurrentEntry["SpopTrackUri"] = (string)$arrayResponse["tracks"][$i]["uri"];
+		$arrayCurrentEntry["Title"] = $arrayResponse["tracks"][$i]["title"];
+		$arrayCurrentEntry["Artist"] = $arrayResponse["tracks"][$i]["artist"];
+		$arrayCurrentEntry["Album"] = $arrayResponse["tracks"][$i]["album"];
+
+		array_push($arrayReturn, $arrayCurrentEntry);
+
+		$i++;
+	}
+
+	return $arrayReturn;
 }
 
 // Make an array describing the requested level of the Spop database

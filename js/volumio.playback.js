@@ -407,8 +407,16 @@ jQuery(document).ready(function($){ 'use strict';
 			$.post('db/?cmd=spop-playtrackuri', { 'path': path }, function(data) {}, 'json');
 
         }
+        if ($(this).data('cmd') == 'spop-addtrackuri') {
+			$.post('db/?cmd=spop-addtrackuri', { 'path': path }, function(data) {}, 'json');
+
+        }
         if ($(this).data('cmd') == 'spop-playplaylistindex') {
 			$.post('db/?cmd=spop-playplaylistindex', { 'path': path }, function(data) {}, 'json');
+
+        }
+        if ($(this).data('cmd') == 'spop-addplaylistindex') {
+			$.post('db/?cmd=spop-addplaylistindex', { 'path': path }, function(data) {}, 'json');
 
         }
         if ($(this).data('cmd') == 'spop-stop') {
