@@ -357,7 +357,7 @@ jQuery(document).ready(function($){ 'use strict';
             }
         }
     });
-
+	// Double-click play 
     $('.database').on('dblclick', '.db-song', function() {
         $('.database li').removeClass('active');
         $(this).parent().addClass('active');
@@ -373,6 +373,15 @@ jQuery(document).ready(function($){ 'use strict';
         var path = $(this).parent().data('path');
         //console.log('doubleclicked path = ', path);
         $.post('db/?cmd=spop-playtrackuri', { 'path': path }, function(data) {}, 'json');
+    });
+    
+    $('.database').on('dblclick', '.db-other', function() {
+        $('.database li').removeClass('active');
+        $(this).parent().addClass('active');
+        var path = $(this).parent().data('path');
+        //console.log('doubleclicked path = ', path);
+        getDB('addplay', path);
+        notify('add', path);
     });
 
     // click on ADD button
