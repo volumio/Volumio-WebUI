@@ -118,8 +118,18 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 				
 				case 'search':
 					if (isset($_POST['query']) && $_POST['query'] != '' && isset($_GET['querytype']) && $_GET['querytype'] != '') {
-						echo json_encode(searchDB($mpd,$_GET['querytype'],$_POST['query']));
+						$arraySearchResults = searchDB($mpd,$_GET['querytype'],$_POST['query']);
+
+						if ($spop) {
+							$arraySpopSearchResults = querySpopDB($spop, 'file', $_POST['query']);
+							$arraySearchResults = array_merge($arraySearchResults, $arraySpopSearchResults);
+
+						}
+
+						echo json_encode($arraySearchResults);
+
 					}
+
 					break;
 
 				case 'loadlib':
@@ -145,11 +155,24 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 					}
 					break;
 
+				case 'spop-addtrackuri':
+					if (isset($_POST['path']) && $_POST['path'] != '') {
+						echo sendSpopCommand($spop, "uadd " . $_POST['path']);
+					}
+					break;
+
 				case 'spop-playplaylistindex':
 					if (isset($_POST['path']) && $_POST['path'] != '') {
 						$sSpopPlaylistIndex = end(explode("@", $_POST['path']));
 						sendMpdCommand($mpd,'stop');
 						echo sendSpopCommand($spop, "play " . $sSpopPlaylistIndex);
+					}
+					break;
+
+				case 'spop-addplaylistindex':
+					if (isset($_POST['path']) && $_POST['path'] != '') {
+						$sSpopPlaylistIndex = end(explode("@", $_POST['path']));
+						echo sendSpopCommand($spop, "add " . $sSpopPlaylistIndex);
 					}
 					break;
 
