@@ -366,6 +366,14 @@ jQuery(document).ready(function($){ 'use strict';
         getDB('addplay', path);
         notify('add', path);
     });
+    
+    $('.database').on('dblclick', '.db-browse', function() {
+        $('.database li').removeClass('active');
+        $(this).parent().addClass('active');
+        var path = $(this).parent().data('path');
+        //console.log('doubleclicked path = ', path);
+        $.post('db/?cmd=spop-playtrackuri', { 'path': path }, function(data) {}, 'json');
+    });
 
     // click on ADD button
     $('.database').on('click', '.db-action', function() {
