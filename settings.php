@@ -155,6 +155,23 @@ if (isset($_POST['syscmd'])){
 			// unlock session file
 			playerSession('unlock');
 	break;
+	
+	case 'updateui':
+	
+			if ($_SESSION['w_lock'] != 1 && $_SESSION['w_queue'] == '') {
+			// start / respawn session
+			session_start();
+			$_SESSION['w_queue'] = "updateui";
+			$_SESSION['w_active'] = 1;
+			// set UI notify
+			$_SESSION['notify']['title'] = 'Update';
+			$_SESSION['notify']['msg'] = 'Retrieving Updates, if available';
+			// unlock session file
+			playerSession('unlock');
+			} else {
+			echo "background worker busy";
+			}
+	break;
 		
 	case 'totalbackup':
 		
