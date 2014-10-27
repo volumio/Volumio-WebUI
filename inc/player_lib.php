@@ -1245,8 +1245,8 @@ function wrk_mpdconf($outpath,$db) {
 	foreach ($mpdcfg as $cfg) {
 		if ($cfg['param'] == 'audio_output_format' && $cfg['value_player'] == 'disabled'){
 		$output .= '';
-		} else if ($cfg['param'] == 'dsd_usb') {
-		$dsd = $cfg['value_player'];
+		} else if ($cfg['param'] == 'dop') {
+		$dop = $cfg['value_player'];
 		} else if ($cfg['param'] == 'device') {
 		$device = $cfg['value_player'];
 		var_export($device);
@@ -1283,7 +1283,7 @@ function wrk_mpdconf($outpath,$db) {
 	$output .= "\t\t mixer_index \t\"0\"\n";
 	//$output .= "\t\t mixer_index \t\"".$hwmixer['index']."\"\n";
 	}
-	$output .= "\t\t dsd_usb \t\"".$dsd."\"\n";
+	$output .= "\t\t dop \t\"".$dop."\"\n";
 	$output .= "\n}\n";
 
 // write mpd.conf file

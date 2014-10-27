@@ -125,7 +125,7 @@ $_mpd = array (
 										'mixer_type' => '',
 										'audio_buffer_size' => '',
 										'buffer_before_play' => '',
-										'dsd_usb' => '',
+										'dop' => '',
 										'device' => '',
 										'volume_normalization' => ''
 									);
@@ -145,9 +145,9 @@ foreach ($mpdconf as $key => $value) {
 $_mpd_select['gapless_mp3_playback'] .= "<option value=\"yes\" ".(($_mpd['gapless_mp3_playback'] == 'yes') ? "selected" : "")." >yes</option>\n";	
 $_mpd_select['gapless_mp3_playback'] .= "<option value=\"no\" ".(($_mpd['gapless_mp3_playback'] == 'no') ? "selected" : "")." >no</option>\n";
 
-// dsd_usb
-$_mpd_select['dsd_usb'] .= "<option value=\"yes\" ".(($_mpd['dsd_usb'] == 'yes') ? "selected" : "")." >yes</option>\n";	
-$_mpd_select['dsd_usb'] .= "<option value=\"no\" ".(($_mpd['dsd_usb'] == 'no') ? "selected" : "")." >no</option>\n";	
+// dsd_dop
+$_mpd_select['dop'] .= "<option value=\"yes\" ".(($_mpd['dop'] == 'yes') ? "selected" : "")." >yes</option>\n";	
+$_mpd_select['dop'] .= "<option value=\"no\" ".(($_mpd['dop'] == 'no') ? "selected" : "")." >no</option>\n";	
 
 
 //output device names

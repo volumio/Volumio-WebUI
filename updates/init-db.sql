@@ -117,7 +117,7 @@ INSERT INTO "cfg_mpd" VALUES(78,'optional_shout_output _parameters','timeout','_
 INSERT INTO "cfg_mpd" VALUES(79,'optional_shout_output _parameters','description','__description__','This specifies a description of the stream',NULL,NULL,NULL);
 INSERT INTO "cfg_mpd" VALUES(80,'optional_shout_output _parameters','genre','__genre__','This specifies the genre(s) of the stream',NULL,NULL,NULL);
 INSERT INTO "cfg_mpd" VALUES(81,'optional_parameters','group','__group__','This specifies the group that MPD will run as','audio','audio','');
-INSERT INTO "cfg_mpd" VALUES(82,'optional_alsa_output_parameters','dsd_usb','__yes or no__','enable DSD audio support.','yes','yes','');
+INSERT INTO "cfg_mpd" VALUES(82,'optional_alsa_output_parameters','dop','__yes or no__','enable DSD audio support.','no','no','');
 INSERT INTO "cfg_mpd" VALUES(83,'required_audio_output_parameters','device','_0,1,2_',NULL,'0','0',NULL);
 CREATE TABLE cfg_engine (
 id INTEGER PRIMARY KEY,
