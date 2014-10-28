@@ -5,7 +5,7 @@ function notify(command, msg) {
 			$.pnotify({
 				title: 'Added to playlist',
 				text: msg,
-				icon: 'fa fa-ok',
+				icon: 'fa fa-check',
 				opacity: .9
 			});
 		break;
