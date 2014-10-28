@@ -373,6 +373,11 @@ session_start();
 		sysCmd($cmd);
 		break;
 		
+		case 'updateui':
+		$cmd = 'git --work-tree=/var/www --git-dir=/var/www/.git pull origin master';
+		sysCmd($cmd);
+		break;
+		
 		case 'syschmod':
 		wrk_syschmod();
 		break;
