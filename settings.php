@@ -362,8 +362,8 @@ if (isset($_POST['hostname']) && $_POST['hostname'] != $_SESSION['hostname']){
 		// active worker queue
 		$_SESSION['w_active'] = 1;
 		} else {
-		$_SESSION['notify']['title'] = 'Job Failed';
-		$_SESSION['notify']['msg'] = 'background worker is busy.';
+		$_SESSION['notify']['title'] = 'Player Name Changed';
+		$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 		// open to read and modify
 
 
