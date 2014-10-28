@@ -52,11 +52,19 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 					} else if (strcmp($sRawCommand, "pause") == 0) {
 						$sSpopCommand = "toggle";
 
-					} else if (strcmp($sRawCommand, "play") == 0 || strcmp($sRawCommand, "next") == 0) {
+					} else if (strcmp(substr($sRawCommand,0,6), "random") == 0) {
+						$sSpopCommand = "shuffle";
+
+					} else if (strcmp(substr($sRawCommand,0,6), "repeat") == 0) {
+						$sSpopCommand = "repeat";
+
+					} else if (strcmp(substr($sRawCommand,0,6), "single") == 0 || strcmp(substr($sRawCommand,0,7), "consume") == 0) {
+						// Ignore command since spop does not support
+						$sSpopCommand = "";
+
+					} else if (strcmp($sRawCommand, "play") == 0 || strcmp($sRawCommand, "next") == 0 || strcmp($sRawCommand, "stop") == 0 || strcmp(substr($sRawCommand,0,4), "seek") == 0) {
 						$sSpopCommand = $sRawCommand;
 
-					} else if (strcmp($sRawCommand, "stop") == 0) {
-						$sSpopCommand = $sRawCommand;
 					}
 
 				}
@@ -65,13 +73,14 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 
 			if (isset($sSpopCommand)) {
 			// If command is to be passed to spop
-				sendSpopCommand($spop,$sSpopCommand);
-				closeSpopSocket($spop);
+				if (strcmp($sSpopCommand,"") != 0) {
+					sendSpopCommand($spop,$sSpopCommand);
+
+				}
 
 			} else {
 			// Else pass command to MPD
 				sendMpdCommand($mpd,$sRawCommand);
-				closeMpdSocket($mpd);
 
 			}
 
@@ -83,5 +92,16 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 	echo 'hosted on raspyfi.local:82';
 
 }
+
+if ($mpd) {
+	closeMpdSocket($mpd);
+
+}
+
+if ($spop) {
+	closeSpopSocket($spop);
+
+}
+
 ?>
 

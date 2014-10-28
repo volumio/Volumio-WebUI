@@ -140,7 +140,6 @@ jQuery(document).ready(function($){ 'use strict';
             } else {
                 cmd = $(this).attr('id') + ' 1';
             }
-            $(this).toggleClass('btn-primary');
         // send command
         } else {
             cmd = $(this).attr('id');
@@ -169,8 +168,32 @@ jQuery(document).ready(function($){ 'use strict';
 				GUI.halt = 1;
 				// console.log('GUI.halt (Knobs2)= ', GUI.halt);
 				window.clearInterval(GUI.currentKnob);
-				var seekto = Math.floor((value * parseInt(GUI.MpdState['time'])) / 1000);
-				sendCmd('seek ' + GUI.MpdState['song'] + ' ' + seekto);
+
+				var seekto = 0;
+				if (GUI.SpopState['state'] == 'play' || GUI.SpopState['state'] == 'pause') {
+					seekto = Math.floor((value * parseInt(GUI.SpopState['time'])) / 1000);
+					// Spop expects input to seek in ms
+					sendCmd('seek ' + seekto * 1000);
+					// Spop idle mode does not detect a seek change, so update UI manually
+					$.ajax({
+						type : 'GET',
+						url : '_player_engine_spop.php?state=manualupdate',
+						async : true,
+						cache : false,
+						success : function(data) {
+							if (data != '') {
+								GUI.SpopState = eval('(' + data + ')');
+								renderUI();
+							}
+						}
+					});
+
+				} else {
+					seekto = Math.floor((value * parseInt(GUI.MpdState['time'])) / 1000);
+					sendCmd('seek ' + GUI.MpdState['song'] + ' ' + seekto);
+
+				}
+
 				//console.log('seekto = ', seekto);
 				$('#time').val(value);
 				$('#countdown-display').countdown('destroy');

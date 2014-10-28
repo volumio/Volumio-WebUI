@@ -270,12 +270,60 @@ function getSpopState($sock, $mode) {
 	}
 
 	if (array_key_exists("album", $arrayResponse) == TRUE) {
-		$arrayReturn["currentalbum"] = $arrayResponse["album"] . "<br />[Spotify Temporary Playback]</b>";
+		$arrayReturn["currentalbum"] = $arrayResponse["album"] . "<br />[Spotify Temporary Playback Queue]</b>";
 
 	}
 
-	return $arrayReturn;
+	if (array_key_exists("repeat", $arrayResponse) == TRUE) {
+		if ($arrayResponse["repeat"] == TRUE) {
+			$arrayReturn["repeat"] = 1;
 
+		} else {
+			$arrayReturn["repeat"] = 0;
+
+		}
+
+	}
+
+	if (array_key_exists("shuffle", $arrayResponse) == TRUE) {
+		if ($arrayResponse["shuffle"] == TRUE) {
+			$arrayReturn["random"] = 1;
+
+		} else {
+			$arrayReturn["random"] = 0;
+
+		}
+
+	}
+
+	if (array_key_exists("position", $arrayResponse) == TRUE && array_key_exists("duration", $arrayResponse) == TRUE) {
+		$nTimeElapsed = round($arrayResponse["position"]);
+		$nTimeTotal = round($arrayResponse["duration"] / 1000);
+
+		if ($nTimeElapsed != 0) {
+			$nSeekPercent = round(($nTimeElapsed*100)/$nTimeTotal);
+
+		} else {
+			$nSeekPercent = 0;
+
+		}
+
+		$arrayReturn["song_percent"] = $nSeekPercent;
+		$arrayReturn["elapsed"] = $nTimeElapsed;
+		$arrayReturn["time"] = $nTimeTotal;
+
+	}
+
+	if (array_key_exists("current_track", $arrayResponse) == TRUE && array_key_exists("total_tracks", $arrayResponse) == TRUE) {
+		$arrayReturn["song"] = $arrayResponse["current_track"] - 1;
+		$arrayReturn["playlistlength"] = $arrayResponse["total_tracks"];
+
+	}
+
+	$arrayReturn["single"] = 0;
+	$arrayReturn["consume"] = 0;
+
+	return $arrayReturn;
 }
 
 function getTrackInfo($sock,$songID) {
