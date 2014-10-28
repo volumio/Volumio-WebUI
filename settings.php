@@ -358,7 +358,7 @@ if (isset($_POST['hostname']) && $_POST['hostname'] != $_SESSION['hostname']){
 		$_SESSION['w_queueargs'] = $_POST['hostname'];
 		// set UI notify
 		$_SESSION['notify']['title'] = 'Player Name Changed';
-		$_SESSION['notify']['msg'] = 'New Player Name is  '.$_POST['hostname'] ;
+		$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect'] ;
 		// active worker queue
 		$_SESSION['w_active'] = 1;
 		} else {
