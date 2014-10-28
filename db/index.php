@@ -178,16 +178,24 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 
 			}
 
-				
-		closeMpdSocket($mpd);
-		closeSpopSocket($spop);
 		}
 
 } else {
+	echo 'MPD DB INTERFACE<br>';
+	echo 'INTERNAL USE ONLY<br>';
+	echo 'hosted on raspyfi.local:81';
 
-echo 'MPD DB INTERFACE<br>';
-echo 'INTERNAL USE ONLY<br>';
-echo 'hosted on raspyfi.local:81';
 }
+
+if ($mpd) {
+	closeMpdSocket($mpd);
+
+}
+
+if ($spop) {
+	closeSpopSocket($spop);
+
+}
+
 ?>
 

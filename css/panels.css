@@ -6,6 +6,9 @@ html, body {
 	background: #525C66;
 	color: #eee;
 }
+body {
+	overflow-y: scroll;
+}
 #wrap {
 	margin: 0 auto -180px;
 	min-height: 100%;

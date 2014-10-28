@@ -126,14 +126,17 @@ function renderUI() {
 	    GUI.state = GUI.SpopState['state'];
 
 		// Combine the Spop state array with the Mpd state array - any state variable defined by Spop will overwrite the corresponding Mpd state variable
-		// This is a temporary way to get a few UI elements to reflect Spop status (playback control buttons, song title) while the rest reflect Mpd status (seek, timer, volume, etc)
 		var objectCombinedState = $.extend({}, GUI.MpdState, GUI.SpopState);
 	    updateGUI(objectCombinedState);
+		refreshTimer(parseInt(objectCombinedState['elapsed']), parseInt(objectCombinedState['time']), objectCombinedState['state']);
+		refreshKnob(objectCombinedState);
 
 	} else {
 	// Else UI should be connected to MPD status
 	    GUI.state = GUI.MpdState['state'];
 	    updateGUI(GUI.MpdState);
+		refreshTimer(parseInt(GUI.MpdState['elapsed']), parseInt(GUI.MpdState['time']), GUI.MpdState['state']);
+		refreshKnob(GUI.MpdState);
 
 	}
 
@@ -142,8 +145,6 @@ function renderUI() {
 
     }
 
-    refreshTimer(parseInt(GUI.MpdState['elapsed']), parseInt(GUI.MpdState['time']), GUI.MpdState['state']);
-    refreshKnob(GUI.MpdState);
 
     if (GUI.MpdState['playlist'] != GUI.playlist) {
         getPlaylist(GUI.MpdState);
@@ -457,7 +458,53 @@ function populateDB(data, path, uplevel, keyword){
 // update interface
 function updateGUI(objectInputState){
     // check MPD status
-    refreshState(objectInputState['state']);
+    if (objectInputState['state'] == 'play') {
+        $('#play').addClass('btn-primary');
+        $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
+        $('#stop').removeClass('btn-primary');
+
+    } else if (objectInputState['state'] == 'pause') {
+        $('#playlist-position').html('Not playing');
+        $('#play').addClass('btn-primary');
+        $('#play i').removeClass('fa fa-play').addClass('fa fa-pause');
+        $('#stop').removeClass('btn-primary');
+
+    } else if (objectInputState['state'] == 'stop') {
+        $('#play').removeClass('btn-primary');
+        $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
+        $('#stop').addClass('btn-primary');
+        $('#countdown-display').countdown('destroy');
+        $('#elapsed').html('00:00');
+        $('#total').html('');
+        $('#time').val(0).trigger('change');
+        $('#format-bitrate').html('&nbsp;');
+        $('.playlist li').removeClass('active');
+
+    }
+
+	$('#elapsed').html(timeConvert(objectInputState['elapsed']));
+	$('#total').html(timeConvert(objectInputState['time']));
+	//$('#time').val(objectInputState['song_percent']).trigger('change');
+
+	var fileinfo = (objectInputState['audio_channels'] && objectInputState['audio_sample_depth'] && objectInputState['audio_sample_rate']) ? (objectInputState['audio_channels'] + ' - ' + objectInputState['audio_sample_depth'] + ' bit - ' + objectInputState['audio_sample_rate'] +' kHz ') : '&nbsp;';
+	$('#format-bitrate').html(fileinfo);
+
+	$('#playlist-position').html('Playlist position ' + (parseInt(objectInputState['song']) + 1) +'/'+objectInputState['playlistlength']);
+	$('.playlist li').removeClass('active');
+	var current = parseInt(objectInputState['song']) + 1;
+	if (!isNaN(current)) {
+		$('.playlist li:nth-child(' + current + ')').addClass('active');
+
+	}
+
+	// show UpdateDB icon
+	// console.log('dbupdate = ', GUI.MpdState['updating_db']);
+	if (typeof GUI.MpdState['updating_db'] != 'undefined') {
+		$('.open-panel-sx').html('<i class="fa fa-refresh fa-spin"></i> Updating');
+	} else {
+		$('.open-panel-sx').html('<i class="fa fa-music sx"></i> Browse');
+	}
+
     // check song update
     if (GUI.currentsong != objectInputState['currentsong']) {
         countdownRestart(0);
@@ -500,60 +547,16 @@ function updateGUI(objectInputState){
     GUI.halt = 0;
     GUI.currentsong = objectInputState['currentsong'];
 	GUI.currentartist = objectInputState['currentartist'];
+
 	//Change Name according to Now Playing
-	if (GUI.currentartist!=null && GUI.currentsong!=null) {
-	document.title = objectInputState['currentsong'] + ' - ' + objectInputState['currentartist'] + ' - ' + 'Volumio';
+	if (GUI.currentartist != null && GUI.currentsong != null) {
+		document.title = objectInputState['currentsong'] + ' - ' + objectInputState['currentartist'] + ' - ' + 'Volumio';
+
 	} else {
             document.title = 'Volumio - Audiophile Music Player';
-        }
-}
-
-// update status on playback view
-function refreshState(state) {
-    if (state == 'play') {
-        $('#play').addClass('btn-primary');
-        $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
-        $('#stop').removeClass('btn-primary');
-    } else if (state == 'pause') {
-        $('#playlist-position').html('Not playing');
-        $('#play').addClass('btn-primary');
-        $('#play i').removeClass('fa fa-play').addClass('fa fa-pause');
-        $('#stop').removeClass('btn-primary');
-    } else if (state == 'stop') {
-        $('#play').removeClass('btn-primary');
-        $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
-        $('#stop').addClass('btn-primary');
-        $('#countdown-display').countdown('destroy');
-        $('#elapsed').html('00:00');
-        $('#total').html('');
-        $('#time').val(0).trigger('change');
-        $('#format-bitrate').html('&nbsp;');
-        $('.playlist li').removeClass('active');
-    }
-    if (state == 'play' || state == 'pause') {
-        $('#elapsed').html(timeConvert(GUI.MpdState['elapsed']));
-        $('#total').html(timeConvert(GUI.MpdState['time']));
-        //$('#time').val(json['song_percent']).trigger('change');
-        $('#playlist-position').html('Playlist position ' + (parseInt(GUI.MpdState['song']) + 1) +'/'+GUI.MpdState['playlistlength']);
-        var fileinfo = (GUI.MpdState['audio_channels'] && GUI.MpdState['audio_sample_depth'] && GUI.MpdState['audio_sample_rate']) ? (GUI.MpdState['audio_channels'] + ' - ' + GUI.MpdState['audio_sample_depth'] + ' bit - ' + GUI.MpdState['audio_sample_rate'] +' kHz ') : '&nbsp;';
-        $('#format-bitrate').html(fileinfo);
-        $('.playlist li').removeClass('active');
-        var current = parseInt(GUI.MpdState['song']) + 1;
-
-		if (!isNaN(current)) {
-	        $('.playlist li:nth-child(' + current + ')').addClass('active');
-
-		}
 
     }
-	
-	// show UpdateDB icon
-	// console.log('dbupdate = ', GUI.MpdState['updating_db']);
-	if (typeof GUI.MpdState['updating_db'] != 'undefined') {
-		$('.open-panel-sx').html('<i class="fa fa-refresh fa-spin"></i> Updating');
-	} else {
-		$('.open-panel-sx').html('<i class="fa fa-music sx"></i> Browse');
-	}
+
 }
 
 // update countdown
