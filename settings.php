@@ -251,11 +251,11 @@ if (isset($_POST['shairport']) && $_POST['shairport'] != $_SESSION['shairport'])
 	}
 	// set UI notify
 	if ($_POST['shairport'] == 1) {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'Airplay capability enabled';
+	$_SESSION['notify']['title'] = 'Airplay capability enabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	} else {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'Airplay capability disabled';
+	$_SESSION['notify']['title'] = 'Airplay capability disabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	}
 	// unlock session file
 	playerSession('unlock');
@@ -271,11 +271,11 @@ if (isset($_POST['upnpmpdcli']) && $_POST['upnpmpdcli'] != $_SESSION['upnpmpdcli
 	}
 	// set UI notify
 	if ($_POST['upnpmpdcli'] == 1) {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'UPNP Control enabled';
+	$_SESSION['notify']['title'] = 'UPNP Control enabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	} else {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'UPNP Control disabled';
+	$_SESSION['notify']['title'] = 'UPNP Control disabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	}
 	// unlock session file
 	playerSession('unlock');
@@ -291,11 +291,11 @@ if (isset($_POST['djmount']) && $_POST['djmount'] != $_SESSION['djmount']){
 	}
 	// set UI notify
 	if ($_POST['djmount'] == 1) {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'UPNP\DLNA Indexing enabled';
+	$_SESSION['notify']['title'] = 'UPNP\DLNA Indexing enabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	} else {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'UPNP\DLNA Indexing disabled';
+	$_SESSION['notify']['title'] = 'UPNP\DLNA Indexing disabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	}
 	// unlock session file
 	playerSession('unlock');
@@ -311,11 +311,11 @@ if (isset($_POST['minidlna']) && $_POST['minidlna'] != $_SESSION['minidlna']){
 	}
 	// set UI notify
 	if ($_POST['minidlna'] == 1) {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'DLNA Library Server enabled';
+	$_SESSION['notify']['title'] = 'DLNA Library Server enabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	} else {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'DLNA Library Server disabled';
+	$_SESSION['notify']['title'] = 'DLNA Library Server disabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	}
 	// unlock session file
 	playerSession('unlock');
@@ -600,11 +600,11 @@ if (isset($_POST['spotify']) && $_POST['spotify'] != $_SESSION['spotify']){
 	$_SESSION['w_queue'] = "spotify";
 	$_SESSION['w_queueargs'] = $_POST['spotify'];
 	if ($_POST['spotify'] == 1) {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'Spotify Service enabled';
+	$_SESSION['notify']['title'] = 'Spotify Service enabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	} else {
-	$_SESSION['notify']['title'] = '';
-	$_SESSION['notify']['msg'] = 'Spotify Service disabled';
+	$_SESSION['notify']['title'] = 'Spotify Service disabled';
+	$_SESSION['notify']['msg'] = 'You must reboot for changes to take effect';
 	}
 	// unlock session file
 	playerSession('unlock');
