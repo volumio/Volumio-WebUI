@@ -174,11 +174,26 @@ function showAllSongs() {
     renderSongs();
 }
 
+function checkMergeAlbums(objAlbum, albumsMap) {
+    if (albumsMap.hasOwnProperty(objAlbum.album)) {
+        if (albumsMap[objAlbum.album].ptr.artist !== objAlbum.artist) {
+            albumsMap[objAlbum.album].ptr.artist = "Several artists";
+            objAlbum.artist = "Several artists";
+        }
+    } else {
+        library.allAlbums.push(objAlbum);
+        albumsMap[objAlbum.album] = {
+            ptr: objAlbum
+        };
+    }
+}
+
 function filterLib(forceShowAll) {
     library.allGenres = [];
     library.allArtists = [];
     library.allAlbums = [];
     library.allSongs = [];
+    var albumsMap = {};
     var needReload = false;
     for (var genre in library.fullData) {
         library.allGenres.push(genre);
@@ -188,7 +203,7 @@ function filterLib(forceShowAll) {
                 if (library.filters.artists.length == 0 || library.filters.artists.indexOf(artist) >= 0) {
                     for (var album in library.fullData[genre][artist]) {
                         var objAlbum = {"album": album, "artist": artist};
-                        library.allAlbums.push(objAlbum);
+                        checkMergeAlbums(objAlbum, albumsMap);
                         if (!forceShowAll && !hasActiveFilters()) {
                             // Don't display all songs, let the browser breath!
                             continue;
