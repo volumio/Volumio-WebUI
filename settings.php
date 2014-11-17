@@ -188,7 +188,7 @@ if (isset($_POST['syscmd'])){
 // Show i2s selector only on RaspberryPI
 $arch = wrk_getHwPlatform();
 if ($arch != '01') {
-    $_i2s = "class=\"hide\"";
+    $_divi2s = "class=\"hide\"";
     }
 if (isset($_POST['orionprofile']) && $_POST['orionprofile'] != $_SESSION['orionprofile']){
 	// load worker queue 
