@@ -479,7 +479,7 @@ jQuery(document).ready(function($){ 'use strict';
 
         }
         if ($(this).data('cmd') == 'spop-searchalbum') {
-			$('#db-search-keyword').val('artist:' + artist + ' album:' + album);
+			$('#db-search-keyword').val('album:' + album);
 			getDB('search', '', 'file');
 
         }
