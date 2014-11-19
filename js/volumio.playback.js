@@ -410,7 +410,13 @@ jQuery(document).ready(function($){ 'use strict';
     // click on ADD button
     $('.database').on('click', '.db-action', function() {
         var path = $(this).parent().attr('data-path');
+        var title = $(this).parent().attr('data-title');
+        var artist = $(this).parent().attr('data-artist');
+        var album = $(this).parent().attr('data-album');
         GUI.DBentry[0] = path;
+        GUI.DBentry[3] = title;
+        GUI.DBentry[4] = artist;
+        GUI.DBentry[5] = album;
         // console.log('getDB path = ', GUI.DBentry);
     });
 
@@ -421,6 +427,9 @@ jQuery(document).ready(function($){ 'use strict';
 
     $('.context-menu a').click(function(){
         var path = GUI.DBentry[0];
+        var title = GUI.DBentry[3];
+        var artist = GUI.DBentry[4];
+        var album = GUI.DBentry[5];
         GUI.DBentry[0] = '';
         if ($(this).data('cmd') == 'add') {
             getDB('add', path);
@@ -457,6 +466,21 @@ jQuery(document).ready(function($){ 'use strict';
         }
         if ($(this).data('cmd') == 'spop-addplaylistindex') {
 			$.post('db/?cmd=spop-addplaylistindex', { 'path': path }, function(data) {}, 'json');
+
+        }
+        if ($(this).data('cmd') == 'spop-searchtitle') {
+			$('#db-search-keyword').val('track:' + title);
+			getDB('search', '', 'file');
+
+        }
+        if ($(this).data('cmd') == 'spop-searchartist') {
+			$('#db-search-keyword').val('artist:' + artist);
+			getDB('search', '', 'file');
+
+        }
+        if ($(this).data('cmd') == 'spop-searchalbum') {
+			$('#db-search-keyword').val('album:' + album);
+			getDB('search', '', 'file');
 
         }
         if ($(this).data('cmd') == 'spop-stop') {
