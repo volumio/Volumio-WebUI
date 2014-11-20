@@ -56,16 +56,19 @@
 <!-- loader -->
 <div id="loader"><div id="loaderbg"></div><div id="loadercontent"><i class="fa fa-refresh fa-spin"></i>connecting...</div></div>
 <script src="js/jquery-1.8.2.min.js"></script>
-<script src="js/jquery-ui-1.11.1.custom.min.js"></script>
+<script src="js/jquery-ui-1.11.2.custom.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/bootstrap-select.min.js"></script>
 <script src="js/notify.js"></script>
 <script src="js/jquery.countdown.js"></script>
 <script src="js/jquery.countdown-it.js"></script>
 <script src="js/jquery.scrollTo.min.js"></script>
+<script src="js/socket.io-1.2.0.min.js"></script>
 <script src="js/volumio.api.js"></script>
+<script src="js/volumio.mpd.js"></script>
 <script src="js/volumio.lazyloader.js"></script>
 <script src="js/volumio.library.js"></script>
+<script src="js/volumio.common-ctrl.js"></script>
 
 <!-- 'fixes' links to other pages so that when saved to the homescreen
      on a iOS device all the links stay within the app 

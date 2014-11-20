@@ -27,182 +27,91 @@
  *  version:                 2
  */
 
-jQuery(document).ready(function($){ 'use strict';
+jQuery(document).ready(function($) {
+    'use strict';
 
     // INITIALIZATION
-    // ----------------------------------------------------------------------------------------------------
-    // first connection with MPD and SPOP daemons
-    backendRequest();
-	backendRequestSpop();
-
+    // -----------------------------------------------------------------------------------
     // first GUI update
-    updateGUI(GUI.MpdState);
-    getDB('filepath', GUI.currentpath, 'file');
+    updateGUI(GUI.mpd);
+    mpdLsInfo(GUI.currentpath, function(data) {
+        renderDir(GUI.currentpath, data, 0);
+    });
     $.pnotify.defaults.history = false;
 
-    // hide "connecting" layer
-    if (GUI.state != 'disconnected') {
-        $('#loader').hide();
-    }
-
     // BUTTONS
-    // ----------------------------------------------------------------------------------------------------
-    // playback
-    $("#play").mouseenter(function() {
-        if (GUI.state == "play") {
-            $("#play i").removeClass("fa fa-play").addClass("fa fa-pause");
-        } else if (GUI.state == "pause") {
-            $("#play i").removeClass("fa fa-pause").addClass("fa fa-play");
-        }
-    }).mouseleave(function() {
-        if (GUI.state == "play") {
-            $("#play i").removeClass("fa fa-pause").addClass("fa fa-play");
-        } else if (GUI.state == "pause") {
-            $("#play i").removeClass("fa fa-play").addClass("fa fa-pause");
-        }
+    // -----------------------------------------------------------------------------------
+    $("#repeat").click(function() {
+        $(this).toggleClass('btn-primary');
+        mpdRepeat($(this).hasClass('btn-primary'));
     });
 
-    $('.btn-cmd').click(function(){
-        var cmd;
-        // stop
-        if ($(this).attr('id') == 'stop') {
-            $(this).addClass('btn-primary');
-            $('#play').removeClass('btn-primary');
-            refreshTimer(0, 0, 'stop')
-			window.clearInterval(GUI.currentKnob);
-            $('.playlist li').removeClass('active');
-            $('#total').html('');
-        }
-        // play/pause
-        else if ($(this).attr('id') == 'play') {
-            //if (json['currentsong'] != null) {
-                if (GUI.state == 'play') {
-                    cmd = 'pause';
-                    $('#countdown-display').countdown('pause');
-                } else if (GUI.state == 'pause') {
-                    cmd = 'play';
-                    $('#countdown-display').countdown('resume');
-                } else if (GUI.state == 'stop') {
-                    cmd = 'play';
-                    $('#countdown-display').countdown({since: 0, compact: true, format: 'MS'});
-                }
-                //$(this).find('i').toggleClass('icon-play').toggleClass('icon-pause');
-                window.clearInterval(GUI.currentKnob);
-                sendCmd(cmd);
-                //console.log('sendCmd(' + cmd + ');');
-                return;
-            // } else {
-                // $(this).addClass('btn-primary');
-                // $('#stop').removeClass('btn-primary');
-                // $('#time').val(0).trigger('change');
-                // $('#countdown-display').countdown({since: 0, compact: true, format: 'MS'});
-            // }
-        }
-        // previous/next
-        else if ($(this).attr('id') == 'previous' || $(this).attr('id') == 'next') {
-            GUI.halt = 1;
-            // console.log('GUI.halt (next/prev)= ', GUI.halt);
-			$('#countdown-display').countdown('pause');
-			window.clearInterval(GUI.currentKnob);
-        }
-        // step volume control
-        else if ($(this).hasClass('btn-volume')) {
-            if (GUI.volume == null ) {
-                GUI.volume = $('#volume').val();
-            }
-            if ($(this).attr('id') == 'volumedn') {
-                var vol = parseInt(GUI.volume) - 1;
-                GUI.volume = vol;
-                $('#volumemute').removeClass('btn-primary');
-            } else if ($(this).attr('id') == 'volumeup') {
-                var vol = parseInt(GUI.volume) + 1;
-                GUI.volume = vol;
-                $('#volumemute').removeClass('btn-primary');
-            } else if ($(this).attr('id') == 'volumemute') {
-                if ($('#volume').val() != 0 ) {
-                    GUI.volume = $('#volume').val();
-                    $(this).addClass('btn-primary');
-                    var vol = 0;
-                } else {
-                    $(this).removeClass('btn-primary');
-                    var vol = GUI.volume;
-                }
-            }
-            //console.log('volume = ', GUI.volume);
-            sendCmd('setvol ' + vol);
-            return;
-        }
+    $("#random").click(function() {
+        $(this).toggleClass('btn-primary');
+        mpdRandom($(this).hasClass('btn-primary'));
+    });
 
-        // toggle buttons
-        if ($(this).hasClass('btn-toggle')) {
-            if ($(this).hasClass('btn-primary')) {
-                cmd = $(this).attr('id') + ' 0';
-            } else {
-                cmd = $(this).attr('id') + ' 1';
-            }
-        // send command
-        } else {
-            cmd = $(this).attr('id');
+    $("#single").click(function() {
+        $(this).toggleClass('btn-primary');
+        mpdSingle($(this).hasClass('btn-primary'));
+    });
+
+    $("#consume").click(function() {
+        $(this).toggleClass('btn-primary');
+        mpdConsume($(this).hasClass('btn-primary'));
+    });
+
+    $("#volumedn").click(function() {
+        changeVolume(function(vol) { return vol-1; });
+    });
+
+    $("#volumeup").click(function() {
+        changeVolume(function(vol) { return vol+1; });
+    });
+
+    $("#volumemute").click(function() {
+        if (GUI.volume == null ) {
+            GUI.volume = $('#volume').val();
         }
-        sendCmd(cmd);
-        //console.log('sendCmd(' + cmd + ');');
+        if ($('#volume').val() != 0 ) {
+            GUI.volume = $('#volume').val();
+            $(this).addClass('btn-primary');
+            mpdVolume(0);
+        } else {
+            $(this).removeClass('btn-primary');
+            mpdVolume(GUI.volume);
+        }
     });
 
     // KNOBS
-    // ----------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
     // playback progressing
     $('.playbackknob').knob({
         inline: false,
 		change : function (value) {
             if (GUI.state != 'stop') {
-				// console.log('GUI.halt (Knobs)= ', GUI.halt);
 				window.clearInterval(GUI.currentKnob)
 				//$('#time').val(value);
-				//console.log('click percent = ', value);
 				// implementare comando
 			} else $('#time').val(0);
         },
         release : function (value) {
 			if (GUI.state != 'stop') {
-				//console.log('release percent = ', value);
-				GUI.halt = 1;
-				// console.log('GUI.halt (Knobs2)= ', GUI.halt);
 				window.clearInterval(GUI.currentKnob);
-
 				var seekto = 0;
-				if (GUI.SpopState['state'] == 'play' || GUI.SpopState['state'] == 'pause') {
-					seekto = Math.floor((value * parseInt(GUI.SpopState['time'])) / 1000);
-					// Spop expects input to seek in ms
-					sendCmd('seek ' + seekto * 1000);
-					// Spop idle mode does not detect a seek change, so update UI manually
-					$.ajax({
-						type : 'GET',
-						url : '_player_engine_spop.php?state=manualupdate',
-						async : true,
-						cache : false,
-						success : function(data) {
-							if (data != '') {
-								GUI.SpopState = eval('(' + data + ')');
-								renderUI();
-							}
-						}
-					});
-
-				} else {
-					seekto = Math.floor((value * parseInt(GUI.MpdState['time'])) / 1000);
-					sendCmd('seek ' + GUI.MpdState['song'] + ' ' + seekto);
-
-				}
-
-				//console.log('seekto = ', seekto);
+                if (GUI.spop.state === 'play' || GUI.spop.state === 'pause') {
+                    seekto = Math.floor((value * parseInt(GUI.spop.time)) / 1000);
+                    spopSeek(seekto);
+                } else {
+                    seekto = Math.floor((value * parseInt(GUI.mpd.time)) / 1000);
+                    mpdSeek(GUI.mpd.song, seekto);
+                }
 				$('#time').val(value);
 				$('#countdown-display').countdown('destroy');
 				$('#countdown-display').countdown({since: -seekto, compact: true, format: 'MS'});
 			}
         },
-        cancel : function () {
-            //console.log('cancel : ', this);
-        },
+        cancel : function () {},
         draw : function () {}
     });
 
@@ -287,31 +196,12 @@ jQuery(document).ready(function($){ 'use strict';
     };
     volumeKnob.knob(volumeKnob[0].knobEvents);
 
-    // "pulse" effect knob
-    /*
-    setInterval(function() {
-        if (GUI.MpdState['state'] == 'play') {
-            if (GUI.MpdState['state'] == 'play') {
-                $('#timeflow').toggleClass('pulse');
-                setTimeout(function(){
-                    $('#timeknob').toggleClass('pulse');
-                }, 1000);
-            }
-        }
-    }, 1000);
-    */
-
-
     // PLAYLIST
-    // ----------------------------------------------------------------------------------------------------
-
+    // -----------------------------------------------------------------------------------
     // click on playlist entry
     $('.playlist').on('click', '.pl-entry', function() {
         var pos = $('.playlist .pl-entry').index(this);
-        var cmd = 'play ' + pos;
-        sendCmd(cmd);
-        GUI.halt = 1;
-        // console.log('GUI.halt (playlist)= ', GUI.halt);
+        mpdPlayIdx(pos);
         $('.playlist li').removeClass('active');
         $(this).parent().addClass('active');
     });
@@ -320,37 +210,35 @@ jQuery(document).ready(function($){ 'use strict';
     $('.playlist').on('click', '.pl-action', function(event) {
         event.preventDefault();
         var pos = $('.playlist .pl-action').index(this);
-        var cmd = 'trackremove&songid=' + pos;
         notify('remove', '');
-        sendPLCmd(cmd);
+        mpdRemoveFromQueue(pos);
     });
 
     // click on playlist save button
     $('#pl-controls').on('click', '#pl-btnSave', function(event) {
-	var plname = $("#pl-saveName").val();
-	if (plname) {
-	        sendPLCmd('savepl&plname=' + plname);
-		notify('savepl', plname);
-	} else {
-		notify('needplname', '');
-	}
+        var plname = $("#pl-saveName").val();
+        if (plname) {
+            mpdSavePlaylist(plname);
+            notify('savepl', plname);
+        } else {
+            notify('needplname', '');
+        }
     });
 
     // click on playlist tab
     $('#open-panel-dx a').click(function(){
-        var current = parseInt(GUI.MpdState['song']);
+        var current = parseInt(GUI.mpd.song);
         customScroll('pl', current, 200); // da eseguire sul tab ready!
     });
 
     // click on playback tab
     $('#open-playback a').click(function(){
         // fai qualcosa
-        // console.log('JSON = ', GUI.MpdState);
     });
 
 
     // DATABASE
-    // ----------------------------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
 
     // click on database "back"
     $('#db-back').click(function() {
@@ -362,7 +250,9 @@ jQuery(document).ready(function($){ 'use strict';
         }  else {
             path = '';
         }
-        getDB('filepath', path, GUI.browsemode, 1);
+        mpdLsInfo(path, function(data) {
+            renderDir(path, data, GUI.currentDBpos[GUI.currentDBpos[10]]);
+        });
     });
 
     // click on database entry
@@ -376,17 +266,19 @@ jQuery(document).ready(function($){ 'use strict';
                 entryID = entryID.replace('db-','');
                 GUI.currentDBpos[GUI.currentDBpos[10]] = entryID;
                 ++GUI.currentDBpos[10];
-                getDB('filepath', path, 'file', 0);
+                mpdLsInfo(path, function(data) {
+                    renderDir(path, data, 0);
+                });
             }
         }
     });
+
 	// Double-click play 
     $('.database').on('dblclick', '.db-song', function() {
         $('.database li').removeClass('active');
         $(this).parent().addClass('active');
         var path = $(this).parent().data('path');
-        //console.log('doubleclicked path = ', path);
-        getDB('addplay', path);
+        mpdPlay(path);
         notify('add', path);
     });
     
@@ -409,47 +301,43 @@ jQuery(document).ready(function($){ 'use strict';
 
     // click on ADD button
     $('.database').on('click', '.db-action', function() {
-        var path = $(this).parent().attr('data-path');
-        var title = $(this).parent().attr('data-title');
-        var artist = $(this).parent().attr('data-artist');
-        var album = $(this).parent().attr('data-album');
-        GUI.DBentry[0] = path;
-        GUI.DBentry[3] = title;
-        GUI.DBentry[4] = artist;
-        GUI.DBentry[5] = album;
-        // console.log('getDB path = ', GUI.DBentry);
+        GUI.menuClicked.path = $(this).parent().attr('data-path');
+        GUI.menuClicked.title = $(this).parent().attr('data-title');
+        GUI.menuClicked.artist = $(this).parent().attr('data-artist');
+        GUI.menuClicked.album = $(this).parent().attr('data-album');
     });
 
     // chiudi i risultati di ricerca nel DB
     $('.database').on('click', '.search-results', function() {
-        getDB('filepath', GUI.currentpath);
+        mpdLsInfo(GUI.currentpath, function(data) {
+            renderDir(GUI.currentpath, data, 0);
+        });
     });
 
     $('.context-menu a').click(function(){
-        var path = GUI.DBentry[0];
-        var title = GUI.DBentry[3];
-        var artist = GUI.DBentry[4];
-        var album = GUI.DBentry[5];
-        GUI.DBentry[0] = '';
+        var path = GUI.menuClicked.path;
+        var title = GUI.menuClicked.title;
+        var artist = GUI.menuClicked.artist;
+        var album = GUI.menuClicked.album;
+        GUI.menuClicked.path = '';
+        GUI.menuClicked.title = '';
+        GUI.menuClicked.artist = '';
+        GUI.menuClicked.album = '';
         if ($(this).data('cmd') == 'add') {
-            getDB('add', path);
-            notify('add', path);
-        }
-        if ($(this).data('cmd') == 'addplay') {
-            getDB('addplay', path);
+            mpdAdd(path);
             notify('add', path);
         }
         if ($(this).data('cmd') == 'addreplaceplay') {
-            getDB('addreplaceplay', path);
+            mpdPlay(path);
             notify('addreplaceplay', path);
             if (!path.contains("/")) {
 	            $("#pl-saveName").val(path);
             } else {
 	            $("#pl-saveName").val("");
-			}
+            }
         }
         if ($(this).data('cmd') == 'update') {
-            getDB('update', path);
+            mpdUpdate(path);
             notify('update', path);
         }
         if ($(this).data('cmd') == 'spop-playtrackuri') {
@@ -468,24 +356,21 @@ jQuery(document).ready(function($){ 'use strict';
 			$.post('db/?cmd=spop-addplaylistindex', { 'path': path }, function(data) {}, 'json');
 
         }
-        if ($(this).data('cmd') == 'spop-searchtitle') {
-			$('#db-search-keyword').val('track:' + title);
-			getDB('search', '', 'file');
-
-        }
-        if ($(this).data('cmd') == 'spop-searchartist') {
-			$('#db-search-keyword').val('artist:' + artist);
-			getDB('search', '', 'file');
-
-        }
-        if ($(this).data('cmd') == 'spop-searchalbum') {
-			$('#db-search-keyword').val('album:' + album);
-			getDB('search', '', 'file');
-
-        }
         if ($(this).data('cmd') == 'spop-stop') {
 			$.post('db/?cmd=spop-stop', {}, function(data) {}, 'json');
 
+        }
+        if ($(this).data('cmd') == 'spop-searchtitle') {
+			$('#db-search-keyword').val('track:' + title);
+            searchFile();
+        }
+        if ($(this).data('cmd') == 'spop-searchartist') {
+			$('#db-search-keyword').val('artist:' + artist);
+            searchFile();
+        }
+        if ($(this).data('cmd') == 'spop-searchalbum') {
+			$('#db-search-keyword').val('album:' + album);
+            searchFile();
         }
     });
 
@@ -525,7 +410,6 @@ jQuery(document).ready(function($){ 'use strict';
     // multipurpose debug buttons
     $('#db-debug-btn').click(function(){
         var scrollTop = $(window).scrollTop();
-        // console.log('scrollTop = ', scrollTop);
     });
     $('#pl-debug-btn').click(function(){
         randomScrollPL();
@@ -578,21 +462,22 @@ jQuery(document).ready(function($){ 'use strict';
 (function() {
     hidden = 'hidden';
     // Standards:
-    if (hidden in document)
+    if (hidden in document) {
         document.addEventListener('visibilitychange', onchange);
-    else if ((hidden = 'mozHidden') in document)
+    } else if ((hidden = 'mozHidden') in document) {
         document.addEventListener('mozvisibilitychange', onchange);
-    else if ((hidden = "webkitHidden") in document)
+    } else if ((hidden = "webkitHidden") in document) {
         document.addEventListener('webkitvisibilitychange', onchange);
-    else if ((hidden = "msHidden") in document)
+    } else if ((hidden = "msHidden") in document) {
         document.addEventListener('msvisibilitychange', onchange);
     // IE 9 and lower:
-    else if ('onfocusin' in document)
+    } else if ('onfocusin' in document) {
         document.onfocusin = document.onfocusout = onchange;
     // All others:
-    else
+    } else {
         window.onpageshow = window.onpagehide
             = window.onfocus = window.onblur = onchange;
+    }
 
     function onchange (evt) {
         var v = 'visible', h = 'hidden',
@@ -603,17 +488,246 @@ jQuery(document).ready(function($){ 'use strict';
         evt = evt || window.event;
         if (evt.type in evtMap) {
             document.body.className = evtMap[evt.type];
-            // console.log('boh? = ', evtMap[evt.type]);
         } else {
             document.body.className = this[hidden] ? 'hidden' : 'visible';
             if (this[hidden]) {
                 GUI.visibility = 'hidden';
-                // console.log('focus = hidden');
             } else {
                 GUI.visibility = 'visible';
-                // console.log('focus = visible');
             }
         }
     }
 })();
 
+function spopSeek(seekto) {
+    // Spop expects input to seek in ms
+    mpdSeek(GUI.mpd.song, seekto * 1000);
+    // Spop idle mode does not detect a seek change, so update UI manually
+    $.ajax({
+        type : 'GET',
+        url : '_player_engine_spop.php?state=manualupdate',
+        async : true,
+        cache : false,
+        success : function(data) {
+            if (data != '') {
+                GUI.spop = eval('(' + data + ')');
+                renderUI();
+            }
+        }
+    });
+}
+
+function changeVolume(modFunc) {
+    if (GUI.volume == null) {
+        GUI.volume = $('#volume').val();
+    }
+    GUI.volume = modFunc(parseInt(GUI.volume));
+    $('#volumemute').removeClass('btn-primary');
+    mpdVolume(GUI.volume);
+}
+
+function searchFile() {
+    var keyword = $('#db-search-keyword').val();
+    if (keyword) {
+        mpdSearch(keyword, function(data) {
+            renderDir(GUI.currentpath, data, 0);
+        });
+    }
+}
+
+function renderDir(path, data, scrollTo, searchKeywords) {
+    GUI.currentpath = path;
+	var $ul = $('ul.database');
+	$ul.html('');
+    if (searchKeywords) {
+		var nbResults = data.length || 0;
+		var s = (nbResults < 2) ? '' : 's';
+		var text = "" + nbResults + ' result' + s + ' for "<em class="keyword">' + searchKeywords + '</em>"';
+		$("#db-back").attr("title", "Close search results and go back to the DB");
+		$("#db-back-text").html(text);
+		$("#db-back").show();
+    } else if (path === '') {
+        // Root level
+        $("#db-back").hide();
+        if (library && library.isEnabled && !library.displayAsTab) {
+            $ul.append(pluginListItem("db-plug-lib", "LIBRARY", "fa-columns", "showLibraryView()"));
+        }
+	} else {
+        // Subfolder
+		$("#db-back").attr("title", "");
+		$("#db-back-text").html("back");
+		$("#db-back").show();
+    }
+    var dataByType = {
+        mpdDir: [],
+        mpdPL: [],
+        mpdFile: [],
+        spopRoot: [],
+        spopDir: [],
+        spopPL: [],
+        spopTrack: []
+    };
+    data.forEach(function(item) {
+        if (item.type === "spopTrack") {
+            dataByType.spopTrack.push(item);
+        } else if (item.type === "spopDirectory") {
+            if (path === '') {
+                dataByType.spopRoot.push(item);
+            } else if (item.SpopPlaylistIndex !== undefined) {
+                dataByType.spopPL.push(item);
+            } else {
+                dataByType.spopDir.push(item);
+            }
+        } else if (item.directory !== undefined) {
+            dataByType.mpdDir.push(item);
+        } else if (item.playlist !== undefined) {
+            dataByType.mpdPL.push(item);
+        } else if (item.file !== undefined) {
+            dataByType.mpdFile.push(item);
+        }
+    });
+    var idx = 1;
+    dataByType.spopRoot.forEach(function(item) {
+        $ul.append(renderSpopRoot(item, path, "db-" + idx));
+        idx++;
+    });
+    dataByType.spopDir.forEach(function(item) {
+        $ul.append(renderSpopDirItem(item, path, "db-" + idx));
+        idx++;
+    });
+    dataByType.spopPL.forEach(function(item) {
+        $ul.append(renderSpopPLItem(item, path, "db-" + idx));
+        idx++;
+    });
+    dataByType.spopTrack.forEach(function(item) {
+        $ul.append(renderSpopTrackItem(item, path, "db-" + idx));
+        idx++;
+    });
+    dataByType.mpdDir.forEach(function(item) {
+        $ul.append(renderSubdirItem(item, path, "db-" + idx));
+        idx++;
+    });
+    dataByType.mpdPL.forEach(function(item) {
+        item.file = item.playlist;
+        $ul.append(renderFileItem(item, path, "db-" + idx));
+        idx++;
+    });
+    dataByType.mpdFile.forEach(function(item) {
+        $ul.append(renderFileItem(item, path, "db-" + idx));
+        idx++;
+    });
+	$('#db-currentpath span').html(path);
+	if (path.indexOf("WEBRADIO") >= 0) {
+        $("#webradio-add").show();
+	} else {
+        $("#webradio-add").hide();
+	}
+    if (scrollTo !== 0) {
+        $('#db-' + scrollTo).addClass('active');
+	}
+    customScroll('db', scrollTo);
+}
+
+function pluginListItem(id, text, faicon, onclick) {
+    return '<li id="#' + id + '" class="db-plugin" onclick="'
+        + onclick + '"><div class="db-icon db-other"><i class="fa '
+        + faicon + ' icon-root sx"></i></div><div class="db-entry db-other">'
+        + text + '</div></li>';
+}
+
+function renderSubdirItem(item, parentPath, itemId) {
+    var iconClass = "";
+    var dataTarget = "#context-menu-root";
+    if (parentPath !== '') {
+        iconClass = "fa fa-folder-open sx";
+        dataTarget = "#context-menu";
+    } else if (item.directory === 'WEBRADIO') {
+        iconClass = "fa fa-microphone icon-root sx";
+    } else if (item.directory === 'NAS') {
+        iconClass = "fa fa-code-fork icon-root sx";
+    } else if (item.directory === 'USB') {
+        iconClass = "fa fa-hdd-o icon-root sx";
+    } else if (item.directory === 'RAMPLAY') {
+        iconClass = "fa fa-spinner icon-root sx";
+    }
+    return '<li id="' + itemId + '" class="clearfix" data-path="'
+        + item.directory + '">'
+        + '<div class="db-icon db-folder db-browse"><i class="'
+        + iconClass +'"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="'
+        + dataTarget + '"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">'
+        + item.directory.replace(parentPath + '/', '');
+        + '</div></li>';
+}
+
+function renderFileItem(item, sParentPath, itemId) {
+    var parentPath = sParentPath;
+    if (parentPath === '') {
+        parentPath = retrieveParentPath(item.file)
+    }
+    var iconClass = "fa fa-music sx db-browse";
+    var itemClass = "db-song";
+    var songTime = "";
+    var text = "";
+
+    if (item.time === undefined) {
+        itemClass = "db-other";
+    } else {
+        songTime = "<em class='songtime'>" + timeConvert(item.time) + "</em>";
+    }
+
+    if (parentPath === 'WEBRADIO') {
+        iconClass = "fa fa-microphone sx db-browse";
+        text = item.file.replace(parentPath + '/', '').replace('.pls', '') + songTime;
+    } else if (typeof item.title !== 'undefined') {
+        text = item.title + songTime + " <span>" + item.artist
+            + " - " + item.album + "</span>";
+    } else {
+        text = item.file.replace(parentPath + '/', '') + songTime;
+    }
+
+    return '<li id="' + itemId + '" class="clearfix" data-path="' + item.file
+        + '"><div class="db-icon ' + itemClass + ' db-browse"><i class="'
+        + iconClass + '"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu"><i class="fa fa-reorder"></i></a></div><div class="db-entry ' + itemClass + ' db-browse">'
+        + text + '</div></li>';
+}
+
+function renderSpopRoot(item, sParentPath, itemId) {
+    var parentPath = sParentPath;
+    if (parentPath === '') {
+        parentPath = retrieveParentPath(item.file)
+    }
+    return '<li id="' + itemId + '" class="clearfix" data-path="'
+        + item.directory + '">'
+        + '<div class="db-icon db-folder db-browse"><i class="fa fa-spotify icon-root sx"></i></div><div class="db-entry db-folder db-browse">'
+        + item.directory.replace(parentPath + '/', '')
+        + '</div></li>';
+}
+
+function renderSpopDirItem(item, sParentPath, itemId) {
+    var parentPath = sParentPath;
+    if (parentPath === '') {
+        parentPath = retrieveParentPath(item.file)
+    }
+    var text = (item.displayName) ? item.displayName : item.directory.replace(parentPath + '/', '');
+    return '<li id="' + itemId + '" class="clearfix" data-path="'
+        + item.directory + '">'
+        + '<div class="db-icon db-folder db-browse"><i class="fa fa-folder-open sx"></i></div><div class="db-entry db-folder db-browse">' + text + '</div></li>';
+}
+
+function renderSpopPLItem(item, sParentPath, itemId) {
+    var parentPath = sParentPath;
+    if (parentPath === '') {
+        parentPath = retrieveParentPath(item.file)
+    }
+    var text = (item.displayName) ? item.displayName : item.directory.replace(parentPath + '/', '');
+    return '<li id="' + itemId + '" class="clearfix" data-path="'
+        + item.directory + '">'
+        + '<div class="db-icon db-folder db-browse"><i class="fa fa-list-ol sx"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-spotifyplaylist"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-folder db-browse">' + text + '</div></li>';
+}
+
+function renderSpopTrackItem(item, sParentPath, itemId) {
+    return '<li id="' + itemId + '" class="clearfix" data-path="' + item.spopTrackUri
+        + '" data-artist="' + item.artist + '" data-album="' + item.album + '" data-title="' + item.title + '"><div class="db-icon db-browse"><i class="fa fa-spotify sx db-browse"></i></div><div class="db-action"><a class="btn" href="#notarget" title="Actions" data-toggle="context" data-target="#context-menu-spotifytrack"><i class="fa fa-reorder"></i></a></div><div class="db-entry db-browse">'
+        + item.title + ' <em class="songtime">' + timeConvert(item.time) + '</em> <span>'
+        + item.artist + ' - ' + item.album + '</span></div></li>';
+}

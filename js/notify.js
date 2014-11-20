@@ -1,5 +1,5 @@
 // mostra le notifiche sulle azioni
-function notify(command, msg) {
+function notify(command, msg, title) {
 	switch (command) {
 		case 'add':
 			$.pnotify({
@@ -37,23 +37,32 @@ function notify(command, msg) {
 			});
 		break;
 
-                case 'savepl':
-                        $.pnotify({
-                                title: 'Playlist has been saved',
-                                text: msg,
-                                icon: 'fa fa-remove',
-                                opacity: .9
-                        });
-                break;
+        case 'savepl':
+            $.pnotify({
+                title: 'Playlist has been saved',
+                text: msg,
+                icon: 'fa fa-remove',
+                opacity: .9
+            });
+        break;
 
-                case 'needplname':
-                        $.pnotify({
-                                title: 'Give a name for saving playlist',
-                                text: msg,
-                                icon: 'fa fa-remove',
-                                opacity: .9
-                        });
-                break;
+        case 'needplname':
+            $.pnotify({
+                title: 'Give a name for saving playlist',
+                text: msg,
+                icon: 'fa fa-remove',
+                opacity: .9
+            });
+        break;
+
+        case 'custom':
+            $.pnotify({
+                title: title,
+                text: msg,
+                icon: 'fa fa-remove',
+                opacity: .9
+            });
+        break;
 
 	}
 }

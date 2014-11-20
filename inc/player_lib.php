@@ -27,67 +27,20 @@
  *
  */
  
-// Predefined daemon Response messages
+// Predefined MPD Response messages
 define("MPD_RESPONSE_ERR", "ACK");
 define("MPD_RESPONSE_OK",  "OK");
 
-// Spotify daemon communication functions
-function openSpopSocket($host, $portSpop) {
-	$sock = stream_socket_client('tcp://'.$host.':'.$portSpop.'', $errorno, $errorstr, 30 );
-
-	if ($sock) {
-		// First response is typically "spop [version]"
-		$response = fgets($sock);
-
-	}
-
-	return $sock;
-}
-
-function closeSpopSocket($sock) {
-	sendSpopCommand($sock,"bye");
-	fclose($sock);
-
-}
-
-function sendSpopCommand($sock, $cmd) {
-	if ($sock) {
-		$cmd = $cmd."\n";
-		fputs($sock, $cmd);
-
-		while(!feof($sock)) {
-			// fgets() may time out during the wait for response from commands like 'idle'.
-			// This loop will keep reading until a response is received, or until the socket closes.
-			$output = fgets($sock);
-
-			if ($output) {
-				break;
-
-			}
-
-		}
-
-		return _parseSpopResponse($output);
-
-	}
-
-}
-
 // v2
 function openMpdSocket($host, $port) {
-$sock = stream_socket_client('tcp://'.$host.':'.$port.'', $errorno, $errorstr, 30 );
-$response = readMpdResponse($sock);
-	if ($response = '') {
-	sysCmd('command/shell.sh '.$response);
-	exit;
-	} else {
+    $sock = stream_socket_client('tcp://'.$host.':'.$port.'', $errorno, $errorstr, 30 );
+    readMpdResponse($sock);
 	return $sock;
-	}
 } //end openMpdSocket()
 
 function closeMpdSocket($sock) {
-sendMpdCommand($sock,"close");
-fclose($sock);
+    sendMpdCommand($sock,"close");
+    fclose($sock);
 }
 
 // v2
@@ -101,331 +54,63 @@ function sendMpdCommand($sock,$cmd) {
 	}
 }
 
-function chainMpdCommands($sock, $commands) {
-	foreach ($commands as $command) {
-		fputs($sock, $command."\n");
-		fflush($sock);
-		// MPD seems to be disoriented when it receives several commands chained. Need to sleep a little bit
-		// 200 ms
-		usleep(200000);
-	}
-}
-
 // v3
 function readMpdResponse($sock) {
-$output = "";
-			while(!feof($sock)) {
-				$response =  fgets($sock,1024);
-				$output .= $response;
-					if (strncmp(MPD_RESPONSE_OK,$response,strlen(MPD_RESPONSE_OK)) == 0) {
-					break;
-					}
-					if (strncmp(MPD_RESPONSE_ERR,$response,strlen(MPD_RESPONSE_ERR)) == 0) {
-					$output = "MPD error: $response";
-					break;
-					}
-			}
-return $output;
-}
-
-function loadAllLib($sock) {
-	$flat = _loadDirForLib($sock, array(), "");
-	return json_encode(_organizeJsonLib($flat));
-}
-
-function _loadDirForLib($sock, $flat, $dir) {
-	sendMpdCommand($sock, "lsinfo \"".html_entity_decode($dir)."\"");
-	$resp = readMpdResponse($sock);
-
-	if (!is_null($resp)) {
-		$lines = explode("\n", $resp);
-		$iItem = 0;
-		$skip = true;
-		for ($iLine = 0; $iLine < count($lines); $iLine++) {
-			list($element, $value) = explode(": ", $lines[$iLine], 2);
-			if ($element == "file") {
-				$skip = false;
-				$iItem = count($flat);
-			} else if ($element == "directory") {
-				$flat = _loadDirForLib($sock, $flat, $value);
-				$skip = true;
-			} else if ($element == "playlist") {
-				$skip = true;
-			}
-			if (!$skip) {
-				$flat[$iItem][$element] = $value;
-			}
-		} 
-	}
-	return $flat;
-}
-
-function _organizeJsonLib($flat) {
-	// Build json like "{Genre1: {Artist1: {Album1: [{song1}, {song2}], Album2:...}, Artist2:...}, Genre2:...}
-	$lib = array();
-	foreach ($flat as $songData) {
-		$genre = $songData["Genre"] ? $songData["Genre"] : "Unknown";
-		$artist = $songData["AlbumArtist"] ? $songData["AlbumArtist"] : ($songData["Artist"] ? $songData["Artist"] : "Unknown");
-		$album = $songData["Album"] ? $songData["Album"] : "Unknown";
-
-		if (!$lib[$genre]) {
-			$lib[$genre] = array();
-		}
-		if (!$lib[$genre][$artist]) {
-			$lib[$genre][$artist] = array();
-		}
-                if (!$lib[$genre][$artist][$album]) {
-                        $lib[$genre][$artist][$album] = array();
-                }
-		$songDataLight = array(	"file" => $songData['file'],
-					"display" => ($songData['Track'] ? $songData['Track']." - " : "")
-						.$songData['Title']);
-		array_push($lib[$genre][$artist][$album], $songDataLight);
-	}
-	return $lib;
-}
-
-function playAll($sock, $json) {
-	if (count($json) > 0) {
-		// Clear, add first file and play
-	        $commands = array();
-		array_push($commands, "clear");
-		array_push($commands, "add \"".html_entity_decode($json[0]['file'])."\"");
-		array_push($commands, "play");
-	        chainMpdCommands($sock, $commands);
-
-		// Then add remaining
-		$commands = array();
-		for ($i = 1; $i < count($json); $i++) {
-	                array_push($commands, "add \"".html_entity_decode($json[$i]['file'])."\"");
-	        }
-	        chainMpdCommands($sock, $commands);
-	}
-}
-
-function enqueueAll($sock, $json) {
-	$commands = array();
-        foreach ($json as $song) {
-                $path = $song["file"];
-		array_push($commands, "add \"".html_entity_decode($path)."\"");
+    $output = "";
+    while(!feof($sock)) {
+        $response =  fgets($sock,1024);
+        $output .= $response;
+        if (strncmp(MPD_RESPONSE_OK,$response,strlen(MPD_RESPONSE_OK)) == 0) {
+            break;
         }
-	chainMpdCommands($sock, $commands);
-}
-
-// v2, Does not return until a change occurs.
-function sendMpdIdle($sock) {
-sendMpdCommand($sock,"idle"); 
-$response = readMpdResponse($sock);
-return true;
-}
-
-// Return state array for MPD. Does not return until a change occurs.
-function monitorMpdState($sock) {
-	if (sendMpdIdle($sock)) {
-	$status = _parseStatusResponse(MpdStatus($sock));
-	return $status;
-	}
-}
-
-// Return state array for spop daemon.
-function getSpopState($sock, $mode) {
-	$arrayReturn = array();
-
-	if (strcmp($mode, "CurrentState") == 0) {
-	// Return the current state array
-		$arrayResponse = sendSpopCommand($sock, "status");
-
-	} else if (strcmp($mode, "NextState") == 0) {
-	// Return a state array when a change has occured
-		$arrayResponse = sendSpopCommand($sock, "idle");
-
-	}
-
-	// Format the response to be understandable by Volumio
-	if (array_key_exists("status", $arrayResponse) == TRUE) {
-		if (strcmp($arrayResponse["status"], "stopped") == 0) {
-			$arrayReturn["state"] = "stop";
-
-		} else if (strcmp($arrayResponse["status"], "playing") == 0) {
-			$arrayReturn["state"] = "play";
-
-		} else if (strcmp($arrayResponse["status"], "paused") == 0) {
-			$arrayReturn["state"] = "pause";
-
-		} else {
-			$arrayReturn["state"] = $arrayResponse["status"];
-
-		}
-
-	}
-
-	if (array_key_exists("title", $arrayResponse) == TRUE) {
-		$arrayReturn["currentsong"] = $arrayResponse["title"];
-
-	}
-
-	if (array_key_exists("artist", $arrayResponse) == TRUE) {
-		$arrayReturn["currentartist"] = $arrayResponse["artist"];
-
-	}
-
-	if (array_key_exists("album", $arrayResponse) == TRUE) {
-		$arrayReturn["currentalbum"] = $arrayResponse["album"] . "<br />[Spotify Temporary Playback Queue]</b>";
-
-	}
-
-	if (array_key_exists("repeat", $arrayResponse) == TRUE) {
-		if ($arrayResponse["repeat"] == TRUE) {
-			$arrayReturn["repeat"] = 1;
-
-		} else {
-			$arrayReturn["repeat"] = 0;
-
-		}
-
-	}
-
-	if (array_key_exists("shuffle", $arrayResponse) == TRUE) {
-		if ($arrayResponse["shuffle"] == TRUE) {
-			$arrayReturn["random"] = 1;
-
-		} else {
-			$arrayReturn["random"] = 0;
-
-		}
-
-	}
-
-	if (array_key_exists("position", $arrayResponse) == TRUE && array_key_exists("duration", $arrayResponse) == TRUE) {
-		$nTimeElapsed = round($arrayResponse["position"]);
-		$nTimeTotal = round($arrayResponse["duration"] / 1000);
-
-		if ($nTimeElapsed != 0) {
-			$nSeekPercent = round(($nTimeElapsed*100)/$nTimeTotal);
-
-		} else {
-			$nSeekPercent = 0;
-
-		}
-
-		$arrayReturn["song_percent"] = $nSeekPercent;
-		$arrayReturn["elapsed"] = $nTimeElapsed;
-		$arrayReturn["time"] = $nTimeTotal;
-
-	}
-
-	if (array_key_exists("current_track", $arrayResponse) == TRUE && array_key_exists("total_tracks", $arrayResponse) == TRUE) {
-		$arrayReturn["song"] = $arrayResponse["current_track"] - 1;
-		$arrayReturn["playlistlength"] = $arrayResponse["total_tracks"];
-
-	}
-
-	$arrayReturn["single"] = 0;
-	$arrayReturn["consume"] = 0;
-
-	return $arrayReturn;
-}
-
-function getTrackInfo($sock,$songID) {
-			// set currentsong, currentartis, currentalbum
-			sendMpdCommand($sock,"playlistinfo ".$songID);
-			$track = readMpdResponse($sock);
-			return _parseFileListResponse($track);
+        if (strncmp(MPD_RESPONSE_ERR,$response,strlen(MPD_RESPONSE_ERR)) == 0) {
+            $output = "MPD error: $response";
+            break;
+        }
+    }
+    return $output;
 }
 
 function getPlayQueue($sock) {
-sendMpdCommand($sock,"playlistinfo");
-$playqueue = readMpdResponse($sock);
-return _parseFileListResponse($playqueue);
+    sendMpdCommand($sock,"playlistinfo");
+    $playqueue = readMpdResponse($sock);
+    return _parseFileListResponse($playqueue);
 }
 
 function getTemplate($template) {
-return str_replace("\"","\\\"",implode("",file($template)));
+    return str_replace("\"","\\\"",implode("",file($template)));
 }
 
 function echoTemplate($template) {
-echo $template;
-}
-
-// Perform Spotify database query/search
-function querySpopDB($sock, $queryType, $queryString) {
-
-	if (strcmp($queryType, "filepath") == 0) {
-		return _getSpopListing($sock, $queryString);
-
-	} else if (strcmp($queryType, "file") == 0) {
-		return _searchSpopTracks($sock, $queryString);
-
-	}
-
-	return array();
-}
-
-function searchDB($sock,$querytype,$query) {
-	switch ($querytype) {
-	case "filepath":
-		if (isset($query) && !empty($query)){
-		sendMpdCommand($sock,"lsinfo \"".html_entity_decode($query)."\"");
-		break;
-		} else {
-		sendMpdCommand($sock,"lsinfo");
-		break;
-		}
-	case "album":
-	case "artist":
-	case "title":
-	case "file":
-		sendMpdCommand($sock,"search ".$querytype." \"".html_entity_decode($query)."\"");
-		//sendMpdCommand($sock,"search any \"".html_entity_decode($query)."\"");
-	break;
-	
-	}
-	
-	//$response =  htmlentities(readMpdResponse($sock),ENT_XML1,'UTF-8');
-	//$response = htmlspecialchars(readMpdResponse($sock));
-	$response = readMpdResponse($sock);
-	return _parseFileListResponse($response);
-}
-
-function remTrackQueue($sock,$songpos) {
-$datapath = findPLposPath($songpos,$sock);
-sendMpdCommand($sock,"delete ".$songpos);
-$response = readMpdResponse($sock);
-return $datapath;
+    echo $template;
 }
 
 function addQueue($sock,$path) {
-$fileext = parseFileStr($path,'.');
-if ($fileext == 'm3u' OR $fileext == 'pls' OR strpos($path, '/') === false) {
-sendMpdCommand($sock,"load \"".html_entity_decode($path)."\"");
-} else {
-sendMpdCommand($sock,"add \"".html_entity_decode($path)."\"");
-}
-$response = readMpdResponse($sock);
-return $response;
-}
-
-function MpdStatus($sock) {
-sendMpdCommand($sock,"status");
-$status= readMpdResponse($sock);
-return $status;
+    $fileext = parseFileStr($path,'.');
+    if ($fileext == 'm3u' OR $fileext == 'pls' OR strpos($path, '/') === false) {
+        sendMpdCommand($sock,"load \"".html_entity_decode($path)."\"");
+    } else {
+        sendMpdCommand($sock,"add \"".html_entity_decode($path)."\"");
+    }
+    $response = readMpdResponse($sock);
+    return $response;
 }
 
 // create JS like Timestamp
 function jsTimestamp() {
-$timestamp = round(microtime(true) * 1000);
-return $timestamp;
+    $timestamp = round(microtime(true) * 1000);
+    return $timestamp;
 }
 
 function songTime($sec) {
-$minutes = sprintf('%02d', floor($sec / 60));
-$seconds = sprintf(':%02d', (int) $sec % 60);
-return $minutes.$seconds;
+    $minutes = sprintf('%02d', floor($sec / 60));
+    $seconds = sprintf(':%02d', (int) $sec % 60);
+    return $minutes.$seconds;
 }
 
 function phpVer() {
-$version = phpversion();
-return substr($version, 0, 3); 
+    $version = phpversion();
+    return substr($version, 0, 3); 
 }
 
 // fix sessioni per ambienti PHP 5.3 (il solito WAMP di ACX...)
@@ -443,254 +128,48 @@ function sysCmd($syscmd) {
     exec($syscmd." 2>&1", $output);
     return $output;
 }
-function _parseSpopResponse($resp) {
-	return json_decode($resp, true);
-
-}
-
-// Perform a Spotify search
-function _searchSpopTracks($sock, $queryString) {
-	$arrayReturn = array();
-	$arrayResponse = sendSpopCommand($sock,"search \"" . $queryString . "\"");
-
-	$i = 0;
-	$nItems = sizeof($arrayResponse["tracks"]);
-	while ($i < $nItems) {
-		$arrayCurrentEntry = array();
-		$arrayCurrentEntry["Type"] = "SpopTrack";
-		$arrayCurrentEntry["SpopTrackUri"] = (string)$arrayResponse["tracks"][$i]["uri"];
-		$arrayCurrentEntry["Title"] = $arrayResponse["tracks"][$i]["title"];
-		$arrayCurrentEntry["Artist"] = $arrayResponse["tracks"][$i]["artist"];
-		$arrayCurrentEntry["Album"] = $arrayResponse["tracks"][$i]["album"];
-
-		array_push($arrayReturn, $arrayCurrentEntry);
-
-		$i++;
-	}
-
-	return $arrayReturn;
-}
-
-// Make an array describing the requested level of the Spop database
-function _getSpopListing($sock, $queryString) {
-	$arrayReturn = array();
-
-	if (strcmp($queryString, "") == 0) {
-	// The SPOTIFY root item is requested
-		$arrayRootItem = array();
-		$arrayRootItem["directory"] = "SPOTIFY";
-		$arrayRootItem["Type"] = "SpopDirectory";
-		$arrayRoot = array(0 => $arrayRootItem);
-		$arrayReturn = $arrayRoot;
-
-	} else if (strncmp($queryString, "SPOTIFY", 7) == 0) {
-	// Looking into the SPOTIFY folder
-		$arrayResponse = sendSpopCommand($sock,"ls");
-		$arrayQueryStringParts = preg_split( "(@|/)", $queryString);
-		$nQueryStringParts = count($arrayQueryStringParts);
-		$sCurrentDirectory = "SPOTIFY";
-		$sCurrentDisplayPath = "SPOTIFY";
-
-		$i = 1;
-		while ($i < $nQueryStringParts) {
-			$sCurrentDirectory = $sCurrentDirectory . "/" . $arrayQueryStringParts[$i];
-			if (isset($arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"]) && $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"] == 0) {
-				$sCurrentDisplayPath = $sCurrentDisplayPath . "/" . "Starred";
-
-			} else {
-				$sCurrentDisplayPath = $sCurrentDisplayPath . "/" . $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["name"];
-
-			}
-
-			if (strcmp($arrayResponse["playlists"][$arrayQueryStringParts[$i]]["type"], "playlist") == 0) { 
-			// This is a playlist, navigate into it and stop
-				$arrayResponse = sendSpopCommand($sock,"ls " . $arrayResponse["playlists"][$arrayQueryStringParts[$i]]["index"]);
-				break;
-
-			} else {
-			// Index further into the directory listing
-				$arrayResponse = $arrayResponse["playlists"][$arrayQueryStringParts[$i]];
-
-			}
-
-			$i++;
-		}
-
-		$arrayCurrentEntry = array();
-		$arrayCurrentEntry["DisplayPath"] = $sCurrentDisplayPath;
-		array_push($arrayReturn, $arrayCurrentEntry);
-
-		$i = 0;
-		if (isset($arrayResponse["tracks"])) { 
-		// This is a tracklist within a playlist
-			$nItems = sizeof($arrayResponse["tracks"]);
-			while ($i < $nItems) {
-				$arrayCurrentEntry = array();
-				$arrayCurrentEntry["Type"] = "SpopTrack";
-				$arrayCurrentEntry["SpopTrackUri"] = (string)$arrayResponse["tracks"][$i]["uri"];
-				$arrayCurrentEntry["Title"] = $arrayResponse["tracks"][$i]["title"];
-				$arrayCurrentEntry["Artist"] = $arrayResponse["tracks"][$i]["artist"];
-				$arrayCurrentEntry["Album"] = $arrayResponse["tracks"][$i]["album"];
-				
-				array_push($arrayReturn, $arrayCurrentEntry);
-
-				$i++;
-			}
-
-		} else if (isset($arrayResponse["playlists"])) {
-		// This is a browsable listing
-			$nItems = sizeof($arrayResponse["playlists"]);
-			while ($i < $nItems) {
-				$arrayCurrentEntry = array();
-				$arrayCurrentEntry["Type"] = "SpopDirectory";
-				$sItemDisplayName = $arrayResponse["playlists"][$i]["name"];
-
-				if (strcmp($arrayResponse["playlists"][$i]["type"], "playlist") == 0) {
-				// This is a browsable playlist
-					$arrayCurrentEntry["SpopPlaylistIndex"] = $arrayResponse["playlists"][$i]["index"];
-					$sItemDirectory = $sCurrentDirectory . "/" . $i . "@" . $arrayResponse["playlists"][$i]["index"];
-
-					if ($arrayResponse["playlists"][$i]["index"] == 0) {
-						$sItemDisplayName = "Starred";
-
-					}
-
-				} else {
-				// This is a Spotify folder
-					$sItemDirectory = $sCurrentDirectory . "/" . $i;
-
-				}
-
-				$arrayCurrentEntry["directory"] = $sItemDirectory;
-				$arrayCurrentEntry["DisplayName"] = $sItemDisplayName;
-				array_push($arrayReturn, $arrayCurrentEntry);
-
-				$i++;
-			}
-
-		}
-
-	}
-
-	return $arrayReturn;
-}
 
 // format Output for "playlist"
 function _parseFileListResponse($resp) {
-	if ( is_null($resp) ) {
-		return NULL;
+    if ( is_null($resp) ) {
+        return NULL;
+    } else {
+        $plistArray = array();
+        $dirArray = array();
+        $plCounter = -1;
+        $dirCounter = 0;
+        $plistLine = strtok($resp,"\n");
+        $plistFile = "";
+        while ( $plistLine ) {
+            list ( $element, $value ) = explode(": ",$plistLine,2);
+            if ( $element == "file" OR $element == "playlist") {
+                $plCounter++;
+                $plistFile = $value;
+                $plistArray[$plCounter]["file"] = $plistFile;
+                $plistArray[$plCounter]["fileext"] = parseFileStr($plistFile,'.');
+            } else if ( $element == "directory") {
+                $dirArray[$dirCounter++]["directory"] = $value;
+            } else {
+                $plistArray[$plCounter][$element] = $value;
+                $plistArray[$plCounter]["Time2"] = songTime($plistArray[$plCounter]["Time"]);
+            }
 
-	} else {
-		$plistArray = array();
-		$dirArray = array();
-		$plCounter = -1;
-		$dirCounter = 0;
-		$plistLine = strtok($resp,"\n");
-		$plistFile = "";
-
-		while ( $plistLine ) {
-			list ( $element, $value ) = explode(": ",$plistLine,2);
-
-			if ( $element == "file" OR $element == "playlist") {
-				$plCounter++;
-				$plistFile = $value;
-				$plistArray[$plCounter]["file"] = $plistFile;
-				$plistArray[$plCounter]["fileext"] = parseFileStr($plistFile,'.');
-				$plistArray[$plCounter]["Type"] = "MpdFile";
-
-			} else if ( $element == "directory") {
-				$dirCounter++;
-				$dirArray[$dirCounter]["directory"] = $value;
-				$dirArray[$dirCounter]["Type"] = "MpdDirectory";
-
-			} else {
-				$plistArray[$plCounter][$element] = $value;
-				$plistArray[$plCounter]["Time2"] = songTime($plistArray[$plCounter]["Time"]);
-
-			}
-
-			$plistLine = strtok("\n");
-
-		}
-
-	}
-
-	return array_merge($dirArray, $plistArray);
-}
-
-// format Output for "status"
-function _parseStatusResponse($resp) {
-	if ( is_null($resp) ) {
-		return NULL;
-
-	} else {
-		$plistArray = array();
-		$plistLine = strtok($resp,"\n");
-		$plistFile = "";
-		$plCounter = -1;
-
-		while ( $plistLine ) {
-			list ( $element, $value ) = explode(": ",$plistLine,2);
-			$plistArray[$element] = $value;
-			$plistLine = strtok("\n");
-
-		}
-
-		// "elapsed time song_percent" added to output array
-		$time = explode(":", $plistArray['time']);
-
-		if ($time[0] != 0) {
-			$percent = round(($time[0]*100)/$time[1]);
-
-		} else {
-			$percent = 0;
-
-		}
-
-		$plistArray["song_percent"] = $percent;
-		$plistArray["elapsed"] = $time[0];
-		$plistArray["time"] = $time[1];
-
-		// "audio format" output
-		$audio_format = explode(":", $plistArray['audio']);
-		switch ($audio_format[0]) {
-			case '48000':
-			case '96000':
-			case '192000':
-			$plistArray['audio_sample_rate'] = rtrim(rtrim(number_format($audio_format[0]),0),',');
-			break;
-
-			case '44100':
-			case '88200':
-			case '176400':
-			case '352800':
-			$plistArray['audio_sample_rate'] = rtrim(number_format($audio_format[0],0,',','.'),0);
-			break;
-		}
-
-		// format "audio_sample_depth" string
-			$plistArray['audio_sample_depth'] = $audio_format[1];
-
-		// format "audio_channels" string
-			if ($audio_format[2] == "2") $plistArray['audio_channels'] = "Stereo";
-			if ($audio_format[2] == "1") $plistArray['audio_channels'] = "Mono";
-			if ($audio_format[2] > 2) $plistArray['audio_channels'] = "Multichannel";
-
-	}
-
-	return $plistArray;
+            $plistLine = strtok("\n");
+        }
+    }
+    return array_merge($dirArray, $plistArray);
 }
 
 // get file extension
 function parseFileStr($strFile,$delimiter) {
-$pos = strrpos($strFile, $delimiter);
-$str = substr($strFile, $pos+1);
-return $str;
+    $pos = strrpos($strFile, $delimiter);
+    $str = substr($strFile, $pos+1);
+    return $str;
 }
 
 // cfg engine and session management
 function playerSession($action,$db,$var,$value) {
-$status = session_status();	
+    $status = session_status();	
 	// open new PHP SESSION
 	if ($action == 'open') {
 		// check the PHP SESSION status
