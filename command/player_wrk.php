@@ -307,7 +307,8 @@ if (isset($_SESSION['shairport']) && $_SESSION['shairport'] == 1) {
 // Start Shairport with Volumio name, stopping Mpd on start, with Selected output device
 	playerSession('open',$db);
 	$hostname = $_SESSION['hostname'];	
-	$cmd = '/usr/local/bin/shairport -a "'.$hostname.'" -w -B "mpc stop" -o alsa -- -d plughw:'.$device.' > /dev/null 2>&1 &';
+	$tempfile = '/tmp/.restart_mpd'; // if this file exists, start playing mpd after shairport stopped
+	$cmd = '/usr/local/bin/shairport -a "'.$hostname.'" -w -B "(/usr/bin/mpc | grep -q playing && touch \''.$tempfile.'\'); /usr/bin/mpc stop" -E "test -f \''.$tempfile.'\' && /usr/bin/mpc play && rm -f \''.$tempfile.'\'" -o alsa -- -d plughw:'.$device.' > /dev/null 2>&1 &';
 	sysCmd($cmd);
 } 
 
