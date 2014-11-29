@@ -591,6 +591,7 @@ if (isset($_POST['spotify']) && $_POST['spotify'] != $_SESSION['spotify']){
 	$content .= "spotify_password = ".$_SESSION['spotpassword']."\n"; 
 	$content .= "audio_output = sox"."\n"; 
 	$content .= "[sox]"."\n"; 
+	$content .= "output_type = alsa"."\n"; 
 	$content .= "output_name =  plughw:".$device.""."\n";
 	if ($_POST['spotifybitrate'] == 0) {
 	$content .= "high_bitrate = false"."\n";
