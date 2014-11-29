@@ -289,7 +289,6 @@ if (isset($_SESSION['cmediafix']) && $_SESSION['cmediafix'] == 1) {
 
 // Shairport for Airplay Capability
 //Retrieve Output Device
-if (isset($_SESSION['shairport']) && $_SESSION['shairport'] == 1) {
 	$dbh = cfgdb_connect($db);
 	$query_cfg = "SELECT param,value_player FROM cfg_mpd WHERE value_player!=''";
 	$mpdcfg = sdbquery($query_cfg,$dbh);
@@ -305,6 +304,7 @@ if (isset($_SESSION['shairport']) && $_SESSION['shairport'] == 1) {
 		}
 	}
 // Start Shairport with Volumio name, stopping Mpd on start, with Selected output device
+if (isset($_SESSION['shairport']) && $_SESSION['shairport'] == 1) {
 	playerSession('open',$db);
 	$hostname = $_SESSION['hostname'];	
 	$tempfile = '/tmp/.restart_mpd'; // if this file exists, start playing mpd after shairport stopped
