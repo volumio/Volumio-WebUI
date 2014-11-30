@@ -48,12 +48,12 @@ $mpdconfdefault = cfgdb_read('',$dbh,'mpdconfdefault');
 	$_SESSION['w_active'] = 1;
 	// set UI notify
 	$_SESSION['notify']['title'] = 'Reset MPD Config';
-	$_SESSION['notify']['msg'] = 'restarting MPD daemon...';
+	$_SESSION['notify']['msg'] = 'Restarting MPD daemon...';
 	session_write_close();
 	} else {
 	session_start();
 	$_SESSION['notify']['title'] = 'Job Failed';
-	$_SESSION['notify']['msg'] = 'background worker is busy.';
+	$_SESSION['notify']['msg'] = 'Background worker is busy.';
 	session_write_close();
 	}
 unset($_POST);
@@ -71,12 +71,12 @@ if(isset($_POST['conf']) && !empty($_POST['conf'])) {
 		$_SESSION['w_active'] = 1;
 		// set UI notify
 		$_SESSION['notify']['title'] = 'MPD Config modified';
-		$_SESSION['notify']['msg'] = 'restarting MPD daemon...';
+		$_SESSION['notify']['msg'] = 'Restarting MPD daemon...';
 		session_write_close();
 		} else {
 		session_start();
 		$_SESSION['notify']['title'] = 'Job Failed';
-		$_SESSION['notify']['msg'] = 'background worker is busy.';
+		$_SESSION['notify']['msg'] = 'Background worker is busy.';
 		session_write_close();
 		}
 }
@@ -91,12 +91,12 @@ if(isset($_POST['mpdconf']) && !empty($_POST['mpdconf'])) {
 		$_SESSION['w_active'] = 1;
 		// set UI notify
 		$_SESSION['notify']['title'] = 'MPD Config modified';
-		$_SESSION['notify']['msg'] = 'restarting MPD daemon...';
+		$_SESSION['notify']['msg'] = 'Restarting MPD daemon...';
 		session_write_close();
 		} else {
 		session_start();
 		$_SESSION['notify']['title'] = 'Job Failed';
-		$_SESSION['notify']['msg'] = 'background worker is busy.';
+		$_SESSION['notify']['msg'] = 'Background worker is busy.';
 		session_write_close();
 		}
 }
@@ -173,7 +173,7 @@ $_mpd_select['buffer_before_play'] .= "<option value=\"20%\" ".(($_mpd['buffer_b
 $_mpd_select['buffer_before_play'] .= "<option value=\"30%\" ".(($_mpd['buffer_before_play'] == '30%') ? "selected" : "")." >30%</option>\n";	
 
 //samplerate_converter
-$_mpd_select['samplerate_converter'] .= "<option value=\"Fastest Sinc Interpolator\" ".(($_mpd['samplerate_converter'] == 'Fastest Sinc Interpolator0%') ? "selected" : "")." >Fastest Sinc Interpolator</option>\n";	
+$_mpd_select['samplerate_converter'] .= "<option value=\"Fastest Sinc Interpolator\" ".(($_mpd['samplerate_converter'] == 'Fastest Sinc Interpolator') ? "selected" : "")." >Fastest Sinc Interpolator</option>\n";	
 $_mpd_select['samplerate_converter'] .= "<option value=\"Medium Sinc Interpolator\" ".(($_mpd['samplerate_converter'] == 'Medium Sinc Interpolator') ? "selected" : "")." >Medium Sinc Interpolator</option>\n";	
 $_mpd_select['samplerate_converter'] .= "<option value=\"Best Sinc Interpolator\" ".(($_mpd['samplerate_converter'] == 'Best Sinc Interpolator') ? "selected" : "")." >Best Sinc Interpolator</option>\n";	
 
@@ -241,7 +241,7 @@ eval("echoTemplate(\"".getTemplate("templates/$tpl")."\");");
 <!-- content -->
 
 <?php 
-// debug($_POST);
+ debug($_POST);
 ?>
 
 <?php include('_footer.php'); ?>
