@@ -232,7 +232,7 @@ if (!empty($ipwlan0)) {
     $_wlan0 .= "<div class=\"alert alert-info\">\n";
 	$_wlan0 .= "<div><b>Status:</b>   ".$statuswl."</div>\n";
     $_wlan0 .= "<div><b>IP address:</b> ".$ipwlan0."</div>\n";
-	$_wlan0 .= "<div><b>Signal Strenght:</b> ".$quwlan0."%</div>\n";
+	$_wlan0 .= "<div><b>Signal Strength:</b> ".$quwlan0."%</div>\n";
 	$_wlan0 .= "<div><b>BitRate:</b> ".$bitrate." Mb/s</div>\n";
     $_wlan0 .= "</div>\n";
     $_wlan0ssid = $wifisec[0]['ssid'];
