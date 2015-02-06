@@ -1514,6 +1514,11 @@ $file = '/proc/cpuinfo';
 					$arch = '07';
 					break;
 					
+					// RaspberryPi 2
+					case 'BCM2709':
+					$arch = '08';
+					break;
+					
 					default:
 					$arch = '--';
 					break;
@@ -1568,9 +1573,16 @@ playerSession('write',$db,'playerid',$playerid);
 		playerSession('write',$db,'hwplatformid',$arch);
 		break;
 		
+		case '08':
+		playerSession('write',$db,'hwplatform','RaspberryPi');
+		playerSession('write',$db,'hwplatformid',01);
+		break;
+		
 		default:
 		playerSession('write',$db,'hwplatform','unknown');
 		playerSession('write',$db,'hwplatformid',$arch);
+		
+	
 
 	}
 }
