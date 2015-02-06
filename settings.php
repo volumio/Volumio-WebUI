@@ -187,7 +187,7 @@ if (isset($_POST['syscmd'])){
 
 // Show i2s selector only on RaspberryPI
 $arch = wrk_getHwPlatform();
-if ($arch === '01') or ($arch === '08') {
+if ($arch == '01' || '08') {
 } else 	{
     $_divi2s = "class=\"hide\"";
     }
