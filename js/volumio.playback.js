@@ -386,7 +386,7 @@ jQuery(document).ready(function($){ 'use strict';
         $(this).parent().addClass('active');
         var path = $(this).parent().data('path');
         //console.log('doubleclicked path = ', path);
-		$.post('db/?cmd=spop-stop', {}, function(data) {}, 'json');
+	$.post('db/?cmd=spop-stop', {}, function(data) {}, 'json');
         getDB('addplay', path);
         notify('add', path);
     });
@@ -397,6 +397,7 @@ jQuery(document).ready(function($){ 'use strict';
         var path = $(this).parent().data('path');
         //console.log('doubleclicked path = ', path);
         $.post('db/?cmd=spop-playtrackuri', { 'path': path }, function(data) {}, 'json');
+        notify('add', path);
     }); 
     
     $('.database').on('dblclick', '.db-other', function() {
@@ -404,6 +405,7 @@ jQuery(document).ready(function($){ 'use strict';
         $(this).parent().addClass('active');
         var path = $(this).parent().data('path');
         //console.log('doubleclicked path = ', path);
+        $.post('db/?cmd=spop-stop', {}, function(data) {}, 'json');
         getDB('addplay', path);
         notify('add', path);
     });
