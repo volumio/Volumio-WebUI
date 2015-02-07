@@ -41,7 +41,7 @@ killall -9 ntpd
 #killall -9 rpc.statd
 #killall -9 rpcbind
 killall -9 thd
-killall -9 udevd
+#killall -9 udevd
 #killall -9 automount
 killall -9 cron
 killall -9 atd
