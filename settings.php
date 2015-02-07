@@ -412,11 +412,10 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 
 	case 'Hifiberry':
 		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-bcm2708_dmaengine
-snd_soc_pcm5102a
-snd_soc_hifiberry_dac';
+	$file = '/boot/config.txt';
+	$text = 'gpu_mem=16
+	hdmi_drive=2
+	dtoverlay=hifiberry-dac';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Hifiberry Driver Activated. You must reboot for changes to take effect';
 	$_SESSION['w_active'] = 1;
@@ -428,10 +427,10 @@ snd_soc_hifiberry_dac';
 	
 	case 'Hifiberryplus':
 		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-bcm2708_dmaengine
-snd_soc_hifiberry_dacplus';
+	$file = '/boot/config.txt';
+	$text = 'gpu_mem=16
+	hdmi_drive=2
+	dtoverlay=hifiberry-dacplus';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Hifiberry + Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -442,10 +441,10 @@ snd_soc_hifiberry_dacplus';
 		
 	case 'HifiberryDigi':
 			session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-bcm2708_dmaengine
-snd_soc_hifiberry_digi';
+	$file = '/boot/config.txt';
+	$text = 'gpu_mem=16
+	hdmi_drive=2
+	dtoverlay=hifiberry-digi';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Hifiberry DIGI Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -456,10 +455,10 @@ snd_soc_hifiberry_digi';
 	
 	case 'HifiberryAmp':
 			session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-bcm2708_dmaengine
-snd_soc_hifiberry_amp';
+	$file = '/boot/config.txt';
+	$text = 'gpu_mem=16
+	hdmi_drive=2
+	dtoverlay=hifiberry-amp';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Hifiberry Amp Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -468,30 +467,12 @@ snd_soc_hifiberry_amp';
 	playerSession('unlock');
 	break;
 	
-	case 'RpiDac':
-		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-snd_soc_bcm2708_i2s
-bcm2708_dmaengine
-snd_soc_pcm5102a
-snd_soc_rpi_dac';
-	file_put_contents($file, $text);
-	$_SESSION['notify']['msg'] = 'RPi-DAC Driver Activated. You must reboot for changes to take effect';
-		// save new value on SQLite datastore
-	playerSession('write',$db,'i2s',$_POST['i2s']);
-	// unlock session file
-	playerSession('unlock');
-		break;
-		
 	case 'Iqaudio':
 		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-snd_soc_bcm2708_i2s
-bcm2708_dmaengine
-snd_soc_pcm512x
-snd_soc_iqaudio_dac';
+	$file = '/boot/config.txt';
+	$text = 'gpu_mem=16
+	hdmi_drive=2
+	dtoverlay=iqaudio-dac';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'IQaudIO Pi-DAC Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -500,17 +481,42 @@ snd_soc_iqaudio_dac';
 	playerSession('unlock');	
 		break;
 		
+	case 'IqaudioDacPlus':
+		session_start();
+	$file = '/boot/config.txt';
+	$text = 'gpu_mem=16
+	hdmi_drive=2
+	dtoverlay=iqaudio-dacplus';
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'IQaudIO Pi-DAC Driver Activated. You must reboot for changes to take effect';
+	// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');	
+		break;	
+	
+	case 'RpiDac':
+		session_start();
+	$file = '/boot/config.txt';
+	$text = 'gpu_mem=16
+	hdmi_drive=2
+	dtoverlay=rpi-dac';
+	file_put_contents($file, $text);
+	$_SESSION['notify']['msg'] = 'RPi-DAC Driver Activated. You must reboot for changes to take effect';
+		// save new value on SQLite datastore
+	playerSession('write',$db,'i2s',$_POST['i2s']);
+	// unlock session file
+	playerSession('unlock');
+		break;
+		
+	
+		
 	case 'Generic':
 		session_start();
-	$file = '/etc/modules';
-	$text = 'snd_soc_bcm2708
-snd_soc_bcm2708_i2s
-bcm2708_dmaengine
-snd_soc_pcm512x
-snd_soc_pcm512x
-snd_soc_hifiberry_dac
-snd_soc_rpi_dac';
-
+	$file = '/boot/config.txt';
+	$text = 'gpu_mem=16
+	hdmi_drive=2
+	dtoverlay=rpi-dac';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Generic Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -521,9 +527,9 @@ snd_soc_rpi_dac';
 	
 	case 'i2soff':
 		session_start();
-	$file = '/etc/modules';
-	$text = 'snd-bcm2835';
-	file_put_contents($file, $text);
+	$file = '/boot/config.txt';
+	$text = 'gpu_mem=16
+	hdmi_drive=2h';
 	$_SESSION['notify']['msg'] = 'I2S Driver Deactivated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
 	playerSession('write',$db,'i2s',$_POST['i2s']);
@@ -624,7 +630,8 @@ $_i2s['i2s'] .= "<option value=\"Hifiberry\" ".(($_SESSION['i2s'] == 'Hifiberry'
 $_i2s['i2s'] .= "<option value=\"Hifiberryplus\" ".(($_SESSION['i2s'] == 'Hifiberryplus') ? "selected" : "").">Hifiberry +</option>\n";
 $_i2s['i2s'] .= "<option value=\"HifiberryDigi\" ".(($_SESSION['i2s'] == 'HifiberryDigi') ? "selected" : "").">Hifiberry Digi</option>\n";
 $_i2s['i2s'] .= "<option value=\"HifiberryAmp\" ".(($_SESSION['i2s'] == 'HifiberryAmp') ? "selected" : "").">Hifiberry Amp</option>\n";
-$_i2s['i2s'] .= "<option value=\"Iqaudio\" ".(($_SESSION['i2s'] == 'Iqaudio') ? "selected" : "").">IQaudIO Pi-DAC</option>\n";
+$_i2s['i2s'] .= "<option value=\"Iqaudio\" ".(($_SESSION['i2s'] == 'Iqaudio') ? "selected" : "").">IQaudIO DAC</option>\n";
+$_i2s['i2s'] .= "<option value=\"IqaudioDacPlus\" ".(($_SESSION['i2s'] == 'IqaudioDacPlus') ? "selected" : "").">IQaudIO DAC Plus</option>\n";
 $_i2s['i2s'] .= "<option value=\"RpiDac\" ".(($_SESSION['i2s'] == 'RpiDac') ? "selected" : "").">RPi-DAC</option>\n";
 $_i2s['i2s'] .= "<option value=\"Generic\" ".(($_SESSION['i2s'] == 'Generic') ? "selected" : "").">Generic</option>\n";
 $_system_select['orionprofile'] .= "<option value=\"Orion\" ".(($_SESSION['orionprofile'] == 'Orion') ? "selected" : "").">Orion</option>\n";
