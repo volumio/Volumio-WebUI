@@ -386,17 +386,18 @@ jQuery(document).ready(function($){ 'use strict';
         $(this).parent().addClass('active');
         var path = $(this).parent().data('path');
         //console.log('doubleclicked path = ', path);
+		$.post('db/?cmd=spop-stop', {}, function(data) {}, 'json');
         getDB('addplay', path);
         notify('add', path);
     });
     
-    $('.database').on('dblclick', '.db-browse', function() {
+    $('.database').on('dblclick', '.db-spop', function() {
         $('.database li').removeClass('active');
         $(this).parent().addClass('active');
         var path = $(this).parent().data('path');
         //console.log('doubleclicked path = ', path);
         $.post('db/?cmd=spop-playtrackuri', { 'path': path }, function(data) {}, 'json');
-    });
+    }); 
     
     $('.database').on('dblclick', '.db-other', function() {
         $('.database li').removeClass('active');
