@@ -1574,8 +1574,8 @@ playerSession('write',$db,'playerid',$playerid);
 		break;
 		
 		case '08':
-		playerSession('write',$db,'hwplatform','RaspberryPi');
-		playerSession('write',$db,'hwplatformid',01);
+		playerSession('write',$db,'hwplatform','RaspberryPi2');
+		playerSession('write',$db,'hwplatformid',$arch);
 		break;
 		
 		default:
