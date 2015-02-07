@@ -414,8 +414,8 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 		session_start();
 	$file = '/boot/config.txt';
 	$text = 'gpu_mem=16
-	hdmi_drive=2
-	dtoverlay=hifiberry-dac';
+hdmi_drive=2
+dtoverlay=hifiberry-dac';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Hifiberry Driver Activated. You must reboot for changes to take effect';
 	$_SESSION['w_active'] = 1;
@@ -429,8 +429,8 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 		session_start();
 	$file = '/boot/config.txt';
 	$text = 'gpu_mem=16
-	hdmi_drive=2
-	dtoverlay=hifiberry-dacplus';
+hdmi_drive=2
+dtoverlay=hifiberry-dacplus';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Hifiberry + Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -443,8 +443,8 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 			session_start();
 	$file = '/boot/config.txt';
 	$text = 'gpu_mem=16
-	hdmi_drive=2
-	dtoverlay=hifiberry-digi';
+hdmi_drive=2
+dtoverlay=hifiberry-digi';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Hifiberry DIGI Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -457,8 +457,8 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 			session_start();
 	$file = '/boot/config.txt';
 	$text = 'gpu_mem=16
-	hdmi_drive=2
-	dtoverlay=hifiberry-amp';
+hdmi_drive=2
+dtoverlay=hifiberry-amp';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Hifiberry Amp Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -471,8 +471,8 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 		session_start();
 	$file = '/boot/config.txt';
 	$text = 'gpu_mem=16
-	hdmi_drive=2
-	dtoverlay=iqaudio-dac';
+hdmi_drive=2
+dtoverlay=iqaudio-dac';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'IQaudIO Pi-DAC Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -485,8 +485,8 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 		session_start();
 	$file = '/boot/config.txt';
 	$text = 'gpu_mem=16
-	hdmi_drive=2
-	dtoverlay=iqaudio-dacplus';
+hdmi_drive=2
+dtoverlay=iqaudio-dacplus';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'IQaudIO Pi-DAC Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -499,8 +499,8 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 		session_start();
 	$file = '/boot/config.txt';
 	$text = 'gpu_mem=16
-	hdmi_drive=2
-	dtoverlay=rpi-dac';
+hdmi_drive=2
+dtoverlay=rpi-dac';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'RPi-DAC Driver Activated. You must reboot for changes to take effect';
 		// save new value on SQLite datastore
@@ -515,8 +515,8 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 		session_start();
 	$file = '/boot/config.txt';
 	$text = 'gpu_mem=16
-	hdmi_drive=2
-	dtoverlay=rpi-dac';
+hdmi_drive=2
+dtoverlay=rpi-dac';
 	file_put_contents($file, $text);
 	$_SESSION['notify']['msg'] = 'Generic Driver Activated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
@@ -529,7 +529,7 @@ if (isset($_POST['i2s']) && $_POST['i2s'] != $_SESSION['i2s']){
 		session_start();
 	$file = '/boot/config.txt';
 	$text = 'gpu_mem=16
-	hdmi_drive=2h';
+hdmi_drive=2h';
 	$_SESSION['notify']['msg'] = 'I2S Driver Deactivated. You must reboot for changes to take effect';
 	// save new value on SQLite datastore
 	playerSession('write',$db,'i2s',$_POST['i2s']);
