@@ -25,7 +25,7 @@ $_int0dhcp
 				<div class="control-group">
 					<label class="control-label" for="eth0[netmask]">Netmask</label>
 					<div class="controls">
-						<input class="input-large" class="input-block-level" type="text" data-regexp="^[1-2]{1}[2,4,5,9]{1}[0,2,4,5,8]{1}\.[0-2]{1}[0,2,4,5,9]{1}[0,2,4,5,8]{1}\.[0-2]{1}[0,2,4,5,9]{1}[0,2,4,5,8]{1}\.[0-9]{1,3}$" id="netmask" name="eth0[netmask]" value="$_int0[netmask]" data-trigger="change" data-required="true">
+						<input class="input-large" class="input-block-level" type="text" data-regexp="^(254|252|248|240|224|192|128)\.0\.0\.0|255\.(254|252|248|240|224|192|128|0)\.0\.0|255\.255\.(254|252|248|240|224|192|128|0)\.0|255\.255\.255\.(254|252|248|240|224|192|128|0)$" id="netmask" name="eth0[netmask]" value="$_int0[netmask]" data-trigger="change" data-required="true">
 						<span class="help-block">Manually set the network mask.</span>
 					</div>
 				</div>
