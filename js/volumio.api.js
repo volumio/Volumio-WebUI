@@ -45,7 +45,7 @@
     DBupdate: 0
 };
 
-// FUNZIONI
+// FUNCTIONS
 // ----------------------------------------------------------------------------------------------------
 
 function sendCmd(inputcmd) {
@@ -581,7 +581,7 @@ function refreshTimer(startFrom, stopTo, state){
     }
 }
 
-// update right knob
+// update time knob
 function refreshKnob(json){
     window.clearInterval(GUI.currentKnob)
     var initTime = json['song_percent'];
@@ -624,6 +624,7 @@ function countdownRestart(startFrom) {
 function setVolume(val) {
     GUI.volume = val;
     GUI.halt = 1;
+
     $('#volumemute').removeClass('btn-primary');
     sendCmd('setvol ' + val);
 }

@@ -48,11 +48,12 @@ if (!$mpd) {
 			// record "lastsongid" in PHP SESSION
 			$_SESSION['lastsongid'] = $status['songid'];
 
-			// controllo per cancellazione ramplay
+			// Control for cancelling ramplay
 				// if (!rp_checkPLid($_SESSION['lastsongid'],$mpd)) {
 				// rp_deleteFile($_SESSION['lastsongid'],$mpd);
 				// }
-			// recupero id nextsong e metto in sessione
+
+			// feth next song and put in SESSION
 			$_SESSION['nextsongid'] = $status['nextsongid']; 
 
 		}
@@ -108,13 +109,13 @@ if (!$mpd) {
 				// $status['consume'] = 1;
 				// }
 
-			// copio il pezzo in /dev/shm
+			// Copy the text from /dev/shm
 			$path = rp_copyFile($status['nextsongid'],$mpd);
 
-			// lancio update mdp locazione ramplay
+			// Update MPD ramplay location
 			rp_updateFolder($mpd);
 
-			// lancio addandplay canzone
+			// Launch add/play song
 			rp_addPlay($path,$mpd,$status['playlistlength']);
 
 		}

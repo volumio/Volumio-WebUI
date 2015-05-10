@@ -214,16 +214,24 @@ function enqueueAll($sock, $json) {
 
 // v2, Does not return until a change occurs.
 function sendMpdIdle($sock) {
-sendMpdCommand($sock,"idle"); 
-$response = readMpdResponse($sock);
-return true;
+	$response = NULL;
+
+	// Keep putting socket into "idle" mode until the response is something other than a mixer update
+	// since we don't want to update the GUI for a volume change
+	while (strcmp(substr($response, 0, 14), 'changed: mixer') == 0 || $response == NULL) {
+		sendMpdCommand($sock,"idle");
+		$response = readMpdResponse($sock);
+
+	}
+
+	return true;
 }
 
 // Return state array for MPD. Does not return until a change occurs.
 function monitorMpdState($sock) {
 	if (sendMpdIdle($sock)) {
-	$status = _parseStatusResponse(MpdStatus($sock));
-	return $status;
+		$status = _parseStatusResponse(MpdStatus($sock));
+		return $status;
 	}
 }
 
@@ -388,47 +396,51 @@ function searchDB($sock,$querytype,$query) {
 }
 
 function remTrackQueue($sock,$songpos) {
-$datapath = findPLposPath($songpos,$sock);
-sendMpdCommand($sock,"delete ".$songpos);
-$response = readMpdResponse($sock);
-return $datapath;
+	$datapath = findPLposPath($songpos,$sock);
+	sendMpdCommand($sock,"delete ".$songpos);
+	$response = readMpdResponse($sock);
+	return $datapath;
+
 }
 
 function addQueue($sock,$path) {
-$fileext = parseFileStr($path,'.');
-if ($fileext == 'm3u' OR $fileext == 'pls' OR strpos($path, '/') === false) {
-sendMpdCommand($sock,"load \"".html_entity_decode($path)."\"");
-} else {
-sendMpdCommand($sock,"add \"".html_entity_decode($path)."\"");
-}
-$response = readMpdResponse($sock);
-return $response;
+	$fileext = parseFileStr($path,'.');
+
+	if ($fileext == 'm3u' OR $fileext == 'pls' OR strpos($path, '/') === false) {
+		sendMpdCommand($sock,"load \"".html_entity_decode($path)."\"");
+	} else {
+		sendMpdCommand($sock,"add \"".html_entity_decode($path)."\"");
+	}
+
+	$response = readMpdResponse($sock);
+	return $response;
+
 }
 
 function MpdStatus($sock) {
-sendMpdCommand($sock,"status");
-$status= readMpdResponse($sock);
-return $status;
+	sendMpdCommand($sock,"status");
+	$status= readMpdResponse($sock);
+	return $status;
 }
 
 // create JS like Timestamp
 function jsTimestamp() {
-$timestamp = round(microtime(true) * 1000);
-return $timestamp;
+	$timestamp = round(microtime(true) * 1000);
+	return $timestamp;
 }
 
 function songTime($sec) {
-$minutes = sprintf('%02d', floor($sec / 60));
-$seconds = sprintf(':%02d', (int) $sec % 60);
-return $minutes.$seconds;
+	$minutes = sprintf('%02d', floor($sec / 60));
+	$seconds = sprintf(':%02d', (int) $sec % 60);
+	return $minutes.$seconds;
 }
 
 function phpVer() {
-$version = phpversion();
-return substr($version, 0, 3); 
+	$version = phpversion();
+	return substr($version, 0, 3); 
 }
 
-// fix sessioni per ambienti PHP 5.3 (il solito WAMP di ACX...)
+// Fix session environments in PHP 5.3 (the usual WAMP of ACX...)
 if (phpVer() == '5.3') {
 	function session_status() {
 		if (session_id()) {
@@ -443,6 +455,7 @@ function sysCmd($syscmd) {
     exec($syscmd." 2>&1", $output);
     return $output;
 }
+
 function _parseSpopResponse($resp) {
 	return json_decode($resp, true);
 
@@ -683,14 +696,16 @@ function _parseStatusResponse($resp) {
 
 // get file extension
 function parseFileStr($strFile,$delimiter) {
-$pos = strrpos($strFile, $delimiter);
-$str = substr($strFile, $pos+1);
-return $str;
+	$pos = strrpos($strFile, $delimiter);
+	$str = substr($strFile, $pos+1);
+	return $str;
+
 }
 
 // cfg engine and session management
 function playerSession($action,$db,$var,$value) {
-$status = session_status();	
+	$status = session_status();
+
 	// open new PHP SESSION
 	if ($action == 'open') {
 		// check the PHP SESSION status
@@ -775,6 +790,7 @@ function cfgdb_connect($dbpath) {
         echo "cannot open the database";
         return false;
     }
+
 }
 
 function cfgdb_read($table,$dbh,$param,$id) {
@@ -791,47 +807,48 @@ function cfgdb_read($table,$dbh,$param,$id) {
 	}
     $result = sdbquery($querystr,$dbh);
     return $result;
+
 }
 
 function cfgdb_update($table,$dbh,$key,$value) {
-switch ($table) {
-	case 'cfg_engine':
-	$querystr = "UPDATE ".$table." SET value='".$value."' where param='".$key."'";
-	break;
-	
-	case 'cfg_lan':
-	$querystr = "UPDATE ".$table." SET dhcp='".$value['dhcp']."', ip='".$value['ip']."', netmask='".$value['netmask']."', gw='".$value['gw']."', dns1='".$value['dns1']."', dns2='".$value['dns2']."' where name='".$value['name']."'";
-	break;
-	
-	case 'cfg_mpd':
-	$querystr = "UPDATE ".$table." set value_player='".$value."' where param='".$key."'";
-	break;
-	
-	case 'cfg_wifisec':
-	$querystr = "UPDATE ".$table." SET ssid='".$value['ssid']."', security='".$value['encryption']."', password='".$value['password']."' where id=1";
-	break;
-	
-	case 'cfg_source':
-	$querystr = "UPDATE ".$table." SET name='".$value['name']."', type='".$value['type']."', address='".$value['address']."', remotedir='".$value['remotedir']."', username='".$value['username']."', password='".$value['password']."', charset='".$value['charset']."', rsize='".$value['rsize']."', wsize='".$value['wsize']."', options='".$value['options']."', error='".$value['error']."' where id=".$value['id'];
-	break;
-}
-//debug
-error_log(">>>>> cfgdb_update(".$table.",dbh,".$key.",".$value.") >>>>> \n".$querystr, 0);
-	if (sdbquery($querystr,$dbh)) {
-	return true;
-	} else {
-	return false;
+	switch ($table) {
+		case 'cfg_engine':
+			$querystr = "UPDATE ".$table." SET value='".$value."' where param='".$key."'";
+			break;
+		case 'cfg_lan':
+			$querystr = "UPDATE ".$table." SET dhcp='".$value['dhcp']."', ip='".$value['ip']."', netmask='".$value['netmask']."', gw='".$value['gw']."', dns1='".$value['dns1']."', dns2='".$value['dns2']."' where name='".$value['name']."'";
+			break;
+		case 'cfg_mpd':
+			$querystr = "UPDATE ".$table." set value_player='".$value."' where param='".$key."'";
+			break;
+		case 'cfg_wifisec':
+			$querystr = "UPDATE ".$table." SET ssid='".$value['ssid']."', security='".$value['encryption']."', password='".$value['password']."' where id=1";
+			break;
+		case 'cfg_source':
+			$querystr = "UPDATE ".$table." SET name='".$value['name']."', type='".$value['type']."', address='".$value['address']."', remotedir='".$value['remotedir']."', username='".$value['username']."', password='".$value['password']."', charset='".$value['charset']."', rsize='".$value['rsize']."', wsize='".$value['wsize']."', options='".$value['options']."', error='".$value['error']."' where id=".$value['id'];
+			break;
+
 	}
+	//debug
+	error_log(">>>>> cfgdb_update(".$table.",dbh,".$key.",".$value.") >>>>> \n".$querystr, 0);
+
+	if (sdbquery($querystr,$dbh)) {
+		return true;
+	} else {
+		return false;
+	}
+
 }
 
 function cfgdb_write($table,$dbh,$values) {
-$querystr = "INSERT INTO ".$table." VALUES (NULL, ".$values.")";
-//debug
-error_log(">>>>> cfgdb_write(".$table.",dbh,".$values.") >>>>> \n".$querystr, 0);
+	$querystr = "INSERT INTO ".$table." VALUES (NULL, ".$values.")";
+	//debug
+	error_log(">>>>> cfgdb_write(".$table.",dbh,".$values.") >>>>> \n".$querystr, 0);
+
 	if (sdbquery($querystr,$dbh)) {
-	return true;
+		return true;
 	} else {
-	return false;
+		return false;
 	}
 }
 

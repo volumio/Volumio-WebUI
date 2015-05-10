@@ -339,12 +339,12 @@ jQuery(document).ready(function($){ 'use strict';
     // click on playlist tab
     $('#open-panel-dx a').click(function(){
         var current = parseInt(GUI.MpdState['song']);
-        customScroll('pl', current, 200); // da eseguire sul tab ready!
+        customScroll('pl', current, 200); // runs when tab ready!
     });
 
     // click on playback tab
     $('#open-playback a').click(function(){
-        // fai qualcosa
+        // do something
         // console.log('JSON = ', GUI.MpdState);
     });
 
@@ -423,7 +423,7 @@ jQuery(document).ready(function($){ 'use strict';
         // console.log('getDB path = ', GUI.DBentry);
     });
 
-    // chiudi i risultati di ricerca nel DB
+    // click search results in DB
     $('.database').on('click', '.search-results', function() {
         getDB('filepath', GUI.currentpath);
     });
