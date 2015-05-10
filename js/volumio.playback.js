@@ -182,7 +182,7 @@ jQuery(document).ready(function($){ 'use strict';
 						cache : false,
 						success : function(data) {
 							if (data != '') {
-								GUI.SpopState = eval('(' + data + ')');
+								GUI.SpopState = data;
 								renderUI();
 							}
 						}
