@@ -31,11 +31,12 @@
 include('../inc/connection.php');
 error_reporting(ERRORLEVEL);
 
+header('Content-Type: application/json');
+
 if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
 
         if ( !$mpd ) {
-        echo 'Error Connecting to MPD daemon ';
-		
+			echo json_encode(['error' => 'Error Connecting to MPD daemon']);
 		} else {
 			$sRawCommand = $_GET['cmd'];
 			$sSpopCommand = NULL;
@@ -87,9 +88,12 @@ if (isset($_GET['cmd']) && $_GET['cmd'] != '') {
         }
 
 } else {
-	echo 'MPD COMMAND INTERFACE<br>';
-	echo 'INTERNAL USE ONLY<br>';
-	echo 'hosted on raspyfi.local:82';
+	echo json_encode(
+		[
+		'service'       => 'MPD COMMAND INTERFACE',
+		'disclaimer'    => 'INTERNAL USE ONLY!',
+		'hosted_on' 	=> gethostname() . ":" . $_SERVER['SERVER_PORT']
+		]);
 
 }
 

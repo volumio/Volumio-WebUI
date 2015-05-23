@@ -121,6 +121,7 @@ if (!$mpd) {
 		}
 
 		// JSON response for GUI
+		header('Content-Type: application/json');
 		echo json_encode($status);
 		
 	closeMpdSocket($mpd);

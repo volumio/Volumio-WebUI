@@ -79,7 +79,7 @@ function backendRequest() {
         async : true,
         cache : false,
         success : function(data) {
-			GUI.MpdState = eval('(' + data + ')');
+			GUI.MpdState = data;
             renderUI();
             backendRequest();
         },
@@ -103,7 +103,7 @@ function backendRequestSpop() {
         cache : false,
         success : function(data) {
 			if (data != '') {
-				GUI.SpopState = eval('(' + data + ')');
+				GUI.SpopState = data;
 				renderUI();
 	            backendRequestSpop();
 			} else {
