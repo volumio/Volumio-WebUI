@@ -623,6 +623,14 @@ function countdownRestart(startFrom) {
 // set volume with knob
 function setVolume(val) {
     GUI.volume = val;
+
+	// Push volume updates into the MPD state array, since we opted not to get
+	// volume change updates from MPD daemon
+	if ("volume" in GUI.MpdState) {
+		GUI.MpdState.volume = val;
+
+	}
+
     GUI.halt = 1;
 
     $('#volumemute').removeClass('btn-primary');
