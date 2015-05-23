@@ -18,6 +18,7 @@ if (!$spop) {
 		} 
 
 		// Return data in json format to ajax requester and close socket
+		header('Content-Type: application/json');
 		echo json_encode($status);
 		closeSpopSocket($spop);
 
