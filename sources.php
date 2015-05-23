@@ -190,8 +190,9 @@ if (isset($_GET['p']) && !empty($_GET['p'])) {
 			$_rsize = $mount['rsize'];
 			$_wsize = $mount['wsize'];
 			// mount type select
-			$_source_select['type'] .= "<option value=\"cifs\" ".(($mount['type'] == 'cifs') ? "selected" : "")." >SMB/CIFS</option>\n";	
-			$_source_select['type'] .= "<option value=\"nfs\" ".(($mount['type'] == 'nfs') ? "selected" : "")." >NFS</option>\n";	
+			$_source_select['type'] .= "<option value=\"cifs\" " .(($mount['type'] == 'cifs')  ? "selected" : "")." >SMB/CIFS</option>\n";	
+			$_source_select['type'] .= "<option value=\"sshfs\" ".(($mount['type'] == 'sshfs') ? "selected" : "")." >SSHFS</option>\n";	
+			$_source_select['type'] .= "<option value=\"nfs\" "  .(($mount['type'] == 'nfs')   ? "selected" : "")." >NFS</option>\n";	
 			$_charset = $mount['charset'];
 			$_options = $mount['options'];
 			$_error = $mount['error'];
@@ -208,6 +209,7 @@ if (isset($_GET['p']) && !empty($_GET['p'])) {
 	$_hideerror = 'hide';
 	$_action = 'add';
 	$_source_select['type'] .= "<option value=\"cifs\">SMB/CIFS</option>\n";	
+	$_source_select['type'] .= "<option value=\"sshfs\">SSHFS</option>\n";	
 	$_source_select['type'] .= "<option value=\"nfs\">NFS</option>\n";	
 	}
 	$tpl = 'source.html';

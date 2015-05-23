@@ -1365,14 +1365,22 @@ function wrk_sourcemount($db,$action,$id) {
 			$mp = cfgdb_read('cfg_source',$dbh,'',$id);
 			sysCmd("mkdir \"/mnt/NAS/".$mp[0]['name']."\"");
 			if ($mp[0]['type'] == 'cifs') {
-			// smb/cifs mount
-			if (empty($mp[0]['username'])) {
-			$mp[0]['username'] = 'guest';
-			}
-			$mountstr = "mount -t cifs \"//".$mp[0]['address']."/".$mp[0]['remotedir']."\" -o username=".$mp[0]['username'].",password=".$mp[0]['password'].",rsize=".$mp[0]['rsize'].",wsize=".$mp[0]['wsize'].",iocharset=".$mp[0]['charset'].",".$mp[0]['options']." \"/mnt/NAS/".$mp[0]['name']."\"";
+				// smb/cifs mount
+				if (empty($mp[0]['username'])) {
+					$mp[0]['username'] = 'guest';
+				}
+				$mountstr = "mount -t cifs \"//".$mp[0]['address']."/".$mp[0]['remotedir']."\" -o username=".$mp[0]['username'].",password=".$mp[0]['password'].",rsize=".$mp[0]['rsize'].",wsize=".$mp[0]['wsize'].",iocharset=".$mp[0]['charset'].",".$mp[0]['options']." \"/mnt/NAS/".$mp[0]['name']."\"";
+			} elseif ($mp[0]['type'] == 'sshfs') {
+				// sshfs mount
+				// TODO document (ignores password, passwordless key required)
+				// TODO document remotedir probably needs to be absolute
+				// TODO support options
+				$options = " -ouid=`id -u` -ogid=`id -g` "; // so the mount shows up as a local rather than remote user
+				$options .= " -oallow_other "; // so the "pi" user can access files
+				$mountstr = "sshfs {$mp[0]['username']}@{$mp[0]['address']}:{$mp[0]['remotedir']} $options \"/mnt/NAS/{$mp[0]['name']}\"";
 			} else {
-			// nfs mount
-			$mountstr = "mount -t nfs -o ".$mp[0]['options']." \"".$mp[0]['address'].":/".$mp[0]['remotedir']."\" \"/mnt/NAS/".$mp[0]['name']."\"";
+				// nfs mount
+				$mountstr = "mount -t nfs -o ".$mp[0]['options']." \"".$mp[0]['address'].":/".$mp[0]['remotedir']."\" \"/mnt/NAS/".$mp[0]['name']."\"";
 			}
 			// debug
 			error_log(">>>>> mount string >>>>> ".$mountstr,0);
@@ -1415,10 +1423,16 @@ unset($queueargs['mount']['action']);
 		case 'reset': 
 		$dbh = cfgdb_connect($db);
 		$source = cfgdb_read('cfg_source',$dbh);
-			foreach ($source as $mp) {
-			sysCmd("umount -f \"/mnt/NAS/".$mp['name']."\"");
-			sysCmd("rmdir \"/mnt/NAS/".$mp['name']."\"");
+		foreach ($source as $mp) {
+			if ($mp['name'] == 'sshfs') {
+				// unmount FUSE file systems properly
+				sysCmd("fusermount -u \"/mnt/NAS/{$mp['name']}\"");
+			} else {
+				// normal file systems
+				sysCmd("umount -f \"/mnt/NAS/".$mp['name']."\"");
 			}
+			sysCmd("rmdir \"/mnt/NAS/".$mp['name']."\"");
+		}
 		if (cfgdb_delete('cfg_source',$dbh)) {
 		$return = 1;
 		} else {
