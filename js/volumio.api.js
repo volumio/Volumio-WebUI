@@ -156,30 +156,33 @@ function renderUI() {
 
 }
 
+// Non-caching version of getPlaylist
 function getPlaylist(json){
-    $.getJSON('db/?cmd=playlist', function(data) {
-        // We wait for playlist to be loaded before loading the library, which is much more time-consumming
-        loadLibraryIfNeeded();
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: 'db/?cmd=playlist',
+        cache: false,
+        async: true,
 
-        // Read received data for playlist
-        var i = 0;
-        var content = '';
-        var output = '';
-        if (data) {
-            for (i = 0; i < data.length; i++){
+        success: function (data) {
+            var i = 0;
+            var content = '';
+            var output = '';
+            for (i = 0; i < data.length; i++) {
                 if (json['state'] != 'stop' && i == parseInt(json['song'])) {
                     content = '<li id="pl-' + (i + 1) + '" class="active clearfix">';
                 } else {
                     content = '<li id="pl-' + (i + 1) + '" class="clearfix">';
                 }
-                content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="fa fa-remove"></i></a></div>';
+                content += '<div class="pl-action"><a class="btn" href="#notarget" title="Remove song from playlist"><i class="icon-remove-sign"></i></a></div>';
                 if (typeof data[i].Title != 'undefined') {
                     content += '<div class="pl-entry">';
                     content += data[i].Title + ' <em class="songtime">' + timeConvert(data[i].Time) + '</em>';
                     content += ' <span>';
-                    content +=  data[i].Artist;
+                    content += data[i].Artist;
                     content += ' - ';
-                    content +=  data[i].Album;
+                    content += data[i].Album;
                     content += '</span></div></li>';
                     output = output + content;
                 } else {
@@ -193,8 +196,12 @@ function getPlaylist(json){
                     output = output + content;
                 }
             }
+            $('ul.playlist').html(output);
+            var current = parseInt(json['song']);
+            if (current != json && GUI.halt != 1) {
+                customScroll('pl', current, 200); // active current song
+            }
         }
-        $('ul.playlist').html(output);
     });
 }
 
