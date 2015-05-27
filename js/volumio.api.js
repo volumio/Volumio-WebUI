@@ -81,6 +81,7 @@ function backendRequest() {
         success : function(data) {
 			GUI.MpdState = data;
             renderUI();
+			$('#loader').hide();
             backendRequest();
         },
         error : function() {
@@ -90,7 +91,7 @@ function backendRequest() {
                 $('#countdown-display').countdown('pause');
                 window.clearInterval(GUI.currentKnob);
                 backendRequest();
-            }, 5000);
+            }, 2000);
         }
     });
 }
@@ -472,20 +473,14 @@ function populateDB(data, path, uplevel, keyword){
 function updateGUI(objectInputState){
     // check MPD status
     if (objectInputState['state'] == 'play') {
-        $('#play').addClass('btn-primary');
-        $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
-        $('#stop').removeClass('btn-primary');
+        $('#play i').removeClass('fa fa-play').addClass('fa fa-pause');
 
     } else if (objectInputState['state'] == 'pause') {
         $('#playlist-position').html('Not playing');
-        $('#play').addClass('btn-primary');
-        $('#play i').removeClass('fa fa-play').addClass('fa fa-pause');
-        $('#stop').removeClass('btn-primary');
+        $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
 
     } else if (objectInputState['state'] == 'stop') {
-        $('#play').removeClass('btn-primary');
         $('#play i').removeClass('fa fa-pause').addClass('fa fa-play');
-        $('#stop').addClass('btn-primary');
         $('#countdown-display').countdown('destroy');
         $('#elapsed').html('00:00');
         $('#total').html('');

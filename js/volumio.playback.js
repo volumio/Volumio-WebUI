@@ -48,26 +48,10 @@ jQuery(document).ready(function($){ 'use strict';
     // BUTTONS
     // ----------------------------------------------------------------------------------------------------
     // playback
-    $("#play").mouseenter(function() {
-        if (GUI.state == "play") {
-            $("#play i").removeClass("fa fa-play").addClass("fa fa-pause");
-        } else if (GUI.state == "pause") {
-            $("#play i").removeClass("fa fa-pause").addClass("fa fa-play");
-        }
-    }).mouseleave(function() {
-        if (GUI.state == "play") {
-            $("#play i").removeClass("fa fa-pause").addClass("fa fa-play");
-        } else if (GUI.state == "pause") {
-            $("#play i").removeClass("fa fa-play").addClass("fa fa-pause");
-        }
-    });
-
     $('.btn-cmd').click(function(){
         var cmd;
         // stop
         if ($(this).attr('id') == 'stop') {
-            $(this).addClass('btn-primary');
-            $('#play').removeClass('btn-primary');
             refreshTimer(0, 0, 'stop')
 			window.clearInterval(GUI.currentKnob);
             $('.playlist li').removeClass('active');
@@ -445,7 +429,7 @@ jQuery(document).ready(function($){ 'use strict';
         if ($(this).data('cmd') == 'addreplaceplay') {
             getDB('addreplaceplay', path);
             notify('addreplaceplay', path);
-            if (!path.contains("/")) {
+            if (path.indexOf("/") == -1) {
 	            $("#pl-saveName").val(path);
             } else {
 	            $("#pl-saveName").val("");
