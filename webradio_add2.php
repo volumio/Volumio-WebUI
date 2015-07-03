@@ -20,6 +20,23 @@ playerSession('open',$db,'','');
 if (isset($_POST['syscmd'])){
 	switch ($_POST['syscmd']) {
 	
+	case 'jpgexist':
+	    $filename=$_POST['filename'];
+		 if(file_exists("/var/lib/mpd/music/$filename") )
+		{
+           echo "yes";
+        }
+		else{
+		echo "no";
+		}
+	break;
+	
+	case 'jpg':
+	    $filename=$_POST['filename'];
+		DownloadFile("/var/lib/mpd/music/$filename");
+		
+	break;
+	
 	
 	
 	case 'add':
@@ -161,5 +178,21 @@ function deleteDirectory($dirPath) {
     
 }
 
+
+function DownloadFile($file) { // $file = include path 
+        if(file_exists($file)) {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+            header('Content-Length: ' . filesize($file));
+            ob_clean();
+            flush();
+            readfile($file);
+            exit;
+        }
+
+    }
 
 ?>

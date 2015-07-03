@@ -80,11 +80,11 @@ $dbh  = cfgdb_connect($db);
 
         // format new config string for eth0
         if ($_POST['eth0']['dhcp'] == 'true' ) {
-        $eth0 = "\nauto eth0\niface eth0 inet dhcp\n";
+        $eth0 = "\nauto eth0\nallow-hotplug eth0\niface eth0 inet dhcp\n";
         }    
         
         else {
-        $eth0 = "\nauto eth0\niface eth0 inet static\n";
+        $eth0 = "\nauto eth0\nallow-hotplug eth0\niface eth0 inet static\n";
         $eth0 .= "address ".$_POST['eth0']['ip']."\n";
         $eth0 .= "netmask ".$_POST['eth0']['netmask']."\n";
         $eth0 .= "gateway ".$_POST['eth0']['gw']."\n";
@@ -103,7 +103,7 @@ $dbh  = cfgdb_connect($db);
     }//if etho dhcp is set
 
     // wlan0
-    if (isset($_POST['wifisec']['ssid']) && !empty($_POST['wifisec']['ssid']) && $_POST['wifisec']['password'] && !empty($_POST['wifisec']['password'])) 
+    if (isset($_POST['wifisec']['ssid']) && !empty($_POST['wifisec']['ssid']) && isset($_POST['wifisec']['password']) && !empty($_POST['wifisec']['password'])) 
     {
    
     $value = array('ssid' => $_POST['wifisec']['ssid'], 'encryption' => $_POST['wifisec']['encryption'], 'password' => $_POST['wifisec']['password']);
@@ -162,12 +162,12 @@ $dbh  = cfgdb_connect($db);
        // format new config string for eth0
         if ($_POST['eth0']['dhcp'] == 'true' ) {
         	
-        $eth0 = "\nauto eth0\niface eth0 inet dhcp\n";
+        $eth0 = "\nauto eth0\nallow-hotplug eth0\niface eth0 inet dhcp\n";
         }    
         
         else {
         	
-        $eth0 = "\nauto eth0\niface eth0 inet static\n";
+        $eth0 = "\nauto eth0\nallow-hotplug eth0\niface eth0 inet static\n";
         $eth0 .= "address ".$_POST['eth0']['ip']."\n";
         $eth0 .= "netmask ".$_POST['eth0']['netmask']."\n";
         $eth0 .= "gateway ".$_POST['eth0']['gw']."\n";
@@ -227,47 +227,8 @@ $dbh = null;
 }
 
 // wait for worker output if $_SESSION['w_active'] = 1
-waitWorker(1);
-// check integrity of /etc/network/interfaces
-if(!hashCFG('check_net',$db)) {
-$_netconf = file_get_contents('/etc/network/interfaces');
-// set manual config template
-$tpl = "net-config-manual.html";
-} else {
-$dbh = cfgdb_connect($db);
-$net = cfgdb_read('cfg_lan',$dbh);
-$wifisec = cfgdb_read('cfg_wifisec',$dbh);
-$dbh = null;
+//waitWorker(1);
 
-    // eth0
-    if (isset($_SESSION['netconf']['eth0']) && !empty($_SESSION['netconf']['eth0'])) {
-    $_eth0 .= "<div class=\"alert alert-info\">\n";
-    $_eth0 .= " IP address: ".$_SESSION['netconf']['eth0']['ip']."\n";
-    $_eth0 .= "</div>\n";
-    $_int0name .= $net[0]['name'];
-    $_int0dhcp .= "<option value=\"true\" ".((isset($net[0]['dhcp']) && $net[0]['dhcp']=="true") ? "selected" : "")." >enabled (Auto)</option>\n";
-    $_int0dhcp .= "<option value=\"false\" ".((isset($net[0]['dhcp']) && $net[0]['dhcp']=="false") ? "selected" : "")." >disabled (Static)</option>\n";
-    $_int0 = $net[0];
-    }
-
-    // wlan0
-    if (isset($_SESSION['netconf']['wlan0']['ip']) && !empty($_SESSION['netconf']['wlan0']['ip'])) {
-    $_wlan0 .= "<legend>Interface ".$net[1]['name']."</legend>\n";
-    $_wlan0 .= "<div class=\"alert alert-info\">\n";
-    $_wlan0 .= $net[1]['name']." IP address: ".$_SESSION['netconf']['wlan0']['ip']."\n";
-    $_wlan0 .= "</div>\n";
-    $_wlan0ssid = $wifisec[0]['ssid'];
-
-    $_wlan0security .= "<option value=\"none\"".(($wifisec[0]['security'] == 'none') ? "selected" : "").">No security</option>\n";
-    $_wlan0security .= "<option value=\"wep\"".(($wifisec[0]['security'] == 'wep') ? "selected" : "").">WEP</option>\n";
-    $_wlan0security .= "<option value=\"wpa\"".(($wifisec[0]['security'] == 'wpa') ? "selected" : "").">WPA/WPA2 - Personal</option>\n";
-
-    } else {
-    $_wlan0hide = "class=\"hide\"";
-    }
-
-$tpl = "net-config.html";
-}
 // unlock session files
 playerSession('unlock',$db,'','');
 ?>
