@@ -1536,6 +1536,11 @@ $file = '/proc/cpuinfo';
 					$arch = '08';
 					break;
 					
+					// Odroid C1
+					case 'ODROIDC':
+					$arch = '09';
+					break;
+					
 					default:
 					$arch = '--';
 					break;
@@ -1592,6 +1597,11 @@ playerSession('write',$db,'playerid',$playerid);
 		
 		case '08':
 		playerSession('write',$db,'hwplatform','RaspberryPi2');
+		playerSession('write',$db,'hwplatformid',$arch);
+		break;
+		
+		case '09':
+		playerSession('write',$db,'hwplatform','Odroid-C1');
 		playerSession('write',$db,'hwplatformid',$arch);
 		break;
 		
