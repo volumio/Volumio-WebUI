@@ -32,7 +32,7 @@ jQuery(document).ready(function($){ 'use strict';
     // INITIALIZATION
     // ----------------------------------------------------------------------------------------------------
     // first connection with MPD and SPOP daemons
-    backendRequest();
+    backendRequest(true);
 	backendRequestSpop();
 
     // first GUI update

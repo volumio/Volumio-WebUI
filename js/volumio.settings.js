@@ -22,14 +22,14 @@
  *  - v1, 1.1: Simone De Gregori (aka Orion)
  *  - v2: Michelangelo Guarise
  *  - v2: Joel Takvorian
- * 
+ *
  *  file:                    volumio.settings.js
  *  version:                 2
  */
 
 jQuery(document).ready(function($){ 'use strict';
 
-    backendRequest();
+    backendRequest(true);
 
     if (GUI.state != 'disconnected') {
         $('#loader').hide();

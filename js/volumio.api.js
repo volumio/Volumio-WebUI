@@ -72,17 +72,18 @@ function sendPLCmd(inputcmd) {
     });
 }
 
-function backendRequest() {
+function backendRequest(send_state) {
+    url = send_state ? ('_player_engine.php?state=' + GUI.MpdState['state']) : '_player_engine.php'
     $.ajax({
         type : 'GET',
-        url : '_player_engine.php?state=' + GUI.MpdState['state'],
+        url : url,
         async : true,
         cache : false,
         success : function(data) {
-			GUI.MpdState = data;
+            GUI.MpdState = data;
             renderUI();
-			$('#loader').hide();
-            backendRequest();
+            $('#loader').hide();
+            backendRequest(true);
         },
         error : function() {
             setTimeout(function() {
@@ -90,7 +91,7 @@ function backendRequest() {
                 $('#loader').show();
                 $('#countdown-display').countdown('pause');
                 window.clearInterval(GUI.currentKnob);
-                backendRequest();
+                backendRequest(false);
             }, 2000);
         }
     });
