@@ -348,6 +348,21 @@ jQuery(document).ready(function($){ 'use strict';
         }
         getDB('filepath', path, GUI.browsemode, 1);
     });
+	
+	//handle back button press
+	window.addEventListener('popstate', function(event) {
+		--GUI.currentDBpos[10];
+        var path = GUI.currentpath;
+        var cutpos=path.lastIndexOf("/");
+        if (cutpos !=-1) {
+            var path = path.slice(0,cutpos);
+        }  else {
+            path = '';
+        }
+        getDB('filepath', path, GUI.browsemode, 1);
+		
+		history.pushState(null, null, window.location.pathname);
+	}, false);
 
     // click on database entry
     $('.database').on('click', '.db-browse', function() {
