@@ -37,6 +37,7 @@ jQuery(document).ready(function($){ 'use strict';
 
     // first GUI update
     updateGUI(GUI.MpdState);
+    GUI.currentpath = "/";
     getDB('filepath', GUI.currentpath, 'file');
     $.pnotify.defaults.history = false;
 
@@ -341,10 +342,10 @@ jQuery(document).ready(function($){ 'use strict';
         --GUI.currentDBpos[10];
         var path = GUI.currentpath;
         var cutpos=path.lastIndexOf("/");
-        if (cutpos !=-1) {
+        if (cutpos >0) {
             var path = path.slice(0,cutpos);
         }  else {
-            path = '';
+            path = '/';
         }
         getDB('filepath', path, GUI.browsemode, 1);
     });
@@ -444,7 +445,7 @@ jQuery(document).ready(function($){ 'use strict';
         if ($(this).data('cmd') == 'addreplaceplay') {
             getDB('addreplaceplay', path);
             notify('addreplaceplay', path);
-            if (path.indexOf("/") == -1) {
+            if (path.indexOf("/") <0) {
 	            $("#pl-saveName").val(path);
             } else {
 	            $("#pl-saveName").val("");

@@ -406,7 +406,7 @@ function remTrackQueue($sock,$songpos) {
 function addQueue($sock,$path) {
 	$fileext = parseFileStr($path,'.');
 
-	if ($fileext == 'm3u' OR $fileext == 'pls' OR strpos($path, '/') === false) {
+	if ($fileext == 'm3u' OR  $fileext == 'cue' OR $fileext == 'pls' OR strpos($path, '/') === false) {
 		sendMpdCommand($sock,"load \"".html_entity_decode($path)."\"");
 	} else {
 		sendMpdCommand($sock,"add \"".html_entity_decode($path)."\"");
